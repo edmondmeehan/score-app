@@ -1,0 +1,73 @@
+import Link from 'next/link';
+import { Gauge, Logo } from '@/components/ui';
+import { BANDS, type Band } from '@/lib/types';
+import WaitlistForm from './WaitlistForm';
+
+export default function Landing() {
+  return (
+    <div>
+      <header className="page row" style={{ justifyContent: 'space-between', padding: '24px', flexWrap: 'wrap' }}>
+        <Logo />
+        <nav className="row" style={{ gap: 20, flexWrap: 'wrap' }}>
+          <a href="#how" style={{ color: 'var(--muted)', textDecoration: 'none' }}>How it works</a>
+          <Link href="/signin" style={{ color: 'var(--muted)', textDecoration: 'none' }}>Sign in</Link>
+          <a href="#invite" className="btn sm">Request an invite</a>
+        </nav>
+      </header>
+
+      <section className="page" style={{ padding: '64px 24px 88px', display: 'flex', flexWrap: 'wrap', gap: 48, alignItems: 'center' }}>
+        <div className="stack" style={{ flex: '1 1 480px', gap: 26 }}>
+          <span className="eyebrow">Invite only · New York</span>
+          <h1 className="serif" style={{ fontSize: 'clamp(48px, 8vw, 88px)', lineHeight: 0.98 }}>Date someone who has their act together.</h1>
+          <p style={{ fontSize: 19, lineHeight: 1.55, color: 'var(--muted)', maxWidth: 520, margin: 0 }}>Score is the dating app where every member has verified their credit and their identity. Every band is welcome. Honesty about money is required.</p>
+          <div className="row" style={{ flexWrap: 'wrap' }}>
+            <a href="#invite" className="btn">Request an invite</a>
+            <Link href="/join" className="btn ghost">I have an invite code</Link>
+          </div>
+        </div>
+        <div style={{ flex: '1 1 320px', display: 'flex', justifyContent: 'center' }}>
+          <Gauge size={280} label="Score gauge" />
+        </div>
+      </section>
+
+      <section style={{ borderTop: '1px solid #1F1F22', borderBottom: '1px solid #1F1F22' }}>
+        <div className="page" style={{ padding: '36px 24px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 28 }}>
+          {[
+            ['Couples with similar credit scores are more likely to stay together.', 'Federal Reserve Board research'],
+            ['Soft pull only. Your score is never affected.', 'About 60 seconds'],
+            ['ID and selfie checked. No fake profiles.', 'Images stay with our verification partner'],
+          ].map(([a, b]) => (
+            <div key={a} className="stack" style={{ gap: 6 }}><span className="serif" style={{ fontSize: 24, lineHeight: 1.2 }}>{a}</span><span className="small muted">{b}</span></div>
+          ))}
+        </div>
+      </section>
+
+      <section id="how" className="page" style={{ padding: '96px 24px 64px' }}>
+        <h2 className="serif" style={{ fontSize: 52, marginBottom: 32 }}>Four bands. All welcome.</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+          {(Object.keys(BANDS) as Band[]).map((k) => (
+            <div key={k} className="card" style={{ borderColor: BANDS[k].color }}>
+              <Gauge fill={BANDS[k].fill} color={BANDS[k].color} size={52} dot={false} />
+              <div className="serif" style={{ fontSize: 38, color: BANDS[k].color }}>{BANDS[k].label}</div>
+              <div className="mono small muted">{BANDS[k].range}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section id="invite" style={{ background: 'var(--graphite)', borderTop: '1px solid var(--line-soft)' }}>
+        <div className="page" style={{ padding: '88px 24px', display: 'flex', flexWrap: 'wrap', gap: 48 }}>
+          <div className="stack" style={{ flex: '1 1 360px' }}>
+            <h2 className="serif" style={{ fontSize: 52, lineHeight: 1.02 }}>Request an invite</h2>
+            <p className="muted" style={{ fontSize: 17, lineHeight: 1.6, margin: 0 }}>New York opens first, in drops every two weeks.</p>
+          </div>
+          <div style={{ flex: '1 1 440px' }}><WaitlistForm /></div>
+        </div>
+      </section>
+      <footer className="page row small muted" style={{ justifyContent: 'space-between', padding: '32px 24px', flexWrap: 'wrap' }}>
+        <span className="mono" style={{ letterSpacing: '.32em' }}>SCORE</span>
+        <span className="row" style={{ gap: 20 }}><Link href="/legal/privacy" style={{ color: 'var(--faint)' }}>Privacy</Link><Link href="/legal/terms" style={{ color: 'var(--faint)' }}>Terms</Link><Link href="/legal/biometric" style={{ color: 'var(--faint)' }}>Biometric policy</Link></span>
+      </footer>
+    </div>
+  );
+}
