@@ -48,7 +48,10 @@ export async function startIdentity(form: FormData) {
     if (error) redirect('/onboarding/identity?error=' + encodeURIComponent(error.message));
     redirect('/onboarding');
   }
-  const inq = await startInquiry(user.id);
+  let inq: { id: string; url: string } | null = null;
+  try { inq = await startInquiry(user.id); }
+  catch (e) { console.error('[persona] start failed:', (e as Error).message); }
+  if (!inq) redirect('/onboarding/identity?error=' + encodeURIComponent('We couldn’t start the ID check right now. Please try again in a few minutes. Our team has been notified.'));
   await supabase.rpc('start_id_verification', { p_provider: 'persona', p_ref: inq.id });
   redirect(inq.url);
 }
