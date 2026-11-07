@@ -26,7 +26,7 @@ export default function Landing() {
             <Link href="/join" className="btn ghost">I have an invite code</Link>
           </div>
         </div>
-        <div style={{ flex: '1 1 320px', display: 'flex', justifyContent: 'center' }}>
+        <div className="hero-glow" style={{ flex: '1 1 320px', display: 'flex', justifyContent: 'center', isolation: 'isolate' }}>
           <Gauge size={280} label="Score gauge" />
         </div>
       </section>
@@ -47,7 +47,7 @@ export default function Landing() {
         <h2 className="serif" style={{ fontSize: 52, marginBottom: 32 }}>Four bands. All welcome.</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
           {(Object.keys(BANDS) as Band[]).map((k) => (
-            <div key={k} className="card" style={{ borderColor: BANDS[k].color }}>
+            <div key={k} className="card band-card" style={{ ['--bc' as string]: BANDS[k].color }}>
               <Gauge fill={BANDS[k].fill} color={BANDS[k].color} size={52} dot={false} />
               <div className="serif" style={{ fontSize: 38, color: BANDS[k].color }}>{BANDS[k].label}</div>
               <div className="mono small muted">{BANDS[k].range}</div>

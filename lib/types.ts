@@ -34,10 +34,10 @@ export type Profile = {
 };
 
 export const BANDS: Record<Band, { label: string; range: string; color: string; fill: number }> = {
-  elite: { label: 'Elite', range: '800+', color: '#E8E8EC', fill: 0.95 },
-  strong: { label: 'Strong', range: '740–799', color: '#D4B46A', fill: 0.8 },
-  solid: { label: 'Solid', range: '670–739', color: '#C4C5CA', fill: 0.6 },
-  building: { label: 'Building', range: 'Under 670', color: '#C98E62', fill: 0.35 },
+  elite: { label: 'Elite', range: '800+', color: 'var(--band-elite)', fill: 0.95 },
+  strong: { label: 'Strong', range: '740–799', color: 'var(--band-strong)', fill: 0.8 },
+  solid: { label: 'Solid', range: '670–739', color: 'var(--band-solid)', fill: 0.6 },
+  building: { label: 'Building', range: 'Under 670', color: 'var(--band-building)', fill: 0.35 },
 };
 
 export const MONEY_QUESTIONS: { id: string; q: string; options: string[] }[] = [

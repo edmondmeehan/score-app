@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { getMe } from '@/lib/session';
 import { BandPill } from '@/components/ui';
 import ThemeSwitch from '@/components/ThemeSwitch';
+import AppFooter from '@/components/AppFooter';
 import { signOut } from '../../signin/actions';
 import { deleteAccount, setStatus } from '../actions';
 import { saveEmailPrefs, saveMapPrivacy } from '../features';
@@ -75,6 +76,7 @@ export default async function Settings({ searchParams }: { searchParams: Promise
         <label className="field">Type DELETE to confirm<input className="input" name="confirm" autoComplete="off" /></label>
         <button className="btn danger sm">Delete my account</button>
       </form>
+      <AppFooter />
     </div>
   );
 }

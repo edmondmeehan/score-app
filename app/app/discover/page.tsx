@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { requireMember } from '@/lib/session';
 import { when, type EventRow } from '@/lib/events';
 import { day, host, type Post, type Story } from '@/lib/content';
+import AppFooter from '@/components/AppFooter';
 
 export const dynamic = 'force-dynamic';
 
@@ -90,6 +91,7 @@ export default async function Discover({ searchParams }: { searchParams: Promise
         )}
         <Link href="/partners" className="small">Own a venue or brand? Partner with Score</Link>
       </Section>
+      <AppFooter />
     </div>
   );
 }
