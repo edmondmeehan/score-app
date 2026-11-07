@@ -17,6 +17,7 @@ export type Profile = {
   song_title: string | null;
   song_artist: string | null;
   song_image: string | null;
+  spotlight_until: string | null;
   money_values: string[];
   band: Band | null;
   trend: 'up' | 'steady' | 'down' | null;

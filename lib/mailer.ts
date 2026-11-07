@@ -3,6 +3,9 @@ import { getIntegration } from '@/lib/integrations';
 import { supabaseAnon } from '@/lib/supabase/server';
 import { build, type TemplateName } from '@/lib/emails';
 
+// Footer links go to the confirmation page; the header points mail apps at the one-click POST endpoint.
+const unsubHeaders = (url?: string) => (url ? { 'List-Unsubscribe': `<${url.replace('/unsubscribe?', '/api/unsubscribe?')}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' } : undefined);
+
 /**
  * Send a Score email through Resend. Never throws: a failed email must not break sign-up,
  * billing or verification. Every attempt is written to email_log for the admin.
@@ -74,7 +77,7 @@ export async function testResend(): Promise<string> {
  * Send one template to many people through Resend's batch endpoint (100 per call).
  * Returns how many were accepted. Each recipient is logged.
  */
-export async function sendBatch<K extends TemplateName>(name: K, items: { to: string; data: Parameters<typeof build<K>>[1] }[]) {
+export async function sendBatch<K extends TemplateName>(name: K, items: { to: string; data: Parameters<typeof build<K>>[1]; unsubUrl?: string }[]) {
   const email = await getIntegration('email');
   const key = email.secrets.resend_api_key || process.env.RESEND_API_KEY;
   const from = email.config.from || process.env.EMAIL_FROM;
@@ -90,9 +93,9 @@ export async function sendBatch<K extends TemplateName>(name: K, items: { to: st
           method: 'POST',
           headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
           body: JSON.stringify(chunk.map((it) => {
-            const m = build(name, it.data);
+            const m = build(name, it.data, { unsubUrl: it.unsubUrl });
             return { from: email.config.from_name ? `${email.config.from_name} <${from}>` : from, to: [it.to], subject: m.subject, html: m.html, text: m.text,
-              reply_to: email.config.reply_to || undefined, tags: [{ name: 'template', value: name }] };
+              reply_to: email.config.reply_to || undefined, tags: [{ name: 'template', value: name }], headers: unsubHeaders(it.unsubUrl) };
           })),
         });
         const body = await res.json().catch(() => ({}));

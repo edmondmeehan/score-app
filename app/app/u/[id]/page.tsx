@@ -5,6 +5,7 @@ import { Gauge, age } from '@/components/ui';
 import { BANDS, type Profile } from '@/lib/types';
 import { photoUrls } from '@/lib/photos';
 import { sayHello } from '../../actions';
+import { sendNote } from '../../features';
 
 export default async function Member({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string }> }) {
   const { id } = await params;
@@ -17,6 +18,12 @@ export default async function Member({ params, searchParams }: { params: Promise
   const { data: social } = await supabase.from('profile_socials').select('instagram').eq('user_id', p.id).maybeSingle();
   const { data: inviter } = p.invited_by ? await supabase.from('profiles').select('first_name').eq('id', p.invited_by).maybeSingle() : { data: null };
   const b = p.band ? BANDS[p.band] : null;
+  const [a2, b2] = [me.id, p.id].sort();
+  const [{ data: existing }, { data: mine }] = await Promise.all([
+    supabase.from('conversations').select('id').eq('user_a', a2).eq('user_b', b2).maybeSingle(),
+    supabase.rpc('my_addons'),
+  ]);
+  const notes: number = mine?.included ? Infinity : (mine?.note ?? 0);
   return (
     <div className="phone" style={{ paddingTop: 0 }}>
       <div className="photo" style={{ margin: '0 -20px', borderRadius: 0, aspectRatio: '4/5' }}>{photos[0] ? <img src={photos[0]} alt={`${p.first_name}`} /> : <span className="serif" style={{ fontSize: 64 }}>{p.first_name?.[0]}</span>}</div>
@@ -50,16 +57,34 @@ export default async function Member({ params, searchParams }: { params: Promise
         </a>
       )}
       {sp.error && <div className="notice error">{sp.error}</div>}
-      <div className="row">
-        {p.id === me.id ? <Link href="/app/profile" className="btn block">Edit profile</Link> : <>
-        <Link href={`/app/report/${p.id}`} className="btn ghost sm">Report</Link>
-        {me.plan === 'preview' ? (
-          <Link href="/plans" className="btn grow">Become a member to say hello</Link>
-        ) : (
-          <form action={sayHello} className="grow"><input type="hidden" name="id" value={p.id} /><button className="btn block">Send a note</button></form>
-        )}
-        </>}
-      </div>
+      {p.id === me.id ? (
+        <Link href="/app/profile" className="btn block">Edit profile</Link>
+      ) : existing ? (
+        <div className="row"><Link href={`/app/report/${p.id}`} className="btn ghost sm">Report</Link><Link href={`/app/messages/${existing.id}`} className="btn grow">Open conversation</Link></div>
+      ) : (
+        <div className="stack">
+          <div className="row">
+            <Link href={`/app/report/${p.id}`} className="btn ghost sm">Report</Link>
+            {me.plan === 'preview' ? (
+              <Link href="/plans" className="btn ghost grow">Become a member to say hello</Link>
+            ) : (
+              <form action={sayHello} className="grow"><input type="hidden" name="id" value={p.id} /><button className="btn block">Say hello</button></form>
+            )}
+          </div>
+          <details className="card" open={me.plan === 'preview'}>
+            <summary style={{ cursor: 'pointer', fontWeight: 600 }}>Send a Note <span className="small muted">· stands out in their inbox{me.plan === 'preview' ? ', works on Preview' : ''}</span></summary>
+            <form action={sendNote} className="stack" style={{ marginTop: 12 }}>
+              <input type="hidden" name="id" value={p.id} />
+              <label className="field">Your note<textarea className="input" name="body" rows={3} maxLength={500} required placeholder={p.prompt_a ? `Say something about “${p.prompt_a.slice(0, 40)}”` : 'Say something specific'} /></label>
+              {notes > 0 ? (
+                <button className="btn block">Send Note{Number.isFinite(notes) ? ` (${notes} left)` : ''}</button>
+              ) : (
+                <Link href="/app/shop" className="btn block">Get Notes · from $1.99</Link>
+              )}
+            </form>
+          </details>
+        </div>
+      )}
     </div>
   );
 }

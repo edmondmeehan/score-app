@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 const tabs = [
   { href: '/app', label: 'Drop', d: 'M12 3v12M6 11l6 6 6-6M5 21h14' },
   { href: '/app/messages', label: 'Messages', d: 'M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z' },
+  { href: '/app/events', label: 'Events', d: 'M4 6h16v15H4zM4 10h16M8 3v5M16 3v5' },
   { href: '/app/invites', label: 'Invites', d: 'M3 8h18v13H3zM3 10l9 6 9-6M8 8V4h8v4' },
   { href: '/app/settings', label: 'You', d: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c1.5-4 4.5-6 8-6s6.5 2 8 6' },
 ];

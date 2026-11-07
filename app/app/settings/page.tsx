@@ -4,12 +4,15 @@ import { getMe } from '@/lib/session';
 import { BandPill } from '@/components/ui';
 import { signOut } from '../../signin/actions';
 import { deleteAccount, setStatus } from '../actions';
+import { saveEmailPrefs } from '../features';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Settings({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string }> }) {
-  const { me } = await getMe();
+  const { me, supabase } = await getMe();
   if (!me) redirect('/signin');
+  const { data: prefRow } = await supabase.from('email_prefs').select('*').eq('user_id', me.id).maybeSingle();
+  const prefs = { daily_drop: true, messages: true, events: true, reminders: true, ...(prefRow || {}) };
   const sp = await searchParams;
   const current = me.status === 'taken' ? 'taken' : me.status === 'paused' ? 'paused' : 'active';
   return (
@@ -18,6 +21,7 @@ export default async function Settings({ searchParams }: { searchParams: Promise
       {me.status === 'suspended' && <div className="notice error">Your account is suspended. Check your email for details and how to appeal.</div>}
       {sp.error && <div className="notice error">{sp.error}</div>}
       {sp.saved && <div className="notice">Saved.</div>}
+      <Link href="/app/shop" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}><span className="grow">Add-ons <span className="small muted">· Spotlight, Extra connections, Notes</span></span><span className="muted">›</span></Link>
 
       {['membership', 'premium', 'black', 'paused'].includes(me.plan) && (
         <form action={setStatus} className="card stack">
@@ -44,6 +48,14 @@ export default async function Settings({ searchParams }: { searchParams: Promise
       <Link href="/signin/new-password?from=settings" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="grow">Set or change password</span><span className="muted">›</span>
       </Link>
+      <form action={saveEmailPrefs} className="card stack" id="email">
+        <span className="label">Email</span>
+        {([['daily_drop', 'Daily Drop', 'When your new matches are ready'], ['messages', 'New messages', 'Only if unread for a bit, never more than every few hours'], ['events', 'Events', 'New member events'], ['reminders', 'Reminders', 'Preview ending and re-verification']] as const).map(([k, l, d]) => (
+          <label key={k} className="choice" style={{ alignItems: 'flex-start' }}><input type="checkbox" name={k} defaultChecked={Boolean(prefs[k])} style={{ accentColor: 'var(--gold)', marginTop: 4, width: 18, height: 18 }} /><span className="stack" style={{ gap: 2 }}><strong>{l}</strong><span className="small muted">{d}</span></span></label>
+        ))}
+        <span className="small muted">Account and security emails (sign-in, password, verification results) always come through.</span>
+        <button className="btn ghost sm">Save email settings</button>
+      </form>
       <form action={signOut}><button className="btn ghost block">Sign out</button></form>
 
       <form action={deleteAccount} className="card stack" style={{ borderColor: '#5A2E2A' }}>

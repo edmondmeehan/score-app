@@ -54,10 +54,12 @@ function blockText(b: Block): string {
   return b.note;
 }
 
-export function render(e: Email): { subject: string; html: string; text: string } {
+export type RenderOpts = { unsubUrl?: string };
+
+export function render(e: Email, opts: RenderOpts = {}): { subject: string; html: string; text: string } {
   const footerLinks =
     e.kind === 'notification'
-      ? `<a href="${SITE_URL}/app/settings" style="color:${C.muted};text-decoration:underline;">Manage email settings</a> · `
+      ? `<a href="${SITE_URL}/app/settings#email" style="color:${C.muted};text-decoration:underline;">Manage email settings</a> · ${opts.unsubUrl ? `<a href="${esc(opts.unsubUrl)}" style="color:${C.muted};text-decoration:underline;">Unsubscribe</a> · ` : ''}`
       : '';
   const html = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark light"><meta name="supported-color-schemes" content="dark light">
@@ -79,7 +81,7 @@ ${footerLinks}<a href="${SITE_URL}/legal/privacy" style="color:${C.muted};text-d
 Score is invite-only dating for people who are honest about money. Exact credit scores are never stored or shown.<br>${esc(POSTAL_ADDRESS)}
 </td></tr></table></td></tr></table></body></html>`;
   const text = [e.eyebrow.toUpperCase(), '', e.heading, '', ...e.blocks.map(blockText).flatMap((t) => [t, '']),
-    '—', e.kind === 'notification' ? `Manage email settings: ${SITE_URL}/app/settings` : '', POSTAL_ADDRESS].filter((l, i, a) => !(l === '' && a[i - 1] === '')).join('\n');
+    '—', e.kind === 'notification' ? `Manage email settings: ${SITE_URL}/app/settings${opts.unsubUrl ? `\nUnsubscribe: ${opts.unsubUrl}` : ''}` : '', POSTAL_ADDRESS].filter((l, i, a) => !(l === '' && a[i - 1] === '')).join('\n');
   return { subject: e.subject, html, text };
 }
 
@@ -269,26 +271,40 @@ export const templates = {
 
   daily_drop: (d: { first_name?: string | null; count: number; top_match?: string | null }) => ({
     subject: `Your Daily Drop: ${d.count} new ${d.count === 1 ? 'person' : 'people'}`,
-    preheader: d.top_match ? `Including ${d.top_match}. Gone at midnight.` : 'Gone at midnight.',
+    preheader: d.top_match ? `Including ${d.top_match}.` : 'Picked for you today.',
     eyebrow: "Today's Drop",
     heading: `${d.count} people, picked for you.`,
     kind: 'notification',
     blocks: [
-      { p: `${hi(d.first_name)} today's Drop is ready${d.top_match ? `, led by ${d.top_match}` : ''}. Each one shares at least three of your money values.` },
+      { p: `${hi(d.first_name)} today's Drop is ready${d.top_match ? `, led by ${d.top_match}` : ''}. Everyone in it is ID-verified and picked for your money values and preferences.` },
       { button: { label: 'Open the Drop', url: `${SITE_URL}/app` } },
-      { note: 'Drops refresh at noon and disappear at midnight.' },
+      { note: 'A new Drop arrives every day around noon.' },
     ],
   }) satisfies Email,
 
-  new_message: (d: { first_name?: string | null; from_name: string; conversation_id: string }) => ({
-    subject: `${d.from_name} sent you a message`,
+  new_message: (d: { first_name?: string | null; from_name: string; conversation_id: string; count?: number }) => ({
+    subject: (d.count || 1) > 1 ? `You have ${d.count} new messages on Score` : `${d.from_name} sent you a message`,
     preheader: 'Open Score to read and reply.',
     eyebrow: 'New message',
-    heading: `${d.from_name} said hello.`,
+    heading: (d.count || 1) > 1 ? `${d.count} new messages.` : `${d.from_name} sent you a message.`,
     kind: 'notification',
     blocks: [
-      { p: `${hi(d.first_name)} you have a new message on Score. For privacy, we don't put message text in email.` },
+      { p: (d.count || 1) > 1 ? `${hi(d.first_name)} you have ${d.count} unread messages, the latest from ${d.from_name}. For privacy, we don't put message text in email.` : `${hi(d.first_name)} you have a new message on Score. For privacy, we don't put message text in email.` },
       { button: { label: 'Read and reply', url: `${SITE_URL}/app/messages/${d.conversation_id}` } },
+      { note: 'We send at most one of these every few hours.' },
+    ],
+  }) satisfies Email,
+
+  event_announce: (d: { first_name?: string | null; title: string; when: string; venue: string; event_id: string; black_only?: boolean }) => ({
+    subject: d.black_only ? `Black members first: ${d.title}` : `New Score event: ${d.title}`,
+    preheader: `${d.when} · ${d.venue}`,
+    eyebrow: d.black_only ? 'Black · first access' : 'Member event',
+    heading: d.title,
+    kind: 'notification',
+    blocks: [
+      { facts: [['When', d.when], ['Where', d.venue]] },
+      { p: d.black_only ? `${hi(d.first_name)} you get first access before RSVPs open to all members. Spots are limited.` : `${hi(d.first_name)} a new member event is open for RSVPs. Spots are limited and go to whoever RSVPs first.` },
+      { button: { label: 'See details and RSVP', url: `${SITE_URL}/app/events/${d.event_id}` } },
     ],
   }) satisfies Email,
 
@@ -387,7 +403,8 @@ export const SAMPLES: { [K in TemplateName]: Parameters<(typeof templates)[K]>[0
   id_needs_attention: { first_name: 'Nadia' },
   photos_review: { first_name: 'Nadia', approved: false },
   daily_drop: { first_name: 'Nadia', count: 5, top_match: 'Owen, 33' },
-  new_message: { first_name: 'Nadia', from_name: 'Owen', conversation_id: 'example' },
+  new_message: { first_name: 'Nadia', from_name: 'Owen', conversation_id: 'example', count: 1 },
+  event_announce: { first_name: 'Nadia', title: 'Rooftop supper club', when: 'Thursday, Dec 4 at 7:30 pm', venue: 'Westlight, Williamsburg', event_id: 'example', black_only: false },
   preview_ending: { first_name: 'Nadia', days_left: 3 },
   plan_ended: { first_name: 'Nadia' },
   status_changed: { first_name: 'Nadia', status: 'paused' },
@@ -410,18 +427,19 @@ export const TEMPLATE_INFO: Record<TemplateName, { label: string; when: string; 
   id_approved: { label: 'ID approved', when: 'Persona approves the ID and selfie check', live: true },
   id_needs_attention: { label: 'ID retry', when: 'Persona declines the ID check', live: true },
   photos_review: { label: 'Photo review result', when: 'Staff approves or rejects photos in review', live: true },
-  daily_drop: { label: 'Daily Drop', when: 'Daily at noon (needs scheduled job, not on yet)', live: false },
-  new_message: { label: 'New message', when: 'A message arrives while the member is away (not on yet)', live: false },
-  preview_ending: { label: 'Preview ending', when: '3 days before a Preview ends (needs scheduled job)', live: false },
+  daily_drop: { label: 'Daily Drop', when: 'Daily around noon (automatic)', live: true },
+  new_message: { label: 'New message', when: 'Unread for 10+ min, at most every 3 hours (automatic)', live: true },
+  event_announce: { label: 'Event announcement', when: 'Staff announces an event (Black first during priority window)', live: true },
+  preview_ending: { label: 'Preview ending', when: '3 days before a Preview ends (automatic)', live: true },
   plan_ended: { label: 'Membership ended', when: 'RevenueCat reports the plan expired or was refunded', live: true },
   status_changed: { label: 'Paused / Taken / Back', when: 'A member changes status in settings', live: true },
-  reverify_reminder: { label: 'Re-verify band', when: 'Every 6 months (needs scheduled job)', live: false },
+  reverify_reminder: { label: 'Re-verify band', when: '2 weeks before the 6-month re-check (automatic)', live: true },
   report_received: { label: 'Report received', when: 'A member reports someone', live: true },
   deletion_confirm: { label: 'Account deletion', when: 'A member deletes their account', live: true },
 };
 
-export function build<K extends TemplateName>(name: K, data: Parameters<(typeof templates)[K]>[0]) {
-  return render((templates[name] as (d: typeof data) => Email)(data));
+export function build<K extends TemplateName>(name: K, data: Parameters<(typeof templates)[K]>[0], opts: RenderOpts = {}) {
+  return render((templates[name] as (d: typeof data) => Email)(data), opts);
 }
 
 /** Supabase Auth email templates: what to paste where. */

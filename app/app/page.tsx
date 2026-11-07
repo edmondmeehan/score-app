@@ -3,10 +3,15 @@ import { requireMember } from '@/lib/session';
 import { BandPill, age } from '@/components/ui';
 import { photoUrls } from '@/lib/photos';
 import type { Profile } from '@/lib/types';
+import { checkIn, useExtraDrop, useSpotlight } from './features';
 
 export const dynamic = 'force-dynamic';
 
-export default async function Drop() {
+type Checkin = { plan_id: string; place: string; starts_at: string; conversation_id: string; match: string; other_id: string };
+type Mine = { included: boolean; extra_drop: number; spotlight: number; note: number; spotlight_until: string | null };
+
+export default async function Drop({ searchParams }: { searchParams: Promise<{ ok?: string; error?: string }> }) {
+  const sp = await searchParams;
   const { supabase, me } = await requireMember();
   if (me.status === 'paused' || me.status === 'taken') {
     return (
@@ -17,7 +22,13 @@ export default async function Drop() {
       </div>
     );
   }
-  const { data: drop } = await supabase.rpc('get_drop');
+  const [{ data: drop }, { data: mineData }, { data: checkinData }] = await Promise.all([
+    supabase.rpc('get_drop'), supabase.rpc('my_addons'), supabase.rpc('pending_checkins'),
+  ]);
+  const mine = (mineData as Mine) || { included: false, extra_drop: 0, spotlight: 0, note: 0, spotlight_until: null };
+  const checkins = (checkinData as Checkin[]) || [];
+  const spotlightUntil = mine.spotlight_until ? new Date(mine.spotlight_until) : null;
+  const now = Date.now();
   const ids = (drop || []).map((d: { match_id: string }) => d.match_id);
   const { data: people } = ids.length ? await supabase.from('profiles').select('*').in('id', ids) : { data: [] };
   const byId = Object.fromEntries((people || []).map((p: Profile) => [p.id, p]));
@@ -27,11 +38,31 @@ export default async function Drop() {
   return (
     <div className="phone">
       <div className="row" style={{ justifyContent: 'space-between' }}>
-        <span className="eyebrow">{preview ? 'Preview' : 'Tonight · 7pm'}</span>
+        <span className="eyebrow">{preview ? 'Preview' : 'Today'}</span>
         {preview && daysLeft !== null && <span className="mono small muted">{daysLeft} days left</span>}
       </div>
       <h1 className="serif" style={{ fontSize: 40 }}>{preview ? 'Your 5 matches' : 'Your Daily Drop'}</h1>
-      <span className="muted small">{preview ? 'Look all you want. Members can say hello.' : 'Ranked by money values and preferences'}</span>
+      <span className="muted small">{preview ? 'Look all you want. Members can say hello, or send a Note.' : 'Ranked by money values and preferences'}</span>
+      {sp.ok && <div className="notice">{sp.ok}</div>}
+      {sp.error && <div className="notice error">{sp.error}</div>}
+      {checkins.map((c) => (
+          <div key={c.plan_id} className="card gold stack" style={{ gap: 10 }}>
+            <span className="label">Check in</span>
+            <span className="serif" style={{ fontSize: 24 }}>How was {c.place} with {c.match}?</span>
+            <span className="small muted">Just for you. {c.match} never sees this.</span>
+            <div className="row" style={{ flexWrap: 'wrap', gap: 8 }}>
+              {([['safe', 'All good'], ['not_great', 'Not great'], ['report', 'Something was wrong']] as const).map(([v, l]) => (
+                <form key={v} action={checkIn}><input type="hidden" name="plan_id" value={c.plan_id} /><input type="hidden" name="status" value={v} /><input type="hidden" name="other_id" value={c.other_id} /><button className={v === 'safe' ? 'btn sm' : 'btn ghost sm'}>{l}</button></form>
+              ))}
+            </div>
+            <span className="small muted">In danger right now? Call 911.</span>
+          </div>
+      ))}
+      <div className="row" style={{ gap: 8, flexWrap: 'wrap' }}>
+        <form action={useExtraDrop}><input type="hidden" name="return" value="/app" /><button className="btn ghost sm" disabled={!mine.included && mine.extra_drop < 1} title="Add 5 more people to today's Drop">+5 more today{!mine.included ? ` (${mine.extra_drop})` : ''}</button></form>
+        <form action={useSpotlight}><input type="hidden" name="return" value="/app" /><button className="btn ghost sm" disabled={Boolean(spotlightUntil) || (!mine.included && mine.spotlight < 1)}>{spotlightUntil ? `Spotlight on until ${spotlightUntil.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' })}` : `Spotlight${!mine.included ? ` (${mine.spotlight})` : ''}`}</button></form>
+        <Link href="/app/shop" className="btn ghost sm">Add-ons</Link>
+      </div>
       {(drop || []).length === 0 && (
         <div className="card stack" style={{ textAlign: 'center', padding: 32 }}>
           <span className="serif" style={{ fontSize: 26 }}>That&apos;s everyone for now</span>
@@ -47,7 +78,7 @@ export default async function Drop() {
             <Link key={d.match_id} href={`/app/u/${p.id}`} className="card row" style={{ textDecoration: 'none', color: 'var(--ivory)', padding: 12 }}>
               <div className="photo" style={{ width: 76, flex: 'none' }}>{photos[p.id]?.[0] ? <img src={photos[p.id][0]} alt="" /> : <span className="serif">{p.first_name?.[0]}</span>}</div>
               <div className="stack grow" style={{ gap: 6, minWidth: 0 }}>
-                <span><strong style={{ fontSize: 17 }}>{p.first_name}</strong> <span className="muted">{age(p.birth_year)}</span></span>
+                <span><strong style={{ fontSize: 17 }}>{p.first_name}</strong> <span className="muted">{age(p.birth_year)}</span>{p.spotlight_until && new Date(p.spotlight_until).getTime() > now && <span className="chip" style={{ marginLeft: 8, fontSize: 11, padding: '2px 8px', color: 'var(--gold-light)' }}>Featured</span>}</span>
                 <span className="small muted" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{[p.job, p.neighborhood].filter(Boolean).join(' · ')}</span>
                 <BandPill band={p.band} trend={p.trend} />
               </div>
