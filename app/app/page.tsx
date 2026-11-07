@@ -62,6 +62,7 @@ export default async function Drop({ searchParams }: { searchParams: Promise<{ o
         <form action={useExtraDrop}><input type="hidden" name="return" value="/app" /><button className="btn ghost sm" disabled={!mine.included && mine.extra_drop < 1} title="Add 5 more people to today's Drop">+5 more today{!mine.included ? ` (${mine.extra_drop})` : ''}</button></form>
         <form action={useSpotlight}><input type="hidden" name="return" value="/app" /><button className="btn ghost sm" disabled={Boolean(spotlightUntil) || (!mine.included && mine.spotlight < 1)}>{spotlightUntil ? `Spotlight on until ${spotlightUntil.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' })}` : `Spotlight${!mine.included ? ` (${mine.spotlight})` : ''}`}</button></form>
         <Link href="/app/shop" className="btn ghost sm">Add-ons</Link>
+        <Link href="/app/map" className="btn ghost sm">Map</Link>
       </div>
       {(drop || []).length === 0 && (
         <div className="card stack" style={{ textAlign: 'center', padding: 32 }}>

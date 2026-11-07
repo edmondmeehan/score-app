@@ -4,7 +4,7 @@ import { getMe } from '@/lib/session';
 import { BandPill } from '@/components/ui';
 import { signOut } from '../../signin/actions';
 import { deleteAccount, setStatus } from '../actions';
-import { saveEmailPrefs } from '../features';
+import { saveEmailPrefs, saveMapPrivacy } from '../features';
 
 export const dynamic = 'force-dynamic';
 
@@ -58,6 +58,11 @@ export default async function Settings({ searchParams }: { searchParams: Promise
       </form>
       <form action={signOut}><button className="btn ghost block">Sign out</button></form>
 
+      <form action={saveMapPrivacy} className="card stack" id="privacy">
+        <span className="label">Privacy</span>
+        <label className="choice" style={{ alignItems: 'flex-start' }}><input type="checkbox" name="map_opt_out" defaultChecked={Boolean(me.map_opt_out)} style={{ accentColor: 'var(--gold)', marginTop: 4, width: 18, height: 18 }} /><span className="stack" style={{ gap: 2 }}><strong>Leave me off the member map</strong><span className="small muted">The map only shows neighborhoods with 25+ members, never individuals. Turn this on to be left out of the count entirely.</span></span></label>
+        <button className="btn ghost sm">Save</button>
+      </form>
       <form action={deleteAccount} className="card stack" style={{ borderColor: '#5A2E2A' }}>
         <span className="label" style={{ color: 'var(--alert)' }}>Delete account</span>
         <span className="small muted">Permanently deletes your profile, photos, chats and verification results. Cancel any App Store subscription first so you&apos;re not billed again.</span>

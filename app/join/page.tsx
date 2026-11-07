@@ -2,11 +2,13 @@ import { Logo } from '@/components/ui';
 import { supabaseServer } from '@/lib/supabase/server';
 import { saveInvite } from './actions';
 import QuickWaitlist from './QuickWaitlist';
+import HeatMap, { Legend, type Spot } from '@/components/HeatMap';
 
 export default async function Join({ searchParams }: { searchParams: Promise<{ code?: string; need?: string; error?: string }> }) {
   const sp = await searchParams;
   const supabase = await supabaseServer();
-  const { data: { user } } = await supabase.auth.getUser();
+  const [{ data: { user } }, { data: heat }] = await Promise.all([supabase.auth.getUser(), supabase.rpc('public_area_heat')]);
+  const spots = (heat as Spot[]) || [];
   return (
     <div className="phone" style={{ justifyContent: 'center' }}>
       <Logo />
@@ -21,6 +23,14 @@ export default async function Join({ searchParams }: { searchParams: Promise<{ c
         <button className="btn block">Continue</button>
       </form>
       <QuickWaitlist email={user?.email} />
+      {spots.length > 0 && (
+        <section className="stack" style={{ gap: 10 }}>
+          <span className="label">Where Score is growing</span>
+          <HeatMap spots={spots} height={280} center={[40.85, -73.85]} zoom={9} />
+          <Legend />
+          <span className="small muted">New York City is open now. Other areas open as their waitlists grow. Shown by area only.</span>
+        </section>
+      )}
     </div>
   );
 }

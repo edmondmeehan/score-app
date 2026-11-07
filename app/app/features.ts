@@ -128,3 +128,11 @@ export async function rsvp(form: FormData) {
   revalidatePath('/app/events');
   back(`/app/events/${id}`, 'ok', data === 'going' ? "You're on the list. See you there." : data === 'waitlist' ? "It's full, so you're on the waitlist. We'll move you in if a spot opens." : 'Your RSVP is cancelled.');
 }
+
+// ---------- Map privacy ----------
+export async function saveMapPrivacy(form: FormData) {
+  const { supabase, user } = await ctx();
+  const { error } = await supabase.from('profiles').update({ map_opt_out: form.get('map_opt_out') === 'on' }).eq('id', user.id);
+  if (error) back('/app/settings', 'error', error.message);
+  redirect('/app/settings?saved=privacy#privacy');
+}

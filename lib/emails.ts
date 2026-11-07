@@ -190,14 +190,14 @@ export const templates = {
   }) satisfies Email,
 
   auth_reset: (d: { url: string }) => ({
-    subject: 'Reset your Score sign-in',
+    subject: 'Reset your Score password',
     preheader: 'This link works once and expires in one hour.',
     eyebrow: 'Account recovery',
-    heading: 'Get back in.',
+    heading: 'Reset your password.',
     kind: 'transactional',
     blocks: [
-      { p: 'We got a request to recover your Score account. Tap below to sign in and update your details.' },
-      { button: { label: 'Recover my account', url: d.url } },
+      { p: 'We got a request to reset your Score password. Tap below to choose a new one. This link works once and expires in one hour.' },
+      { button: { label: 'Choose a new password', url: d.url } },
       { note: "Didn't ask for this? You can ignore this email. Your account is unchanged." },
     ],
   }) satisfies Email,
@@ -444,10 +444,11 @@ export function build<K extends TemplateName>(name: K, data: Parameters<(typeof 
 
 /** Supabase Auth email templates: what to paste where. */
 export const SUPABASE_TEMPLATES: Partial<Record<TemplateName, { slot: string; data: Record<string, string> }>> = {
-  auth_confirm: { slot: 'Confirm signup', data: { url: '{{ .ConfirmationURL }}' } },
-  magic_link: { slot: 'Magic Link', data: { url: '{{ .ConfirmationURL }}' } },
-  auth_invite: { slot: 'Invite user', data: { url: '{{ .ConfirmationURL }}' } },
-  auth_email_change: { slot: 'Change Email Address', data: { url: '{{ .ConfirmationURL }}', new_email: '{{ .NewEmail }}' } },
-  auth_reset: { slot: 'Reset Password', data: { url: '{{ .ConfirmationURL }}' } },
+  // Links use the token-hash flow (/auth/confirm) so they work on any device or browser.
+  auth_confirm: { slot: 'Confirm signup', data: { url: '{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup' } },
+  magic_link: { slot: 'Magic Link', data: { url: '{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=magiclink' } },
+  auth_invite: { slot: 'Invite user', data: { url: '{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite' } },
+  auth_email_change: { slot: 'Change Email Address', data: { url: '{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email_change', new_email: '{{ .NewEmail }}' } },
+  auth_reset: { slot: 'Reset Password', data: { url: '{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery' } },
   auth_reauth: { slot: 'Reauthentication', data: { code: '{{ .Token }}' } },
 };

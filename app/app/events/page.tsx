@@ -16,7 +16,7 @@ export default async function Events() {
     <div className="phone">
       <span className="eyebrow">Members only</span>
       <h1 className="serif" style={{ fontSize: 40 }}>Events</h1>
-      <span className="muted small">Small, hosted nights in the city. Black members get first access.</span>
+      <span className="muted small">Small, hosted nights in the city. Black members get first access. <Link href="/app/map">See where members are</Link>.</span>
       {list.length === 0 && (
         <div className="card stack" style={{ textAlign: 'center', padding: 32 }}>
           <span className="serif" style={{ fontSize: 24 }}>Nothing on the calendar yet</span>
