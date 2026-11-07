@@ -6,6 +6,9 @@ import { compareFaces } from '@/lib/facematch';
 import { BIOMETRIC_POLICY_VERSION } from '@/lib/policy';
 import { sendEmail } from '@/lib/mailer';
 import { trackEvent } from '@/lib/track';
+import { cookies } from 'next/headers';
+import { supabaseAnon } from '@/lib/supabase/server';
+import { findUser, pullBand, spinwheelConfigured, startConnect, toE164, verifyCode } from '@/lib/spinwheel';
 
 async function ctx() {
   const supabase = await supabaseServer();
@@ -127,4 +130,44 @@ export async function notifyArea(form: FormData) {
     await trackEvent('notify_outside_nyc', user.id);
   }
   redirect('/onboarding/not-yet?done=1&zip=' + zip);
+}
+
+// ---------- Credit band via Spinwheel ----------
+const SW_COOKIE = 'score_sw';
+const back = (q: string) => redirect('/onboarding/credit?' + q);
+
+async function finishCredit(userId: string, swUserId: string) {
+  let band;
+  try { band = await pullBand(swUserId); } catch (e) { back('step=code&error=' + encodeURIComponent((e as Error).message)); return; }
+  const { error } = await supabaseAnon().rpc('record_credit_result', { p_secret: process.env.SCORE_SERVER_SECRET, p_user: userId, p_band: band, p_trend: 'steady' });
+  (await cookies()).delete(SW_COOKIE);
+  if (error) back('error=' + encodeURIComponent(error.message));
+  redirect('/onboarding/credit?revealed=1');
+}
+
+export async function creditStart(form: FormData) {
+  const { user } = await ctx();
+  if (!spinwheelConfigured()) back('error=' + encodeURIComponent('The credit partner isn’t set up yet.'));
+  if (form.get('consent') !== 'yes') back('error=' + encodeURIComponent('Please agree to the soft credit check to continue.'));
+  const phone = toE164(String(form.get('phone') || ''));
+  const dob = String(form.get('dob') || '');
+  if (!phone) back('error=' + encodeURIComponent('Enter a US mobile number.'));
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dob)) back('error=' + encodeURIComponent('Enter your date of birth.'));
+  let r: { userId: string; connected: boolean };
+  try { r = await startConnect(user.id, phone!, dob); } catch (e) { back('error=' + encodeURIComponent((e as Error).message)); return; }
+  (await cookies()).set(SW_COOKIE, r.userId, { httpOnly: true, secure: true, sameSite: 'lax', maxAge: 15 * 60, path: '/onboarding' });
+  if (r.connected) await finishCredit(user.id, r.userId);
+  back('step=code');
+}
+
+export async function creditVerify(form: FormData) {
+  const { user } = await ctx();
+  const code = String(form.get('code') || '').replace(/\D/g, '');
+  if (code.length !== 6) back('step=code&error=' + encodeURIComponent('Enter the 6-digit code.'));
+  // Only trust the Spinwheel user that belongs to this member.
+  const swUserId = (await cookies()).get(SW_COOKIE)?.value || (await findUser(user.id));
+  const mine = await findUser(user.id);
+  if (!swUserId || (mine && mine !== swUserId)) back('error=' + encodeURIComponent('That session expired. Start again.'));
+  try { await verifyCode(swUserId!, code); } catch (e) { back('step=code&error=' + encodeURIComponent((e as Error).message)); return; }
+  await finishCredit(user.id, swUserId!);
 }
