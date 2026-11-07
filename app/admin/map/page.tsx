@@ -1,6 +1,7 @@
 import { supabaseServer } from '@/lib/supabase/server';
 import { getBasemap } from '@/lib/basemap';
 import HeatMap, { type Spot } from '@/components/HeatMap';
+import { setPublicMapDemo } from './actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,7 +11,8 @@ export default async function AdminMap({ searchParams }: { searchParams: Promise
   const sp = await searchParams;
   const show = sp.show === 'waiting' ? 'waiting' : 'live';
   const supabase = await supabaseServer();
-  const [{ data, error }, { data: min }] = await Promise.all([supabase.rpc('staff_map'), supabase.rpc('map_min')]);
+  const [{ data, error }, { data: min }, { data: demoRow }] = await Promise.all([supabase.rpc('staff_map'), supabase.rpc('map_min'), supabase.from('app_config').select('value').eq('key', 'public_map_demo').maybeSingle()]);
+  const demoOn = demoRow?.value === true;
   const rows = (data as Row[]) || [];
   const spots: Spot[] = rows.filter((r) => r[show] > 0).map((r) => ({
     name: r.name, kind: r.kind, lat: Number(r.lat), lng: Number(r.lng), level: r[show] >= 100 ? 'hot' : r[show] >= 25 ? 'busy' : 'growing',
@@ -26,6 +28,14 @@ export default async function AdminMap({ searchParams }: { searchParams: Promise
           <a href="/admin/map?show=waiting" className={show === 'waiting' ? 'btn sm' : 'btn ghost sm'}>Waitlist</a>
         </div>
       </div>
+      <form action={setPublicMapDemo} className="card row" style={{ justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+        <span className="stack grow" style={{ gap: 2 }}>
+          <strong>Public map: {demoOn ? 'showing sample data' : 'real data only'}</strong>
+          <span className="small muted">{demoOn ? 'The home page map includes test accounts and shows a “Preview · sample data” tag.' : 'Turn on to include test accounts on the home page map while you launch. It is always labeled as sample data.'}</span>
+        </span>
+        <input type="hidden" name="on" value={demoOn ? 'false' : 'true'} />
+        <button className={demoOn ? 'btn ghost sm' : 'btn sm'}>{demoOn ? 'Switch to real data' : 'Show sample data'}</button>
+      </form>
       {error && <div className="notice error">Run migration 0008 in Supabase to turn on the map. ({error.message})</div>}
       <span className="small muted">Staff only: real counts. Members see heat levels only, for groups of {min ?? 25}+, and never gender or plan.</span>
       <div className="row" style={{ gap: 24, flexWrap: 'wrap' }}>
