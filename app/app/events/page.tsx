@@ -16,7 +16,7 @@ export default async function Events() {
     <div className="phone">
       <span className="eyebrow">Members only</span>
       <h1 className="serif" style={{ fontSize: 40 }}>Events</h1>
-      <span className="muted small">Small, hosted nights in the city. Black members get first access. <Link href="/app/map">See where members are</Link>.</span>
+      <span className="muted small">Small, hosted nights in the city. Reserve members get first access. <Link href="/app/map">See where members are</Link>.</span>
       {list.length === 0 && (
         <div className="card stack" style={{ textAlign: 'center', padding: 32 }}>
           <span className="serif" style={{ fontSize: 24 }}>Nothing on the calendar yet</span>
@@ -34,7 +34,7 @@ export default async function Events() {
                 {e.status === 'cancelled' ? <span className="small" style={{ color: '#E58A7A' }}>Cancelled</span>
                   : r === 'going' ? <span className="small" style={{ color: '#7FC29B' }}>Going</span>
                   : r === 'waitlist' ? <span className="small muted">Waitlist</span>
-                  : early ? <span className="chip" style={{ fontSize: 11, padding: '2px 8px' }}>Black first</span> : null}
+                  : early ? <span className="chip" style={{ fontSize: 11, padding: '2px 8px' }}>Reserve first</span> : null}
               </span>
               <span className="serif" style={{ fontSize: 24 }}>{e.title}</span>
               <span className="small muted">{e.venue}{e.price_note ? ` · ${e.price_note}` : ''}</span>

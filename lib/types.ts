@@ -52,5 +52,5 @@ export const MONEY_QUESTIONS: { id: string; q: string; options: string[] }[] = [
 export const PLANS = {
   membership: { name: 'Membership', monthly: '$24.99/mo', annual: '$155.99/yr', perks: 'Messaging, 5 matches a day, 3 invites' },
   premium: { name: 'Premium', monthly: '$49.99/mo', annual: '$349.99/yr', perks: '10 matches a day, see who liked you, band filters' },
-  black: { name: 'Black', monthly: '$149/mo', annual: 'Monthly only', perks: 'Everything in Premium, plus a matchmaker and member events' },
+  black: { name: 'Reserve', monthly: '$149/mo', annual: 'Monthly only', perks: 'Everything in Premium, plus a matchmaker and member events' },
 } as const;

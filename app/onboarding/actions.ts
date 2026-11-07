@@ -107,7 +107,7 @@ export async function choosePlan(form: FormData) {
   const { error } = await supabase.rpc('choose_plan', { p_plan: plan });
   if (error) redirect('/plans?error=' + encodeURIComponent(error.message));
   const { data: me } = await supabase.from('profiles').select('email, first_name').eq('id', user.id).single();
-  const label: Record<string, string> = { membership: 'Membership', premium: 'Premium', black: 'Black', preview: 'Preview', paused: 'Paused' };
+  const label: Record<string, string> = { membership: 'Membership', premium: 'Premium', black: 'Reserve', preview: 'Preview', paused: 'Paused' };
   if (['membership', 'premium', 'black'].includes(plan)) {
     await sendEmail(me?.email || user.email, 'welcome_member', { first_name: me?.first_name, plan: label[plan], drop_size: plan === 'membership' ? 5 : 10 });
   }

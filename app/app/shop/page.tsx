@@ -31,7 +31,7 @@ export default async function Shop({ searchParams }: { searchParams: Promise<{ o
 
       {m.included ? (
         <div className="card gold stack" style={{ gap: 6 }}>
-          <span className="label">Black</span>
+          <span className="label">Reserve</span>
           <span className="serif" style={{ fontSize: 26 }}>Everything here is included.</span>
           <span className="small muted">Use Spotlight, Extra connections and Notes whenever you like.</span>
         </div>

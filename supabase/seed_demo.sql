@@ -5,6 +5,7 @@
 -- Run in Supabase → SQL Editor AFTER you've created your own account (eddie@please.co),
 -- so the Notes and messages land in your inbox. Safe to run once; running again adds nothing.
 -- Test members can sign in with their email and the password: ScoreDemo!2026
+-- Profile photos are AI-generated portraits of people who don't exist.
 
 set search_path = public, extensions;
 
@@ -28,6 +29,58 @@ declare
   bands text[] := array['elite','strong','strong','solid','solid','building'];
   plans text[] := array['membership','membership','membership','premium','premium','black','preview'];
   first text; g text; seek text[]; uid uuid; i int; em text; n_total int := 50;
+  photos text[] := array[
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164452_de1fd0a3-8f88-49a0-b0a7-1f650c2c7ac2.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164550_4122c6f5-5bfd-46ea-8c73-4cef93a7cb73.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164453_f295e751-c1f6-4e5c-bf76-9adf284c5e03.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164452_9203ac74-c1ba-4bd1-b0d4-6a1e09ad1642.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164544_bbb6543d-12b6-4912-abbb-f478cedf2c74.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164455_851b1e6e-7ab3-4062-96c4-d9cd3e028dbe.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164545_27e7d230-c7fe-4536-b287-ee4711ec6f54.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164457_e30b0a25-711f-4f5d-b069-248ec940dd8f.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164456_139717bf-2348-4aaf-b887-a8a2cb9a5b36.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164454_735d9fc2-01c0-40fa-a926-57fe6d954c47.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164551_7f006448-f2f4-4565-b02e-a49329da390e.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164455_0b742fc2-1e3b-46a8-a50b-511f173f094f.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164551_92be5f24-7c9a-4e5b-92d4-aa75976d71cb.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164549_060bd363-41e7-4c9b-9af1-83025b8bfc65.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164553_aa0fb3fe-9780-410d-85e5-9f7948d498ec.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164548_869ab8a0-2bed-4018-826a-abae3e63dae8.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164638_2ad31d12-0763-4374-ac5b-91e2a3834419.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164639_afeb6e1c-9449-4b04-b2d7-ee0c407b0843.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164638_fc1a85e9-7563-4189-80aa-ac6331da04f3.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164638_ba9b396c-a4eb-421f-9cb6-889fbdd06f1f.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164637_38641d57-3be6-44e9-a6c8-e7c601ea0c5c.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164639_8efa40d7-3a7a-4cee-afc6-fdbca165965a.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164638_84b1c189-291f-481b-9274-e5fc3e394cab.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164729_c343d544-5900-4efe-8a4c-4e1192eaa9ac.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164729_7fc5b93d-b929-4129-8507-7751e6db0867.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164727_2ac7d73f-7336-4d54-aa63-74309c1eb00d.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164727_a7a6db3a-80df-4c52-bb62-9b40517483f7.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164728_9fafd0a0-d944-42bf-85e2-9e9b177bc287.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164729_fb72cbf3-2081-47ea-b2c9-451523a15fd6.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164728_cc25c467-c019-4194-9ca4-bd87a302d6a8.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164728_c9533b3f-d744-44bb-afd5-24f8b4826ccc.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164805_83bb8b4a-ec95-48ee-964f-2859787a4bf2.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164804_66376427-678a-4f97-ab9c-257140ded531.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164806_f58b8a5a-a6a1-4137-8e7b-776b56b795ef.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164805_4249059f-dea3-43a2-9252-97d56c9dc784.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164804_f90b03f8-1a75-4e6d-a54c-2801b0002065.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164805_064892c3-34c0-4c28-9781-964c0502ca20.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164806_a0e8ea08-1d73-4147-9a71-fcdb1fc7043c.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164804_73905cb8-ac37-434c-adae-28e56d94af1b.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164842_8df0fa42-5d9f-4269-a76f-80626fa57278.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164844_966fc174-83eb-49d7-970b-6dea77a15a1b.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164843_53e1c435-bad3-4303-82bd-8e8297f0aa76.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164844_36c06796-2212-438f-acfc-19cce90c0284.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164843_f93d3ceb-fb50-4dd3-8d66-c1d12530c314.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164843_ca336e45-e46c-4a5a-8fa7-160b4c665812.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164843_b444ecf7-2d83-4734-b0fb-63f3d8b91101.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164842_0844e8a6-0a08-4ea7-b3d5-839f9e71838d.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164916_bf28b8fa-8f58-4eaa-8e3c-21683571b6a0.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164916_8b26e13f-86e0-455d-8db1-89deaeb4acc8.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164916_e058be96-cc6e-4f66-94b1-228331d49a9b.png'
+  ];
   ids uuid[] := '{}'; conv uuid; a uuid; b uuid; ev1 uuid; ev2 uuid;
 begin
   if exists (select 1 from auth.users u where u.email like '%@seed.scoredate.test') then
@@ -70,6 +123,10 @@ begin
       is_founder = i <= 6,
       created_at = now() - make_interval(days => (random() * 40)::int)
     where id = uid;
+
+    -- AI-generated portrait (not a real person), shown straight from the image CDN.
+    insert into photos(user_id, path, position) values (uid, photos[i], 0);
+    update photos set match_status = 'approved', match_similarity = 99 where user_id = uid;
 
     if i % 3 = 0 then
       insert into profile_socials(user_id, instagram, instagram_public) values (uid, lower(first) || '.nyc' || i, i % 2 = 0);
@@ -156,6 +213,73 @@ begin
 
   -- One open report for the moderation queue.
   insert into reports(reporter_id, reported_id, reason, note) values (ids[2], ids[30], 'Rude or inappropriate', 'Demo report: said something rude after I declined a second date.');
+end $$;
+
+-- Photos for demo members created before photos were added (safe to re-run).
+do $$
+declare photos text[] := array[
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164452_de1fd0a3-8f88-49a0-b0a7-1f650c2c7ac2.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164550_4122c6f5-5bfd-46ea-8c73-4cef93a7cb73.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164453_f295e751-c1f6-4e5c-bf76-9adf284c5e03.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164452_9203ac74-c1ba-4bd1-b0d4-6a1e09ad1642.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164544_bbb6543d-12b6-4912-abbb-f478cedf2c74.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164455_851b1e6e-7ab3-4062-96c4-d9cd3e028dbe.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164545_27e7d230-c7fe-4536-b287-ee4711ec6f54.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164457_e30b0a25-711f-4f5d-b069-248ec940dd8f.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164456_139717bf-2348-4aaf-b887-a8a2cb9a5b36.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164454_735d9fc2-01c0-40fa-a926-57fe6d954c47.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164551_7f006448-f2f4-4565-b02e-a49329da390e.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164455_0b742fc2-1e3b-46a8-a50b-511f173f094f.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164551_92be5f24-7c9a-4e5b-92d4-aa75976d71cb.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164549_060bd363-41e7-4c9b-9af1-83025b8bfc65.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164553_aa0fb3fe-9780-410d-85e5-9f7948d498ec.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164548_869ab8a0-2bed-4018-826a-abae3e63dae8.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164638_2ad31d12-0763-4374-ac5b-91e2a3834419.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164639_afeb6e1c-9449-4b04-b2d7-ee0c407b0843.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164638_fc1a85e9-7563-4189-80aa-ac6331da04f3.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164638_ba9b396c-a4eb-421f-9cb6-889fbdd06f1f.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164637_38641d57-3be6-44e9-a6c8-e7c601ea0c5c.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164639_8efa40d7-3a7a-4cee-afc6-fdbca165965a.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164638_84b1c189-291f-481b-9274-e5fc3e394cab.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164729_c343d544-5900-4efe-8a4c-4e1192eaa9ac.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164729_7fc5b93d-b929-4129-8507-7751e6db0867.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164727_2ac7d73f-7336-4d54-aa63-74309c1eb00d.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164727_a7a6db3a-80df-4c52-bb62-9b40517483f7.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164728_9fafd0a0-d944-42bf-85e2-9e9b177bc287.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164729_fb72cbf3-2081-47ea-b2c9-451523a15fd6.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164728_cc25c467-c019-4194-9ca4-bd87a302d6a8.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164728_c9533b3f-d744-44bb-afd5-24f8b4826ccc.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164805_83bb8b4a-ec95-48ee-964f-2859787a4bf2.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164804_66376427-678a-4f97-ab9c-257140ded531.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164806_f58b8a5a-a6a1-4137-8e7b-776b56b795ef.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164805_4249059f-dea3-43a2-9252-97d56c9dc784.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164804_f90b03f8-1a75-4e6d-a54c-2801b0002065.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164805_064892c3-34c0-4c28-9781-964c0502ca20.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164806_a0e8ea08-1d73-4147-9a71-fcdb1fc7043c.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164804_73905cb8-ac37-434c-adae-28e56d94af1b.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164842_8df0fa42-5d9f-4269-a76f-80626fa57278.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164844_966fc174-83eb-49d7-970b-6dea77a15a1b.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164843_53e1c435-bad3-4303-82bd-8e8297f0aa76.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164844_36c06796-2212-438f-acfc-19cce90c0284.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164843_f93d3ceb-fb50-4dd3-8d66-c1d12530c314.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164843_ca336e45-e46c-4a5a-8fa7-160b4c665812.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164843_b444ecf7-2d83-4734-b0fb-63f3d8b91101.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164842_0844e8a6-0a08-4ea7-b3d5-839f9e71838d.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164916_bf28b8fa-8f58-4eaa-8e3c-21683571b6a0.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164916_8b26e13f-86e0-455d-8db1-89deaeb4acc8.png',
+    'https://d8j0ntlcm91z4.cloudfront.net/user_3JGuIsmzGLwAlDRE1EVJShdEdvJ/hf_20261107_164916_e058be96-cc6e-4f66-94b1-228331d49a9b.png'
+  ];
+  r record; n int;
+begin
+  for r in select u.id, u.email from auth.users u where u.email like '%@seed.scoredate.test' and u.email ~ '^[a-z]+\.[0-9]+@'
+           and not exists (select 1 from public.photos p where p.user_id = u.id) loop
+    n := substring(r.email from '\.([0-9]+)@')::int;
+    if n between 1 and 50 then
+      insert into public.photos(user_id, path, position) values (r.id, photos[n], 0);
+      update public.photos set match_status = 'approved', match_similarity = 99 where user_id = r.id;
+      update public.profiles set photo_status = 'approved' where id = r.id;
+    end if;
+  end loop;
 end $$;
 
 -- Waitlist: 80 people across areas (not real people).

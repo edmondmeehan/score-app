@@ -15,7 +15,7 @@ const PRODUCT_FIELDS = (prefix: string): Field[] => [
   { key: 'products.membership_annual', label: 'Membership annual product ID', placeholder: `${prefix}.membership.annual` },
   { key: 'products.premium_monthly', label: 'Premium monthly product ID', placeholder: `${prefix}.premium.monthly` },
   { key: 'products.premium_annual', label: 'Premium annual product ID', placeholder: `${prefix}.premium.annual` },
-  { key: 'products.black_monthly', label: 'Black monthly product ID', placeholder: `${prefix}.black.monthly` },
+  { key: 'products.black_monthly', label: 'Reserve monthly product ID', placeholder: `${prefix}.black.monthly` },
   { key: 'products.paused_monthly', label: 'Paused monthly product ID', placeholder: `${prefix}.paused.monthly` },
   { key: 'products.preview_once', label: 'Preview (one-time $9.99) product ID', placeholder: `${prefix}.preview` },
 ];
@@ -49,7 +49,7 @@ export const SPECS: Spec[] = [
     fields: [
       { key: 'entitlements.membership', label: 'Membership entitlement ID', placeholder: 'membership' },
       { key: 'entitlements.premium', label: 'Premium entitlement ID', placeholder: 'premium' },
-      { key: 'entitlements.black', label: 'Black entitlement ID', placeholder: 'black' },
+      { key: 'entitlements.black', label: 'Reserve entitlement ID', placeholder: 'black' },
       { key: 'entitlements.paused', label: 'Paused entitlement ID', placeholder: 'paused' },
       { key: 'ios_public_key', label: 'Public SDK key (iOS)', placeholder: 'appl_…', help: 'Safe to ship in the app.' },
       { key: 'android_public_key', label: 'Public SDK key (Android)', placeholder: 'goog_…' },
@@ -123,17 +123,18 @@ export const SPECS: Spec[] = [
     ],
   },
   {
-    provider: 'carto', name: 'CARTO maps', what: 'The dark basemap behind the member, waitlist and admin heat maps.',
-    required: ['tile_url'],
+    provider: 'carto', name: 'CARTO basemaps', what: 'The dark map behind the member, waitlist and admin heat maps. CARTO requires a key on every map tile.',
+    required: ['api_key'],
     testable: true,
     fields: [
-      { key: 'style', label: 'Basemap style', placeholder: 'dark_all', help: 'dark_all (default), dark_nolabels, light_all, light_nolabels, rastertiles/voyager.' },
-      { key: 'tile_url', label: 'Tile URL from CARTO', placeholder: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?api_key={key}', help: 'Paste the raster tile URL from your CARTO account. Put {key} where the API key goes.' },
-      { key: 'api_key', label: 'API access token', secret: true, help: 'Use a token limited to basemaps and to scoredate.app. Map tiles load in the browser, so the token is visible in network requests.' },
+      { key: 'api_key', label: 'Basemaps API key', secret: true, help: 'From dashboard.basemaps.carto.com (sign in with your email). Paste it exactly as issued; keys are case-sensitive.' },
+      { key: 'style', label: 'Basemap style', placeholder: 'dark_all', help: 'dark_all (default), dark_nolabels, light_all, light_nolabels, voyager.' },
+      { key: 'tile_url', label: 'Custom tile URL (optional)', placeholder: 'https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key={key}', help: 'Leave blank unless CARTO gives you a different URL. {key} is replaced with your key.' },
     ],
     notes: [
-      'Until this is connected, maps use CARTO’s public basemap at the same style.',
-      'CARTO’s public basemaps are free for non-commercial use. A paying app needs a CARTO plan, so connect your account before launch.',
+      'This is a CARTO Basemaps key from dashboard.basemaps.carto.com, not a CARTO platform "API Access Token".',
+      'In the key’s website restrictions list both hosts exactly: scoredate.app and www.scoredate.app (no https://).',
+      'Free tier: 1M commercial requests a month. Keep the "© OpenStreetMap © CARTO" credit visible on the map.',
     ],
   },
 ];

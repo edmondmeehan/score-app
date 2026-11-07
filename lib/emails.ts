@@ -296,9 +296,9 @@ export const templates = {
   }) satisfies Email,
 
   event_announce: (d: { first_name?: string | null; title: string; when: string; venue: string; event_id: string; black_only?: boolean }) => ({
-    subject: d.black_only ? `Black members first: ${d.title}` : `New Score event: ${d.title}`,
+    subject: d.black_only ? `Reserve members first: ${d.title}` : `New Score event: ${d.title}`,
     preheader: `${d.when} · ${d.venue}`,
-    eyebrow: d.black_only ? 'Black · first access' : 'Member event',
+    eyebrow: d.black_only ? 'Reserve · first access' : 'Member event',
     heading: d.title,
     kind: 'notification',
     blocks: [
@@ -429,7 +429,7 @@ export const TEMPLATE_INFO: Record<TemplateName, { label: string; when: string; 
   photos_review: { label: 'Photo review result', when: 'Staff approves or rejects photos in review', live: true },
   daily_drop: { label: 'Daily Drop', when: 'Daily around noon (automatic)', live: true },
   new_message: { label: 'New message', when: 'Unread for 10+ min, at most every 3 hours (automatic)', live: true },
-  event_announce: { label: 'Event announcement', when: 'Staff announces an event (Black first during priority window)', live: true },
+  event_announce: { label: 'Event announcement', when: 'Staff announces an event (Reserve first during priority window)', live: true },
   preview_ending: { label: 'Preview ending', when: '3 days before a Preview ends (automatic)', live: true },
   plan_ended: { label: 'Membership ended', when: 'RevenueCat reports the plan expired or was refunded', live: true },
   status_changed: { label: 'Paused / Taken / Back', when: 'A member changes status in settings', live: true },

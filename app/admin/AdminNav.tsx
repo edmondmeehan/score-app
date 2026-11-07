@@ -7,7 +7,7 @@ export default function AdminNav({ counts, email }: { counts: { rep: number; ver
   const path = usePathname();
   const items = [
     ['/admin', 'Overview', 0], ['/admin/analytics', 'Analytics', 0], ['/admin/map', 'Map', 0], ['/admin/waitlist', 'Waitlist & invites', 0], ['/admin/verification', 'Verification', counts.ver],
-    ['/admin/moderation', 'Moderation', counts.rep], ['/admin/members', 'Members', 0], ['/admin/events', 'Events', 0], ['/admin/deletions', 'Deletions', counts.del], ['/admin/billing', 'Billing', 0], ['/admin/emails', 'Emails', 0], ['/admin/integrations', 'Integrations', 0], ['/admin/audit', 'Audit log', 0],
+    ['/admin/moderation', 'Moderation', counts.rep], ['/admin/members', 'Members', 0], ['/admin/events', 'Events', 0], ['/admin/content', 'Content', 0], ['/admin/deletions', 'Deletions', counts.del], ['/admin/billing', 'Billing', 0], ['/admin/emails', 'Emails', 0], ['/admin/integrations', 'Integrations', 0], ['/admin/audit', 'Audit log', 0],
   ] as const;
   return (
     <nav aria-label="Admin">

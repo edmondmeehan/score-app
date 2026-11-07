@@ -8,7 +8,7 @@ export default async function Billing() {
   ]);
   const count = (fn: (p: { plan: string; plan_store: string | null }) => boolean) => (plans || []).filter(fn).length;
   const tiles = [
-    ['Membership', count((p) => p.plan === 'membership')], ['Premium', count((p) => p.plan === 'premium')], ['Black', count((p) => p.plan === 'black')], ['Paused', count((p) => p.plan === 'paused')],
+    ['Membership', count((p) => p.plan === 'membership')], ['Premium', count((p) => p.plan === 'premium')], ['Reserve', count((p) => p.plan === 'black')], ['Paused', count((p) => p.plan === 'paused')],
     ['Via App Store', count((p) => p.plan_store === 'APP_STORE')], ['Via Google Play', count((p) => p.plan_store === 'PLAY_STORE')],
   ] as const;
   return (

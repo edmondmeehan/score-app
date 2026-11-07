@@ -34,7 +34,7 @@ export async function saveEvent(form: FormData) {
   redirect(`/admin/events/${data}?saved=1`);
 }
 
-/** Email members about a published event. During the Black priority window only Black members get it. */
+/** Email members about a published event. During the Reserve priority window only Reserve members get it. */
 export async function announceEvent(form: FormData) {
   const supabase = await supabaseServer();
   const id = String(form.get('id'));
@@ -48,5 +48,5 @@ export async function announceEvent(form: FormData) {
     to: p.email!, unsubUrl: unsubUrl(p.user_id, 'events'),
     data: { first_name: p.first_name, title: e.title, when: when(e.starts_at), venue: e.venue, event_id: id, black_only: blackOnly },
   })));
-  redirect(`/admin/events/${id}?sent=` + encodeURIComponent(`${r.sent} sent${blackOnly ? ' to Black members' : ''}${r.failed ? `, ${r.failed} failed (${r.error})` : ''}`));
+  redirect(`/admin/events/${id}?sent=` + encodeURIComponent(`${r.sent} sent${blackOnly ? ' to Reserve members' : ''}${r.failed ? `, ${r.failed} failed (${r.error})` : ''}`));
 }

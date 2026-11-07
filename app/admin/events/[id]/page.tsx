@@ -51,7 +51,7 @@ export default async function EditEvent({ params, searchParams }: { params: Prom
           </div>
           <div className="row" style={{ gap: 10, flexWrap: 'wrap' }}>
             <label className="field" style={{ width: 120 }}>Capacity<input className="input" type="number" name="capacity" min={1} max={2000} defaultValue={e?.capacity ?? 40} /></label>
-            <label className="field" style={{ width: 170 }}>Black first (hours)<input className="input" type="number" name="black_priority_hours" min={0} max={336} defaultValue={e?.black_priority_hours ?? 48} /></label>
+            <label className="field" style={{ width: 170 }}>Reserve first (hours)<input className="input" type="number" name="black_priority_hours" min={0} max={336} defaultValue={e?.black_priority_hours ?? 48} /></label>
             <label className="field grow">Price note<input className="input" name="price_note" maxLength={80} defaultValue={e?.price_note || ''} placeholder="Free for members" /></label>
           </div>
           <label className="field">Area<input className="input" name="area" defaultValue={e?.area || 'New York City'} /></label>
@@ -61,14 +61,14 @@ export default async function EditEvent({ params, searchParams }: { params: Prom
             </select>
           </label>
           <button className="btn">Save event</button>
-          <span className="small muted">Black members can RSVP as soon as you publish. Everyone else can RSVP once the Black-first window ends.</span>
+          <span className="small muted">Reserve members can RSVP as soon as you publish. Everyone else can RSVP once the Reserve-first window ends.</span>
         </form>
 
         {e && (
           <section className="stack" style={{ flex: '1 1 300px', gap: 20 }}>
             <form action={announceEvent} className="card stack">
               <h2 style={{ margin: 0, fontSize: 16 }}>Announce by email</h2>
-              <span className="small muted">Emails members who have event emails on. During the Black-first window it goes to Black members only; send again after it ends to reach everyone.</span>
+              <span className="small muted">Emails members who have event emails on. During the Reserve-first window it goes to Reserve members only; send again after it ends to reach everyone.</span>
               <input type="hidden" name="id" value={e.id} />
               <button className="btn ghost sm" disabled={e.status !== 'published'}>Send announcement</button>
             </form>

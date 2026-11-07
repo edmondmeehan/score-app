@@ -42,7 +42,7 @@ export default async function EventPage({ params, searchParams }: { params: Prom
         <span className="small muted">{left > 0 ? `${left} of ${e.capacity} spots left` : `Full · ${counts?.waitlist ?? 0} on the waitlist`}</span>
       </div>
       {e.description && <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{e.description}</p>}
-      {early && <div className="notice test">Black members have first access until {opensAt!.toLocaleString('en-US', { weekday: 'long', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' })}.</div>}
+      {early && <div className="notice test">Reserve members have first access until {opensAt!.toLocaleString('en-US', { weekday: 'long', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' })}.</div>}
 
       {e.status === 'published' && !started && (
         status === 'going' || status === 'waitlist' ? (
