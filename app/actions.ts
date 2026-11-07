@@ -34,6 +34,17 @@ export async function joinWaitlist(_: WaitlistState, form: FormData): Promise<Wa
     p_first: first, p_last: String(form.get('last_name') || '').trim(), p_email: email, p_zip: zip,
     p_job: String(form.get('job') || '').trim(), p_ref: ref,
   });
+  if (error && /join_waitlist|function .* does not exist|schema cache/i.test(error.message)) {
+    // Migration 0016 not run yet: fall back to the original insert so sign-ups never break.
+    const { error: e2 } = await supabase.from('waitlist').insert({
+      first_name: first || '', last_name: String(form.get('last_name') || '').trim() || null, email, zip,
+      job: String(form.get('job') || '').trim() || null, referral_code: ref,
+    });
+    if (e2 && !e2.message.includes('duplicate')) return { ok: false, message: 'Something went wrong. Try again.' };
+    if (e2) return { ok: true, message: `You're already on the waitlist with ${email}. We'll email you when your invite is ready.` };
+    await Promise.all([sendEmail(email, 'waitlist_joined', { first_name: first || null, place, open }), trackEvent(quick ? 'waitlist_join_app' : 'waitlist_join')]);
+    return { ok: true, message: `You're on the waitlist for ${place}. We sent a confirmation to ${email} and will email you when your invite is ready.` };
+  }
   if (error) return { ok: false, message: /zip/i.test(error.message) ? error.message : 'Something went wrong. Try again.' };
   const r = data as { status: 'joined' | 'exists'; resend?: boolean; share_code?: string; status_token?: string; first_name?: string | null; position?: number; total?: number; founder?: boolean; founder_reason?: string | null; referred?: boolean };
   if (r.status === 'exists') {
