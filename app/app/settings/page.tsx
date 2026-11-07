@@ -1,0 +1,54 @@
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { getMe } from '@/lib/session';
+import { BandPill } from '@/components/ui';
+import { signOut } from '../../signin/actions';
+import { deleteAccount, setStatus } from '../actions';
+
+export const dynamic = 'force-dynamic';
+
+export default async function Settings({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string }> }) {
+  const { me } = await getMe();
+  if (!me) redirect('/signin');
+  const sp = await searchParams;
+  const current = me.status === 'taken' ? 'taken' : me.status === 'paused' ? 'paused' : 'active';
+  return (
+    <div className="phone">
+      <div className="row"><div className="stack grow" style={{ gap: 4 }}><span className="serif" style={{ fontSize: 32 }}>{me.first_name || 'You'}</span><span className="small muted">{me.plan} · {me.status}</span></div><BandPill band={me.band} trend={me.trend} /></div>
+      {me.status === 'suspended' && <div className="notice error">Your account is suspended. Check your email for details and how to appeal.</div>}
+      {sp.error && <div className="notice error">{sp.error}</div>}
+      {sp.saved && <div className="notice">Saved.</div>}
+
+      {['membership', 'premium', 'black', 'paused'].includes(me.plan) && (
+        <form action={setStatus} className="card stack">
+          <span className="label">Status</span>
+          {[['active', 'Active', 'In the Daily Drop, matching and messaging.'], ['paused', 'Paused · $4.99/mo', 'Hidden from matching. Keep chats and friends.'], ['taken', 'Taken · $4.99/mo', 'You met someone. Friends see Matched on Score.']].map(([v, l, d]) => (
+            <label key={v} className="choice" style={{ alignItems: 'flex-start' }}><input type="radio" name="status" value={v} defaultChecked={current === v} style={{ accentColor: 'var(--gold)', marginTop: 4 }} /><span className="stack" style={{ gap: 2 }}><strong>{l}</strong><span className="small muted">{d}</span></span></label>
+          ))}
+          <input type="hidden" name="plan" value="membership" />
+          <button className="btn ghost sm">Save status</button>
+        </form>
+      )}
+
+      <Link href="/app/profile" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="stack grow" style={{ gap: 2 }}><strong>Edit profile</strong><span className="small muted">Photos, prompt, song and Instagram</span></span>
+        <span style={{ color: 'var(--gold)' }}>→</span>
+      </Link>
+
+      <div className="card stack">
+        <span className="label">Membership</span>
+        <Link href="/plans">Change plan</Link>
+        <span className="small muted">On iPhone, subscriptions are managed in your App Store settings.</span>
+      </div>
+
+      <form action={signOut}><button className="btn ghost block">Sign out</button></form>
+
+      <form action={deleteAccount} className="card stack" style={{ borderColor: '#5A2E2A' }}>
+        <span className="label" style={{ color: 'var(--alert)' }}>Delete account</span>
+        <span className="small muted">Permanently deletes your profile, photos, chats and verification results. Cancel any App Store subscription first so you&apos;re not billed again.</span>
+        <label className="field">Type DELETE to confirm<input className="input" name="confirm" autoComplete="off" /></label>
+        <button className="btn danger sm">Delete my account</button>
+      </form>
+    </div>
+  );
+}
