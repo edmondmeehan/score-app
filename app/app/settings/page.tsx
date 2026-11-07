@@ -41,6 +41,9 @@ export default async function Settings({ searchParams }: { searchParams: Promise
         <span className="small muted">On iPhone, subscriptions are managed in your App Store settings.</span>
       </div>
 
+      <Link href="/signin/new-password?from=settings" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="grow">Set or change password</span><span className="muted">›</span>
+      </Link>
       <form action={signOut}><button className="btn ghost block">Sign out</button></form>
 
       <form action={deleteAccount} className="card stack" style={{ borderColor: '#5A2E2A' }}>
