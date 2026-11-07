@@ -148,6 +148,71 @@ export const templates = {
     ],
   }) satisfies Email,
 
+  auth_confirm: (d: { url: string }) => ({
+    subject: 'Confirm your email for Score',
+    preheader: 'One tap to confirm it’s you.',
+    eyebrow: 'Confirm your email',
+    heading: 'Confirm it’s you.',
+    kind: 'transactional',
+    blocks: [
+      { p: 'Tap below to confirm your email and finish signing in. This link works once and expires in one hour.' },
+      { button: { label: 'Confirm and sign in', url: d.url } },
+      { note: "Didn't try to join Score? You can ignore this email. Nothing happens without the link." },
+    ],
+  }) satisfies Email,
+
+  auth_invite: (d: { url: string }) => ({
+    subject: 'You’re invited to Score',
+    preheader: 'Your invite is ready. Tap to accept.',
+    eyebrow: 'Invitation',
+    heading: 'Someone thinks you have your act together.',
+    kind: 'transactional',
+    blocks: [
+      { p: 'You’ve been invited to Score, the invite-only dating app where every member has verified their identity and credit band.' },
+      { button: { label: 'Accept your invite', url: d.url } },
+      { note: 'This link works once. If it expires, reply and we’ll send a new one.' },
+    ],
+  }) satisfies Email,
+
+  auth_email_change: (d: { url: string; new_email: string }) => ({
+    subject: 'Confirm your new email for Score',
+    preheader: 'Confirm the change to keep signing in.',
+    eyebrow: 'Email change',
+    heading: 'Confirm your new email.',
+    kind: 'transactional',
+    blocks: [
+      { p: `You asked to change your Score sign-in email to ${d.new_email}. Tap below to confirm.` },
+      { button: { label: 'Confirm new email', url: d.url } },
+      { note: "Didn't ask for this? Don't tap the link, and reply to let us know. Your email stays the same." },
+    ],
+  }) satisfies Email,
+
+  auth_reset: (d: { url: string }) => ({
+    subject: 'Reset your Score sign-in',
+    preheader: 'This link works once and expires in one hour.',
+    eyebrow: 'Account recovery',
+    heading: 'Get back in.',
+    kind: 'transactional',
+    blocks: [
+      { p: 'We got a request to recover your Score account. Tap below to sign in and update your details.' },
+      { button: { label: 'Recover my account', url: d.url } },
+      { note: "Didn't ask for this? You can ignore this email. Your account is unchanged." },
+    ],
+  }) satisfies Email,
+
+  auth_reauth: (d: { code: string }) => ({
+    subject: 'Your Score security code',
+    preheader: 'Use this code to confirm a sensitive change.',
+    eyebrow: 'Security check',
+    heading: 'Confirm it’s you.',
+    kind: 'transactional',
+    blocks: [
+      { p: 'Enter this code in Score to confirm the change you’re making.' },
+      { code: d.code, caption: 'Expires in 10 minutes' },
+      { note: "Didn't ask for this? Someone may have your device. Sign out everywhere from Settings and reply to us." },
+    ],
+  }) satisfies Email,
+
   welcome_member: (d: { first_name?: string | null; plan: string; drop_size: number }) => ({
     subject: 'Welcome to Score',
     preheader: `Your first Daily Drop of ${d.drop_size} arrives tomorrow at noon.`,
@@ -312,6 +377,11 @@ export const SAMPLES: { [K in TemplateName]: Parameters<(typeof templates)[K]>[0
   notify_area: { first_name: 'Nadia', zip: '07030' },
   invite: { first_name: 'Nadia', code: 'SCR-7KQ2-M9', days: 14, inviter: null },
   magic_link: { url: `${SITE_URL}/auth/callback?code=example` },
+  auth_confirm: { url: `${SITE_URL}/auth/callback?code=example` },
+  auth_invite: { url: `${SITE_URL}/auth/callback?code=example` },
+  auth_email_change: { url: `${SITE_URL}/auth/callback?code=example`, new_email: 'nadia@example.com' },
+  auth_reset: { url: `${SITE_URL}/auth/callback?code=example` },
+  auth_reauth: { code: '482913' },
   welcome_member: { first_name: 'Nadia', plan: 'Membership', drop_size: 5 },
   id_approved: { first_name: 'Nadia' },
   id_needs_attention: { first_name: 'Nadia' },
@@ -330,7 +400,12 @@ export const TEMPLATE_INFO: Record<TemplateName, { label: string; when: string; 
   waitlist_joined: { label: 'Waitlist confirmation', when: 'Someone joins the waitlist (open area or opening soon wording by zip)', live: true },
   notify_area: { label: 'Notify me (legacy)', when: 'Not used now: everyone goes on the waitlist', live: false },
   invite: { label: 'Invite', when: 'Staff emails an invite from the waitlist', live: true },
-  magic_link: { label: 'Sign-in link', when: 'Sent by Supabase Auth (paste into Supabase email templates)', live: false },
+  magic_link: { label: 'Sign-in link', when: 'Supabase · Magic Link template', live: false },
+  auth_confirm: { label: 'Confirm email (first sign-in)', when: 'Supabase · Confirm signup template', live: false },
+  auth_invite: { label: 'Staff invite', when: 'Supabase · Invite user template', live: false },
+  auth_email_change: { label: 'Change email', when: 'Supabase · Change Email Address template', live: false },
+  auth_reset: { label: 'Account recovery', when: 'Supabase · Reset Password template', live: false },
+  auth_reauth: { label: 'Security code', when: 'Supabase · Reauthentication template', live: false },
   welcome_member: { label: 'Welcome to Score', when: 'A member picks a paid plan', live: true },
   id_approved: { label: 'ID approved', when: 'Persona approves the ID and selfie check', live: true },
   id_needs_attention: { label: 'ID retry', when: 'Persona declines the ID check', live: true },
@@ -348,3 +423,13 @@ export const TEMPLATE_INFO: Record<TemplateName, { label: string; when: string; 
 export function build<K extends TemplateName>(name: K, data: Parameters<(typeof templates)[K]>[0]) {
   return render((templates[name] as (d: typeof data) => Email)(data));
 }
+
+/** Supabase Auth email templates: what to paste where. */
+export const SUPABASE_TEMPLATES: Partial<Record<TemplateName, { slot: string; data: Record<string, string> }>> = {
+  auth_confirm: { slot: 'Confirm signup', data: { url: '{{ .ConfirmationURL }}' } },
+  magic_link: { slot: 'Magic Link', data: { url: '{{ .ConfirmationURL }}' } },
+  auth_invite: { slot: 'Invite user', data: { url: '{{ .ConfirmationURL }}' } },
+  auth_email_change: { slot: 'Change Email Address', data: { url: '{{ .ConfirmationURL }}', new_email: '{{ .NewEmail }}' } },
+  auth_reset: { slot: 'Reset Password', data: { url: '{{ .ConfirmationURL }}' } },
+  auth_reauth: { slot: 'Reauthentication', data: { code: '{{ .Token }}' } },
+};

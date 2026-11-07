@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { supabaseServer } from '@/lib/supabase/server';
-import { SAMPLES, TEMPLATE_INFO, build, type TemplateName } from '@/lib/emails';
+import { SAMPLES, SUPABASE_TEMPLATES, TEMPLATE_INFO, build, type TemplateName } from '@/lib/emails';
 import { sendTestEmail } from './actions';
 
 export default async function Emails({ searchParams }: { searchParams: Promise<{ t?: string; sent?: string; error?: string }> }) {
@@ -8,7 +8,8 @@ export default async function Emails({ searchParams }: { searchParams: Promise<{
   const names = Object.keys(TEMPLATE_INFO) as TemplateName[];
   const current: TemplateName = (names as string[]).includes(sp.t || '') ? (sp.t as TemplateName) : 'waitlist_joined';
   const email = build(current, SAMPLES[current] as never);
-  const supabaseTemplate = current === 'magic_link' ? build('magic_link', { url: '{{ .ConfirmationURL }}' }).html : null;
+  const sb = SUPABASE_TEMPLATES[current];
+  const supabaseTemplate = sb ? build(current, sb.data as never).html : null;
   const supabase = await supabaseServer();
   const { data: log } = await supabase.from('email_log').select('*').order('created_at', { ascending: false }).limit(25);
   return (
@@ -41,7 +42,7 @@ export default async function Emails({ searchParams }: { searchParams: Promise<{
           {supabaseTemplate && (
             <div className="card stack">
               <h2 style={{ margin: 0, fontSize: 16 }}>Paste into Supabase</h2>
-              <span className="small muted">Supabase → Authentication → Email Templates → Magic Link. Subject: “Your Score sign-in link”. Then set up Resend as custom SMTP (see Integrations → Email).</span>
+              <span className="small muted">Supabase → Authentication → Emails → {sb?.slot}. Subject: “{email.subject}”. Replace the message body with this. Then set up Resend as custom SMTP (see Integrations → Email).</span>
               <textarea readOnly className="input mono small" style={{ height: 180 }} defaultValue={supabaseTemplate} />
             </div>
           )}
