@@ -28,6 +28,11 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
     return NextResponse.redirect(url);
   }
   track(request, response, event, user?.id ?? null);
+  // "Last active" powers gentle reminders (we never nudge someone who was just here). At most once an hour.
+  if (user && path.startsWith('/app') && request.method === 'GET' && !request.cookies.get('score_seen')) {
+    event.waitUntil(Promise.resolve(supabase.rpc('touch_active')).then(() => undefined, () => undefined));
+    response.cookies.set('score_seen', '1', { httpOnly: true, sameSite: 'lax', secure: true, path: '/', maxAge: 60 * 60 });
+  }
   return response;
 }
 

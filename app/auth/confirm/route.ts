@@ -1,8 +1,9 @@
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextResponse, after, type NextRequest } from 'next/server';
 import type { EmailOtpType } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { supabaseServer } from '@/lib/supabase/server';
 import { trackEvent } from '@/lib/track';
+import { flushNotifications } from '@/lib/notify';
 
 /**
  * Email links from Supabase land here with a one-time token_hash (password reset, confirm email,
@@ -36,6 +37,7 @@ export async function GET(request: NextRequest) {
     if (!e) {
       const { data: { user } } = await supabase.auth.getUser();
       await trackEvent('invite_redeemed', user?.id);
+      if (user) after(() => flushNotifications(user.id, 10));
     }
     store.delete('score_invite');
   }

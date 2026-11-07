@@ -6,7 +6,8 @@ import ThemeSwitch from '@/components/ThemeSwitch';
 import AppFooter from '@/components/AppFooter';
 import { signOut } from '../../signin/actions';
 import { deleteAccount, setStatus } from '../actions';
-import { saveEmailPrefs, saveMapPrivacy } from '../features';
+import { saveEmailPrefs, saveMapPrivacy, saveNotifyPrefs } from '../features';
+import PushToggle from '@/components/PushToggle';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,8 @@ export default async function Settings({ searchParams }: { searchParams: Promise
   if (!me) redirect('/signin');
   const { data: prefRow } = await supabase.from('email_prefs').select('*').eq('user_id', me.id).maybeSingle();
   const prefs = { daily_drop: true, messages: true, events: true, reminders: true, ...(prefRow || {}) };
+  const { data: nRow } = await supabase.from('notify_prefs').select('*').eq('user_id', me.id).maybeSingle();
+  const np = { push_interactions: true, push_reminders: true, push_milestones: true, push_nudges: true, email_milestones: false, email_nudges: true, quiet_hours: true, ...(nRow || {}) };
   const sp = await searchParams;
   const current = me.status === 'taken' ? 'taken' : me.status === 'paused' ? 'paused' : 'active';
   return (
@@ -55,9 +58,21 @@ export default async function Settings({ searchParams }: { searchParams: Promise
         <ThemeSwitch />
         <span className="small muted">System follows your phone&apos;s light or dark mode.</span>
       </div>
+      <form action={saveNotifyPrefs} className="card stack" id="notifications">
+        <span className="label">Notifications</span>
+        <PushToggle />
+        {([['push_interactions', 'Messages and date plans', 'New messages, Notes, date invites and replies'], ['push_reminders', 'Reminders', 'Unread messages, upcoming dates and events'], ['push_milestones', 'Milestones', 'First conversation, first date, credit trending up'], ['push_nudges', 'Weekly catch-up', 'Only if you have been away a few days. Stops after a month.']] as const).map(([k, l, d]) => (
+          <label key={k} className="choice" style={{ alignItems: 'flex-start' }}><input type="checkbox" name={k} defaultChecked={Boolean(np[k])} style={{ accentColor: 'var(--gold)', marginTop: 4, width: 18, height: 18 }} /><span className="stack" style={{ gap: 2 }}><strong>{l}</strong><span className="small muted">{d}</span></span></label>
+        ))}
+        <label className="choice" style={{ alignItems: 'flex-start' }}><input type="checkbox" name="quiet_hours" defaultChecked={Boolean(np.quiet_hours)} style={{ accentColor: 'var(--gold)', marginTop: 4, width: 18, height: 18 }} /><span className="stack" style={{ gap: 2 }}><strong>Quiet hours</strong><span className="small muted">Hold reminders and milestones from 10pm to 8am. Messages still come through.</span></span></label>
+        <span className="label" style={{ marginTop: 6 }}>Also by email</span>
+        <label className="choice" style={{ alignItems: 'flex-start' }}><input type="checkbox" name="email_nudges" defaultChecked={Boolean(np.email_nudges)} style={{ accentColor: 'var(--gold)', marginTop: 4, width: 18, height: 18 }} /><span className="stack" style={{ gap: 2 }}><strong>Weekly catch-up email</strong><span className="small muted">At most once a week, only when you&apos;ve been away</span></span></label>
+        <label className="choice" style={{ alignItems: 'flex-start' }}><input type="checkbox" name="email_milestones" defaultChecked={Boolean(np.email_milestones)} style={{ accentColor: 'var(--gold)', marginTop: 4, width: 18, height: 18 }} /><span className="stack" style={{ gap: 2 }}><strong>Milestone emails</strong><span className="small muted">Off by default</span></span></label>
+        <button className="btn ghost sm">Save notification settings</button>
+      </form>
       <form action={saveEmailPrefs} className="card stack" id="email">
         <span className="label">Email</span>
-        {([['daily_drop', 'Daily Drop', 'When your new matches are ready'], ['messages', 'New messages', 'Only if unread for a bit, never more than every few hours'], ['events', 'Events', 'New member events'], ['reminders', 'Reminders', 'Preview ending and re-verification']] as const).map(([k, l, d]) => (
+        {([['daily_drop', 'Daily Drop', 'When your new matches are ready'], ['messages', 'Messages and date plans', 'Unread messages (never more than every few hours) and date invites'], ['events', 'Events', 'New member events'], ['reminders', 'Reminders', 'Preview ending, re-verification, upcoming dates']] as const).map(([k, l, d]) => (
           <label key={k} className="choice" style={{ alignItems: 'flex-start' }}><input type="checkbox" name={k} defaultChecked={Boolean(prefs[k])} style={{ accentColor: 'var(--gold)', marginTop: 4, width: 18, height: 18 }} /><span className="stack" style={{ gap: 2 }}><strong>{l}</strong><span className="small muted">{d}</span></span></label>
         ))}
         <span className="small muted">Account and security emails (sign-in, password, verification results) always come through.</span>

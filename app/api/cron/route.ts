@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { supabaseAnon } from '@/lib/supabase/server';
 import { sendBatch } from '@/lib/mailer';
 import { unsubUrl } from '@/lib/unsub';
+import { flushNotifications } from '@/lib/notify';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -55,6 +56,10 @@ export async function GET(request: NextRequest) {
         to: r.email!, data: { first_name: r.first_name, due: String(r.due || 'soon') }, unsubUrl: unsubUrl(r.user_id, 'reminders'),
       })));
     }
+    // Activity notifications: queue reminders, milestones and nudges, then deliver everything pending.
+    const queued = await sb.rpc('queue_scheduled_notifications', { p_secret: secret, p_job: job === 'daily' ? 'daily' : 'frequent' });
+    out.notifications_queued = queued.data ?? queued.error?.message;
+    out.notifications = await flushNotifications(null, 500);
   } catch (e) {
     out.error = e instanceof Error ? e.message : 'failed';
     return NextResponse.json(out, { status: 500 });

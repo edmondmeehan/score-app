@@ -1,4 +1,6 @@
 'use server';
+import { after } from 'next/server';
+import { flushNotifications } from '@/lib/notify';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { supabaseServer } from '@/lib/supabase/server';
@@ -13,10 +15,11 @@ async function ctx() {
 }
 
 export async function sayHello(form: FormData) {
-  const { supabase } = await ctx();
+  const { supabase, user } = await ctx();
   const other = String(form.get('id'));
   const { data, error } = await supabase.rpc('start_conversation', { p_other: other });
   if (error) redirect(`/app/u/${other}?error=` + encodeURIComponent(error.message));
+  after(() => flushNotifications(user.id));
   redirect(`/app/messages/${data}`);
 }
 
@@ -25,6 +28,7 @@ export async function sendMessage(conversationId: string, body: string) {
   const text = body.trim().slice(0, 2000);
   if (!text) return { ok: false };
   const { error } = await supabase.from('messages').insert({ conversation_id: conversationId, sender_id: user.id, body: text });
+  if (!error) after(() => flushNotifications(user.id, 20));
   return { ok: !error, error: error?.message };
 }
 

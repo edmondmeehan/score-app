@@ -1,4 +1,6 @@
 'use server';
+import { after } from 'next/server';
+import { flushNotifications } from '@/lib/notify';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { supabaseServer } from '@/lib/supabase/server';
@@ -53,6 +55,7 @@ export async function sendNote(form: FormData) {
   const { data, error } = await supabase.rpc('send_note', { p_other: other, p_body: String(form.get('body') || '') });
   if (error) back(`/app/u/${other}`, 'error', friendly(error.message));
   await trackEvent('addon_use:note', user.id);
+  after(() => flushNotifications(user.id));
   redirect(`/app/messages/${data}`);
 }
 
@@ -67,9 +70,22 @@ export async function saveEmailPrefs(form: FormData) {
   redirect('/app/settings?saved=email#email');
 }
 
+// ---------- Notification preferences ----------
+export async function saveNotifyPrefs(form: FormData) {
+  const { supabase, user } = await ctx();
+  const on = (k: string) => form.get(k) === 'on';
+  const { error } = await supabase.from('notify_prefs').upsert({
+    user_id: user.id, push_interactions: on('push_interactions'), push_reminders: on('push_reminders'), push_milestones: on('push_milestones'),
+    push_nudges: on('push_nudges'), email_milestones: on('email_milestones'), email_nudges: on('email_nudges'), quiet_hours: on('quiet_hours'),
+    updated_at: new Date().toISOString(),
+  });
+  if (error) back('/app/settings', 'error', error.message);
+  redirect('/app/settings?saved=notify#notifications');
+}
+
 // ---------- Dates ----------
 export async function proposeDate(form: FormData) {
-  const { supabase } = await ctx();
+  const { supabase, user } = await ctx();
   const conv = String(form.get('conversation_id'));
   const when = String(form.get('starts_at') || '');      // "YYYY-MM-DDTHH:mm" in the member's local time
   const tz = Number(form.get('tz_offset') || 0);         // minutes, from the browser (Date#getTimezoneOffset)
@@ -81,14 +97,16 @@ export async function proposeDate(form: FormData) {
     p_starts_at: utc, p_note: String(form.get('note') || ''),
   });
   if (error) back(`/app/messages/${conv}`, 'error', error.message);
+  after(() => flushNotifications(user.id));
   redirect(`/app/messages/${conv}`);
 }
 
 export async function respondDate(form: FormData) {
-  const { supabase } = await ctx();
+  const { supabase, user } = await ctx();
   const conv = String(form.get('conversation_id'));
   const { error } = await supabase.rpc('respond_date', { p_plan: String(form.get('plan_id')), p_status: String(form.get('status')) });
   if (error) back(`/app/messages/${conv}`, 'error', error.message);
+  after(() => flushNotifications(user.id));
   redirect(`/app/messages/${conv}`);
 }
 
@@ -125,6 +143,7 @@ export async function rsvp(form: FormData) {
   const { data, error } = await supabase.rpc('rsvp_event', { p_event: id, p_going: going });
   if (error) back(`/app/events/${id}`, 'error', error.message);
   await trackEvent('event_rsvp:' + data, user.id);
+  if (!going) after(() => flushNotifications(null, 20));   // someone may have moved off the waitlist
   revalidatePath('/app/events');
   back(`/app/events/${id}`, 'ok', data === 'going' ? "You're on the list. See you there." : data === 'waitlist' ? "It's full, so you're on the waitlist. We'll move you in if a spot opens." : 'Your RSVP is cancelled.');
 }

@@ -1,0 +1,70 @@
+import 'server-only';
+import webpush from 'web-push';
+import { supabaseAnon } from '@/lib/supabase/server';
+import { sendBatch } from '@/lib/mailer';
+import { unsubUrl, type UnsubKind } from '@/lib/unsub';
+import { SITE_URL } from '@/lib/emails';
+
+type Sub = { endpoint: string; p256dh: string; auth: string };
+type Claimed = {
+  id: string; user_id: string; kind: string; category: 'interaction' | 'reminder' | 'milestone' | 'nudge';
+  title: string; body: string; url: string; first_name: string | null; email: string | null; subs: Sub[] | null;
+};
+
+let configured: boolean | null = null;
+function pushReady() {
+  if (configured !== null) return configured;
+  const pub = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  const priv = process.env.VAPID_PRIVATE_KEY;
+  configured = !!(pub && priv);
+  if (configured) webpush.setVapidDetails(process.env.VAPID_SUBJECT || 'mailto:support@scoredate.app', pub!, priv!);
+  return configured;
+}
+
+const unsubKind = (n: Claimed): UnsubKind =>
+  n.category === 'interaction' ? 'messages' : n.kind === 'event_tomorrow' || n.kind === 'waitlist_in' ? 'events' : 'reminders';
+
+/**
+ * Deliver queued notifications: web push to every device the member enabled, and email where their
+ * preferences allow. The database decides who gets what (prefs, quiet hours, blocks) and marks rows
+ * as claimed, so overlapping calls never double-send. Never throws.
+ */
+export async function flushNotifications(actorId: string | null = null, limit = 100) {
+  const out = { claimed: 0, pushed: 0, dead: 0, emailed: 0, error: undefined as string | undefined };
+  try {
+    const sb = supabaseAnon();
+    const secret = process.env.SCORE_SERVER_SECRET;
+    const { data, error } = await sb.rpc('claim_notifications', { p_secret: secret, p_actor: actorId, p_limit: limit });
+    if (error) throw new Error(error.message);
+    const rows = (data as Claimed[]) || [];
+    out.claimed = rows.length;
+    if (!rows.length) return out;
+
+    if (pushReady()) {
+      const jobs: Promise<void>[] = [];
+      for (const n of rows) for (const s of n.subs || []) {
+        const payload = JSON.stringify({ title: n.title, body: n.body, url: n.url, tag: n.kind + ':' + n.url, id: n.id });
+        jobs.push(webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, payload, { TTL: 60 * 60 * 12, urgency: n.category === 'interaction' ? 'high' : 'normal' })
+          .then(() => { out.pushed++; return sb.rpc('push_result', { p_secret: secret, p_endpoint: s.endpoint, p_ok: true }); })
+          .catch((e: { statusCode?: number }) => {
+            if (e?.statusCode === 404 || e?.statusCode === 410) { out.dead++; return sb.rpc('push_result', { p_secret: secret, p_endpoint: s.endpoint, p_ok: false }); }
+          })
+          .then(() => undefined, () => undefined));
+      }
+      await Promise.all(jobs);
+    }
+
+    const mail = rows.filter((n) => n.email);
+    if (mail.length) {
+      const r = await sendBatch('notification', mail.map((n) => ({
+        to: n.email!,
+        data: { first_name: n.first_name, title: n.title, body: n.body, url: n.url.startsWith('http') ? n.url : SITE_URL + n.url, category: n.category },
+        unsubUrl: unsubUrl(n.user_id, unsubKind(n)),
+      })));
+      out.emailed = r.sent;
+    }
+  } catch (e) {
+    out.error = e instanceof Error ? e.message : 'flush failed';
+  }
+  return out;
+}

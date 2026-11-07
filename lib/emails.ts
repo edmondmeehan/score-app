@@ -371,6 +371,18 @@ export const templates = {
     ],
   }) satisfies Email,
 
+  notification: (d: { first_name?: string | null; title: string; body: string; url: string; category: string }) => ({
+    subject: d.title,
+    preheader: d.body,
+    eyebrow: d.category === 'milestone' ? 'Milestone' : d.category === 'reminder' ? 'Reminder' : 'Score',
+    heading: d.title,
+    kind: 'notification',
+    blocks: [
+      { p: `${hi(d.first_name)} ${d.body}` },
+      { button: { label: 'Open Score', url: d.url } },
+    ],
+  }) satisfies Email,
+
   deletion_confirm: (d: { first_name?: string | null }) => ({
     subject: 'Your Score account is being deleted',
     preheader: 'Your profile is gone now. Everything else is erased within 30 days.',
@@ -411,6 +423,7 @@ export const SAMPLES: { [K in TemplateName]: Parameters<(typeof templates)[K]>[0
   reverify_reminder: { first_name: 'Nadia', due: 'December 1' },
   report_received: { first_name: 'Nadia' },
   deletion_confirm: { first_name: 'Nadia' },
+  notification: { first_name: 'Nadia', title: 'Owen suggested a date', body: 'Via Carota · Sat Dec 6 at 7:30 pm', url: `${SITE_URL}/app/messages`, category: 'interaction' },
 };
 
 export const TEMPLATE_INFO: Record<TemplateName, { label: string; when: string; live: boolean }> = {
@@ -436,6 +449,7 @@ export const TEMPLATE_INFO: Record<TemplateName, { label: string; when: string; 
   reverify_reminder: { label: 'Re-verify band', when: '2 weeks before the 6-month re-check (automatic)', live: true },
   report_received: { label: 'Report received', when: 'A member reports someone', live: true },
   deletion_confirm: { label: 'Account deletion', when: 'A member deletes their account', live: true },
+  notification: { label: 'Activity alert', when: 'Date plans, Notes, event and date reminders, weekly catch-up (automatic, respects settings)', live: true },
 };
 
 export function build<K extends TemplateName>(name: K, data: Parameters<(typeof templates)[K]>[0], opts: RenderOpts = {}) {

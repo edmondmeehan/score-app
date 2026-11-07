@@ -1,7 +1,8 @@
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextResponse, after, type NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
 import { supabaseServer } from '@/lib/supabase/server';
 import { trackEvent } from '@/lib/track';
+import { flushNotifications } from '@/lib/notify';
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
@@ -16,6 +17,7 @@ export async function GET(request: NextRequest) {
     if (!error) {
       const { data: { user } } = await supabase.auth.getUser();
       await trackEvent('invite_redeemed', user?.id);
+      if (user) after(() => flushNotifications(user.id, 10));
     }
     store.delete('score_invite');
   }

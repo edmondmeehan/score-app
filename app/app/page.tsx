@@ -4,6 +4,7 @@ import { BandPill, age } from '@/components/ui';
 import { photoUrls } from '@/lib/photos';
 import type { Profile } from '@/lib/types';
 import { checkIn, useExtraDrop, useSpotlight } from './features';
+import PushPrompt from '@/components/PushPrompt';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,9 +23,10 @@ export default async function Drop({ searchParams }: { searchParams: Promise<{ o
       </div>
     );
   }
-  const [{ data: drop }, { data: mineData }, { data: checkinData }] = await Promise.all([
-    supabase.rpc('get_drop'), supabase.rpc('my_addons'), supabase.rpc('pending_checkins'),
+  const [{ data: drop }, { data: mineData }, { data: checkinData }, { data: unread }] = await Promise.all([
+    supabase.rpc('get_drop'), supabase.rpc('my_addons'), supabase.rpc('pending_checkins'), supabase.rpc('unread_notifications'),
   ]);
+  const bell = Number(unread) || 0;
   const mine = (mineData as Mine) || { included: false, extra_drop: 0, spotlight: 0, note: 0, spotlight_until: null };
   const checkins = (checkinData as Checkin[]) || [];
   const spotlightUntil = mine.spotlight_until ? new Date(mine.spotlight_until) : null;
@@ -39,11 +41,18 @@ export default async function Drop({ searchParams }: { searchParams: Promise<{ o
     <div className="phone">
       <div className="row" style={{ justifyContent: 'space-between' }}>
         <span className="eyebrow">{preview ? 'Preview' : 'Today'}</span>
-        {preview && daysLeft !== null && <span className="mono small muted">{daysLeft} days left</span>}
+        <span className="row" style={{ gap: 12 }}>
+          {preview && daysLeft !== null && <span className="mono small muted">{daysLeft} days left</span>}
+          <Link href="/app/activity" aria-label={bell ? `Activity, ${bell} new` : 'Activity'} style={{ position: 'relative', color: 'inherit', display: 'inline-flex' }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
+            {bell > 0 && <span className="mono" style={{ position: 'absolute', top: -6, right: -8, minWidth: 16, height: 16, padding: '0 4px', borderRadius: 8, background: 'var(--gold)', color: 'var(--on-gold)', fontSize: 10, lineHeight: '16px', textAlign: 'center' }}>{bell > 9 ? '9+' : bell}</span>}
+          </Link>
+        </span>
       </div>
       <h1 className="serif" style={{ fontSize: 40 }}>{preview ? 'Your 5 matches' : 'Your Daily Drop'}</h1>
       <span className="muted small">{preview ? 'Look all you want. Members can say hello, or send a Note.' : 'Ranked by money values and preferences'}</span>
       {sp.ok && <div className="notice">{sp.ok}</div>}
+      <PushPrompt />
       {sp.error && <div className="notice error">{sp.error}</div>}
       {checkins.map((c) => (
           <div key={c.plan_id} className="card gold stack" style={{ gap: 10 }}>

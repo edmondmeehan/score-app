@@ -1,8 +1,10 @@
 'use server';
 import { redirect } from 'next/navigation';
+import { after } from 'next/server';
 import { cookies, headers } from 'next/headers';
 import { supabaseServer } from '@/lib/supabase/server';
 import { trackEvent } from '@/lib/track';
+import { flushNotifications } from '@/lib/notify';
 
 const safeNext = (n: string) => (n.startsWith('/') && !n.startsWith('//') ? n : '');
 const back = (mode: string, next: string, msg: string, email = '') =>
@@ -23,6 +25,7 @@ async function finish(next: string, fallback: string) {
     if (!error) {
       const { data: { user } } = await supabase.auth.getUser();
       await trackEvent('invite_redeemed', user?.id);
+      if (user) after(() => flushNotifications(user.id, 10));
     }
     store.delete('score_invite');
   }
