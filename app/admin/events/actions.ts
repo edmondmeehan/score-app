@@ -27,6 +27,7 @@ export async function saveEvent(form: FormData) {
     venue: String(form.get('venue') || '').trim(), address: String(form.get('address') || '').trim(), area: String(form.get('area') || ''),
     starts_at: starts, ends_at: ends, capacity: String(form.get('capacity') || ''), price_note: String(form.get('price_note') || '').trim(),
     black_priority_hours: String(form.get('black_priority_hours') || '48'), status: String(form.get('status') || 'draft'),
+    founders_only: form.get('founders_only') === 'on',
   };
   const { data, error } = await supabase.rpc('staff_save_event', { p: payload });
   if (error) redirect(`${back}?error=` + encodeURIComponent(error.message));

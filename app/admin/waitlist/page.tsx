@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { supabaseServer } from '@/lib/supabase/server';
-import { createInvites, emailInvite, inviteBatch, resendInvite, setAreaStatus, setPrefix, setZip, toggleFounder } from '../actions';
+import { createInvites, emailInvite, inviteBatch, resendInvite, setAreaStatus, setPrefix, setZip, toggleFounder, saveFounderOffer } from '../actions';
+import { getFounderOffer } from '@/lib/founderOffer';
 
 const BOROUGHS = ['Manhattan', 'Brooklyn', 'Queens', 'Bronx', 'Staten Island'];
 type AreaRow = { name: string; status: 'open' | 'waitlist'; waiting: number; invited: number; joined: number };
@@ -17,6 +18,7 @@ export default async function Waitlist({ searchParams }: { searchParams: Promise
     supabase.rpc('staff_waitlist_summary'),
     supabase.from('nyc_zip_codes').select('zip', { count: 'exact', head: true }).eq('active', true),
   ]);
+  const offer = await getFounderOffer(supabase);
   const areas: AreaRow[] = summary?.areas || [];
   const zips: ZipRow[] = (summary?.zips || []).filter((z: ZipRow) => !sp.area || z.area === sp.area);
   const codes = sp.codes ? sp.codes.split(',') : [];
@@ -30,6 +32,19 @@ export default async function Waitlist({ searchParams }: { searchParams: Promise
       {sp.zip_saved && <div className="notice">Saved zip {sp.zip_saved}.</div>}
       {sumErr && <div className="notice error">Run migration 0005 in Supabase to turn on areas. ({sumErr.message})</div>}
       {codes.length > 0 && <div className="card stack"><span className="label">New codes (valid 14 days)</span><pre className="mono small" style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{codes.join('\n')}</pre></div>}
+
+      <form action={saveFounderOffer} className="card stack" style={{ gap: 10 }}>
+        <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'wrap' }}>
+          <strong>Founding Member price offer · {offer.enabled ? 'shown to founders' : 'off'}</strong>
+          <span className="small muted">Turn on only after the offer exists in App Store Connect and RevenueCat (offering “{offer.offering}”).</span>
+        </div>
+        <div className="row" style={{ gap: 10, flexWrap: 'wrap' }}>
+          <label className="field grow">Intro<input className="input" name="intro" defaultValue={offer.intro} maxLength={60} /></label>
+          <label className="field" style={{ width: 160 }}>Founding price<input className="input" name="monthly" defaultValue={offer.monthly} maxLength={30} /></label>
+        </div>
+        <label className="choice"><input type="checkbox" name="enabled" defaultChecked={offer.enabled} style={{ accentColor: 'var(--gold)', width: 18, height: 18 }} /><span>Show this offer to Founding Members (plans page and their waitlist page)</span></label>
+        <button className="btn ghost sm" style={{ alignSelf: 'flex-start' }}>Save offer</button>
+      </form>
 
       {/* Areas */}
       <section className="card scroll-x">

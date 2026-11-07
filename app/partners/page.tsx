@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { Logo } from '@/components/ui';
+import SiteHeader from '@/components/SiteHeader';
+import SiteFooter from '@/components/SiteFooter';
 import { submitInquiry } from './actions';
 
 export const metadata: Metadata = { title: 'Partner with Score', description: 'Host members, offer a perk, or teach financial wellness to verified, invite-only daters in New York.' };
@@ -22,10 +23,7 @@ export default async function Partners({ searchParams }: { searchParams: Promise
   const sp = await searchParams;
   return (
     <main>
-      <header className="page row" style={{ justifyContent: 'space-between', padding: '24px' }}>
-        <Link href="/" aria-label="Score home"><Logo /></Link>
-        <a href="#contact" className="btn ghost sm">Get in touch</a>
-      </header>
+      <SiteHeader cta={false} />
       <section className="page stack" style={{ gap: 18, padding: '48px 24px 24px', maxWidth: 820 }}>
         <span className="eyebrow">Partnerships</span>
         <h1 className="serif" style={{ fontSize: 'clamp(44px, 8vw, 76px)', lineHeight: 1 }}>Meet members who have their act together.</h1>
@@ -68,6 +66,7 @@ export default async function Partners({ searchParams }: { searchParams: Promise
           <button className="btn">Send</button>
         </form>
       </section>
+      <SiteFooter />
     </main>
   );
 }

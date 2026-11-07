@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import FounderBadge from '@/components/FounderBadge';
 import { notFound } from 'next/navigation';
 import { requireMember } from '@/lib/session';
 import { rsvp } from '../../features';
@@ -21,7 +22,8 @@ export default async function EventPage({ params, searchParams }: { params: Prom
   const going = counts?.going ?? 0;
   const left = Math.max(0, e.capacity - going);
   const opensAt = e.published_at ? new Date(new Date(e.published_at).getTime() + e.black_priority_hours * 3600000) : null;
-  const early = opensAt && opensAt.getTime() > Date.now();
+  const early = !e.founders_only && opensAt && opensAt.getTime() > Date.now();
+  const foundersLocked = Boolean(e.founders_only) && !me.is_founder;
   const member = ['membership', 'premium', 'black'].includes(me.plan);
   const started = new Date(e.starts_at).getTime() < Date.now();
 
@@ -42,6 +44,7 @@ export default async function EventPage({ params, searchParams }: { params: Prom
         <span className="small muted">{left > 0 ? `${left} of ${e.capacity} spots left` : `Full · ${counts?.waitlist ?? 0} on the waitlist`}</span>
       </div>
       {e.description && <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{e.description}</p>}
+      {e.founders_only && <div className="notice" style={{ borderColor: 'var(--gold)' }}><FounderBadge /> <span style={{ marginLeft: 6 }}>A Founding Members event.{foundersLocked ? ' Only members with the Founding Member badge can RSVP.' : ' You’re in.'}</span></div>}
       {early && <div className="notice test">Reserve members have first access until {opensAt!.toLocaleString('en-US', { weekday: 'long', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' })}.</div>}
 
       {e.status === 'published' && !started && (
@@ -53,6 +56,8 @@ export default async function EventPage({ params, searchParams }: { params: Prom
           </form>
         ) : !member ? (
           <Link href="/plans" className="btn block">Become a member to RSVP</Link>
+        ) : foundersLocked ? (
+          <button className="btn block" disabled>Founding Members only</button>
         ) : early && me.plan !== 'black' ? (
           <button className="btn block" disabled>RSVPs open {opensAt!.toLocaleString('en-US', { weekday: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' })}</button>
         ) : (

@@ -54,6 +54,7 @@ export default async function EditEvent({ params, searchParams }: { params: Prom
             <label className="field" style={{ width: 170 }}>Reserve first (hours)<input className="input" type="number" name="black_priority_hours" min={0} max={336} defaultValue={e?.black_priority_hours ?? 48} /></label>
             <label className="field grow">Price note<input className="input" name="price_note" maxLength={80} defaultValue={e?.price_note || ''} placeholder="Free for members" /></label>
           </div>
+          <label className="choice" style={{ alignItems: 'flex-start' }}><input type="checkbox" name="founders_only" defaultChecked={Boolean(e?.founders_only)} style={{ accentColor: 'var(--gold)', marginTop: 4, width: 18, height: 18 }} /><span className="stack" style={{ gap: 2 }}><strong>Founding Members only</strong><span className="small muted">Only members with the Founding Member badge can RSVP. Others see it but can’t join.</span></span></label>
           <label className="field">Area<input className="input" name="area" defaultValue={e?.area || 'New York City'} /></label>
           <label className="field">Status
             <select className="input" name="status" defaultValue={e?.status || 'draft'}>

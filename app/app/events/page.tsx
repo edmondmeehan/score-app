@@ -34,6 +34,7 @@ export default async function Events() {
                 {e.status === 'cancelled' ? <span className="small" style={{ color: 'var(--alert)' }}>Cancelled</span>
                   : r === 'going' ? <span className="small" style={{ color: 'var(--rise)' }}>Going</span>
                   : r === 'waitlist' ? <span className="small muted">Waitlist</span>
+                  : e.founders_only ? <span className="chip" style={{ fontSize: 11, padding: '2px 8px', color: 'var(--gold-light)', borderColor: 'var(--gold)' }}>Founding Members</span>
                   : early ? <span className="chip" style={{ fontSize: 11, padding: '2px 8px' }}>Reserve first</span> : null}
               </span>
               <span className="serif" style={{ fontSize: 24 }}>{e.title}</span>

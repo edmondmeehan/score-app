@@ -5,6 +5,7 @@ import { Logo } from '@/components/ui';
 import ShareInvite from '@/components/ShareInvite';
 import FounderBadge from '@/components/FounderBadge';
 import { SITE_URL } from '@/lib/emails';
+import { getFounderOffer } from '@/lib/founderOffer';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Your spot · Score', robots: { index: false } };
@@ -17,7 +18,8 @@ type Status = {
 export default async function Spot({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
   if (!/^[a-f0-9]{20}$/.test(code)) notFound();
-  const { data } = await supabaseAnon().rpc('waitlist_status', { p_token: code });
+  const sb = supabaseAnon();
+  const [{ data }, offer] = await Promise.all([sb.rpc('waitlist_status', { p_token: code }), getFounderOffer(sb)]);
   const s = data as Status | null;
   if (!s) notFound();
   const url = `${SITE_URL}/?ref=${s.share_code}`;
@@ -51,7 +53,7 @@ export default async function Spot({ params }: { params: Promise<{ code: string 
           </div>
         )}
         <span className="small muted">
-          Founding Members get a badge on their profile, go first when invites go out, and get extra invites to bring friends.
+          Founding Members get a badge on their profile, go first when invites go out, extra invites to bring friends, and invitations to Founding Members events{offer.enabled ? `, plus ${offer.intro.toLowerCase()} and Membership at ${offer.monthly} for as long as they stay subscribed` : ''}.
           {' '}Each friend who joins with your link also moves you up {s.spots_per_referral} spots.
         </span>
         {s.founder_spots_left > 0 && <span className="small" style={{ color: 'var(--gold)' }}>{s.founder_spots_left} of {s.founder_spots} early founding spots left in {s.place}.</span>}

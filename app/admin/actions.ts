@@ -98,3 +98,11 @@ export async function toggleFounder(form: FormData) {
   const { error } = await supabase.rpc('staff_set_founder', { p_waitlist: String(form.get('id')), p_on: form.get('on') === 'true' });
   redirect('/admin/waitlist' + (error ? '?error=' + encodeURIComponent(error.message) : ''));
 }
+
+export async function saveFounderOffer(form: FormData) {
+  const supabase = await supabaseServer();
+  const { error } = await supabase.rpc('staff_set_founder_offer', {
+    p_enabled: form.get('enabled') === 'on', p_intro: String(form.get('intro') || ''), p_monthly: String(form.get('monthly') || ''),
+  });
+  redirect('/admin/waitlist' + (error ? '?error=' + encodeURIComponent(error.message) : ''));
+}
