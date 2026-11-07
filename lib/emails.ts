@@ -91,25 +91,36 @@ Score is invite-only dating for people who are honest about money. Exact credit 
 const hi = (name?: string | null) => (name ? `${name},` : 'Hi,');
 
 export const templates = {
-  waitlist_joined: (d: { first_name?: string | null; place: string; open: boolean }) => ({
-    subject: "You're on the Score waitlist",
-    preheader: d.open ? `Invites go out in drops every two weeks. ${d.place} is on the list.` : `We'll email you as soon as Score opens in ${d.place}.`,
-    eyebrow: `Waitlist · ${d.place}`,
-    heading: "You're on the list.",
-    kind: 'transactional',
-    blocks: d.open
+  waitlist_joined: (d: { first_name?: string | null; place: string; open: boolean; share_url?: string; position?: number | null; founder?: boolean; again?: boolean }) => {
+    const share: Block[] = d.share_url
       ? [
-          { p: `${hi(d.first_name)} thanks for signing up. Score sends invites in drops every two weeks, and we'll email you the moment yours is ready.` },
-          { p: 'Invites go out in balanced groups, and people with friends already inside move up the line. Nothing to do right now.' },
-          { facts: [['Area', d.place], ['Drops', 'Every two weeks'], ['Age', '25 and older']] },
-          { note: 'Verification uses a soft credit pull. It never affects your score, and only your band (never the number) is shown to members.' },
+          { p: d.founder ? 'You’re a Founding Member: a badge on your profile, first in line when invites go out, and extra invites to bring friends.' : 'Want in sooner? Every friend who joins with your link moves you up 5 spots, and 3 friends makes you a Founding Member.' },
+          { button: { label: d.again ? 'See my spot' : 'Share my invite link', url: d.share_url } },
+          { note: `Your link: ${d.share_url}` },
         ]
-      : [
-          { p: `${hi(d.first_name)} thanks for signing up. Score is opening in New York City first and expanding area by area. You're on the list for ${d.place}, and we'll email you as soon as invites go out there.` },
-          { p: 'Know someone already on Score? An invite from a member gets you in sooner.' },
-          { facts: [['Area', d.place], ['Status', 'Opening soon'], ['Age', '25 and older']] },
-        ],
-  }) satisfies Email,
+      : [];
+    return {
+      subject: d.again ? 'Your Score waitlist link' : "You're on the Score waitlist",
+      preheader: d.again ? 'Check your spot and share your invite link.' : d.open ? `Invites go out in drops every two weeks. ${d.place} is on the list.` : `We'll email you as soon as Score opens in ${d.place}.`,
+      eyebrow: `Waitlist · ${d.place}`,
+      heading: d.again ? 'Here’s your link.' : "You're on the list.",
+      kind: 'transactional',
+      blocks: d.again
+        ? [{ p: `${hi(d.first_name)} you (or someone using your email) tried to join again. You’re already on the list, and nothing changed.` }, ...share]
+        : d.open
+          ? [
+              { p: `${hi(d.first_name)} thanks for signing up. Score sends invites in drops every two weeks, and we'll email you the moment yours is ready.` },
+              ...share,
+              { facts: [['Area', d.place], ...(d.position ? [['Your spot', `#${d.position.toLocaleString('en-US')}`] as [string, string]] : []), ['Age', '25 and older']] },
+              { note: 'Verification uses a soft credit pull. It never affects your score, and only your band (never the number) is shown to members.' },
+            ]
+          : [
+              { p: `${hi(d.first_name)} thanks for signing up. Score is opening in New York City first and expanding area by area. You're on the list for ${d.place}, and we'll email you as soon as invites go out there.` },
+              ...share,
+              { facts: [['Area', d.place], ['Status', 'Opening soon'], ['Age', '25 and older']] },
+            ],
+    } satisfies Email;
+  },
 
   notify_area: (d: { first_name?: string | null; zip: string }) => ({
     subject: "We'll tell you when Score opens near you",
@@ -401,7 +412,7 @@ export type TemplateName = keyof typeof templates;
 
 /** Sample data for the admin preview page. */
 export const SAMPLES: { [K in TemplateName]: Parameters<(typeof templates)[K]>[0] } = {
-  waitlist_joined: { first_name: 'Nadia', place: 'Brooklyn', open: true },
+  waitlist_joined: { first_name: 'Nadia', place: 'Williamsburg & Greenpoint', open: true, share_url: `${SITE_URL}/w/KH2KVJ`, position: 214, founder: true },
   notify_area: { first_name: 'Nadia', zip: '07030' },
   invite: { first_name: 'Nadia', code: 'SCR-7KQ2-M9', days: 14, inviter: null },
   magic_link: { url: `${SITE_URL}/auth/callback?code=example` },

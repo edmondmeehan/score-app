@@ -6,6 +6,9 @@
 
 set search_path = public, extensions;
 
+-- Normally added by migration 0012; added here too so this file also works if 0012 hasn't run yet.
+alter table public.profiles add column if not exists last_active_at timestamptz;
+
 do $$
 declare
   first_w text[] := array['Ana','Bianca','Carmen','Dana','Eva','Fiona','Gia','Helena','Iris','Josie','Kara','Lena','Mara','Nora','Paige','Rosa','Sasha','Tess','Vera','Willa','Yara','Zara','Alana','Brooke','Celine'];

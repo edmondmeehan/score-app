@@ -92,3 +92,9 @@ export async function resendInvite(form: FormData) {
   const r = await sendEmail(w.email, 'invite', { first_name: w.first_name || null, code: w.invite_code, days: 14, inviter: null });
   redirect('/admin/waitlist?' + (r.ok ? 'invited=' + encodeURIComponent(`Invite re-sent to ${w.email}.`) : 'error=' + encodeURIComponent(r.error || 'failed')));
 }
+
+export async function toggleFounder(form: FormData) {
+  const supabase = await supabaseServer();
+  const { error } = await supabase.rpc('staff_set_founder', { p_waitlist: String(form.get('id')), p_on: form.get('on') === 'true' });
+  redirect('/admin/waitlist' + (error ? '?error=' + encodeURIComponent(error.message) : ''));
+}

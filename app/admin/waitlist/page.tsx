@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { supabaseServer } from '@/lib/supabase/server';
-import { createInvites, emailInvite, inviteBatch, resendInvite, setAreaStatus, setPrefix, setZip } from '../actions';
+import { createInvites, emailInvite, inviteBatch, resendInvite, setAreaStatus, setPrefix, setZip, toggleFounder } from '../actions';
 
 const BOROUGHS = ['Manhattan', 'Brooklyn', 'Queens', 'Bronx', 'Staten Island'];
 type AreaRow = { name: string; status: 'open' | 'waitlist'; waiting: number; invited: number; joined: number };
@@ -136,15 +136,21 @@ export default async function Waitlist({ searchParams }: { searchParams: Promise
           <h2 style={{ margin: 0, fontSize: 16 }}>People{sp.area ? ` · ${sp.area}` : ''}{sp.zip ? ` · ${sp.zip}` : ''} (newest 200)</h2>
           {(sp.area || sp.zip) && <Link href="/admin/waitlist" className="small">Show everyone</Link>}
         </div>
-        <table className="data" style={{ minWidth: 900 }}>
-          <thead><tr><th>Name</th><th>Email</th><th>Zip</th><th>Area</th><th>Job</th><th>Joined list</th><th>Status</th><th></th></tr></thead>
+        <table className="data" style={{ minWidth: 980 }}>
+          <thead><tr><th>Name</th><th>Email</th><th>Zip</th><th>Area</th><th>Referrals</th><th>Founder</th><th>Joined list</th><th>Status</th><th></th></tr></thead>
           <tbody>{(rows || []).map((w) => (
             <tr key={w.id}>
               <td>{w.first_name || w.last_name ? `${w.first_name} ${w.last_name || ''}` : <span className="muted">No name (app)</span>}</td>
               <td className="muted">{w.email}</td>
               <td className="mono">{w.zip || '—'}</td>
               <td className="muted">{w.borough ? `${w.area} · ${w.borough}` : w.area || w.city}</td>
-              <td className="muted">{w.job}</td>
+              <td className="mono">{w.referrals || 0}</td>
+              <td>
+                <form action={toggleFounder} className="row" style={{ gap: 6 }}>
+                  <input type="hidden" name="id" value={w.id} /><input type="hidden" name="on" value={w.founder ? 'false' : 'true'} />
+                  <button className="btn ghost sm" title={w.founder ? `Founder (${w.founder_reason || 'staff'}). Click to remove.` : 'Make founder'}>{w.founder ? `★ ${w.founder_reason || 'yes'}` : '—'}</button>
+                </form>
+              </td>
               <td className="muted">{new Date(w.created_at).toLocaleDateString()}</td>
               <td>{w.status}{w.invite_code ? <span className="mono small muted"> · {w.invite_code}</span> : null}</td>
               <td>

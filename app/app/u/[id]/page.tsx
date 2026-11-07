@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import FounderBadge from '@/components/FounderBadge';
 import { notFound } from 'next/navigation';
 import { requireMember } from '@/lib/session';
 import { Gauge, age } from '@/components/ui';
@@ -27,7 +28,7 @@ export default async function Member({ params, searchParams }: { params: Promise
   return (
     <div className="phone" style={{ paddingTop: 0 }}>
       <div className="photo" style={{ margin: '0 -20px', borderRadius: 0, aspectRatio: '4/5' }}>{photos[0] ? <img src={photos[0]} alt={`${p.first_name}`} /> : <span className="serif" style={{ fontSize: 64 }}>{p.first_name?.[0]}</span>}</div>
-      <div><span className="serif" style={{ fontSize: 40 }}>{p.first_name}</span> <span className="muted" style={{ fontSize: 20 }}>{age(p.birth_year)}</span><div className="muted small">{[p.job, p.neighborhood].filter(Boolean).join(' · ')}</div></div>
+      <div><span className="serif" style={{ fontSize: 40 }}>{p.first_name}</span> <span className="muted" style={{ fontSize: 20 }}>{age(p.birth_year)}</span>{p.is_founder && <span style={{ marginLeft: 10, verticalAlign: 'middle' }}><FounderBadge /></span>}<div className="muted small">{[p.job, p.neighborhood].filter(Boolean).join(' · ')}</div></div>
       {b && (
         <div className="card gold row">
           <Gauge fill={b.fill} color={b.color} size={56} />

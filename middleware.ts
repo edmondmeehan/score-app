@@ -28,6 +28,11 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
     return NextResponse.redirect(url);
   }
   track(request, response, event, user?.id ?? null);
+  // Referral links (scoredate.app/?ref=CODE): remember the code for 30 days so the waitlist form can credit it.
+  const ref = request.nextUrl.searchParams.get('ref');
+  if (ref && /^[A-Za-z0-9]{4,12}$/.test(ref)) {
+    response.cookies.set('score_ref', ref.toUpperCase(), { httpOnly: true, sameSite: 'lax', secure: true, path: '/', maxAge: 60 * 60 * 24 * 30 });
+  }
   // "Last active" powers gentle reminders (we never nudge someone who was just here). At most once an hour.
   if (user && path.startsWith('/app') && request.method === 'GET' && !request.cookies.get('score_seen')) {
     event.waitUntil(Promise.resolve(supabase.rpc('touch_active')).then(() => undefined, () => undefined));

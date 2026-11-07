@@ -1,6 +1,7 @@
 'use client';
 import { useActionState } from 'react';
 import { joinWaitlist, notifyMe, type WaitlistState } from './actions';
+import JoinedCard from '@/components/JoinedCard';
 
 export function NotifyMe({ first_name, email, zip, message }: { first_name: string; email: string; zip: string; message: string }) {
   const [state, action, pending] = useActionState(notifyMe, null);
@@ -21,6 +22,7 @@ export function NotifyMe({ first_name, email, zip, message }: { first_name: stri
 
 export default function WaitlistForm() {
   const [state, action, pending] = useActionState<WaitlistState, FormData>(joinWaitlist, null);
+  if (state?.ok && state.joined) return <JoinedCard message={state.message} code={state.joined.code} token={state.joined.token} position={state.joined.position} founder={state.joined.founder} founderReason={state.joined.founderReason} />;
   if (state?.ok) return <div className="card gold"><p className="serif" style={{ fontSize: 28, margin: 0 }}>{state.message}</p></div>;
   return (
     <form action={action} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14 }}>

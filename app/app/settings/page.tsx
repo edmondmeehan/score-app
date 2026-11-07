@@ -8,6 +8,7 @@ import { signOut } from '../../signin/actions';
 import { deleteAccount, setStatus } from '../actions';
 import { saveEmailPrefs, saveMapPrivacy, saveNotifyPrefs } from '../features';
 import PushToggle from '@/components/PushToggle';
+import FounderBadge from '@/components/FounderBadge';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,7 +23,7 @@ export default async function Settings({ searchParams }: { searchParams: Promise
   const current = me.status === 'taken' ? 'taken' : me.status === 'paused' ? 'paused' : 'active';
   return (
     <div className="phone">
-      <div className="row"><div className="stack grow" style={{ gap: 4 }}><span className="serif" style={{ fontSize: 32 }}>{me.first_name || 'You'}</span><span className="small muted">{me.plan} · {me.status}</span></div><BandPill band={me.band} trend={me.trend} /></div>
+      <div className="row"><div className="stack grow" style={{ gap: 4 }}><span className="serif" style={{ fontSize: 32 }}>{me.first_name || 'You'}</span><span className="small muted">{me.plan} · {me.status}</span>{me.is_founder && <FounderBadge />}</div><BandPill band={me.band} trend={me.trend} /></div>
       {me.status === 'suspended' && <div className="notice error">Your account is suspended. Check your email for details and how to appeal.</div>}
       {sp.error && <div className="notice error">{sp.error}</div>}
       {sp.saved && <div className="notice">Saved.</div>}

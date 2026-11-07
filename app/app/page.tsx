@@ -5,6 +5,7 @@ import { photoUrls } from '@/lib/photos';
 import type { Profile } from '@/lib/types';
 import { checkIn, useExtraDrop, useSpotlight } from './features';
 import PushPrompt from '@/components/PushPrompt';
+import FounderBadge from '@/components/FounderBadge';
 
 export const dynamic = 'force-dynamic';
 
@@ -88,7 +89,7 @@ export default async function Drop({ searchParams }: { searchParams: Promise<{ o
             <Link key={d.match_id} href={`/app/u/${p.id}`} className="card row" style={{ textDecoration: 'none', color: 'var(--ivory)', padding: 12 }}>
               <div className="photo" style={{ width: 76, flex: 'none' }}>{photos[p.id]?.[0] ? <img src={photos[p.id][0]} alt="" /> : <span className="serif">{p.first_name?.[0]}</span>}</div>
               <div className="stack grow" style={{ gap: 6, minWidth: 0 }}>
-                <span><strong style={{ fontSize: 17 }}>{p.first_name}</strong> <span className="muted">{age(p.birth_year)}</span>{p.spotlight_until && new Date(p.spotlight_until).getTime() > now && <span className="chip" style={{ marginLeft: 8, fontSize: 11, padding: '2px 8px', color: 'var(--gold-light)' }}>Featured</span>}</span>
+                <span><strong style={{ fontSize: 17 }}>{p.first_name}</strong> <span className="muted">{age(p.birth_year)}</span>{p.spotlight_until && new Date(p.spotlight_until).getTime() > now && <span className="chip" style={{ marginLeft: 8, fontSize: 11, padding: '2px 8px', color: 'var(--gold-light)' }}>Featured</span>}{p.is_founder && <span style={{ marginLeft: 8 }}><FounderBadge /></span>}</span>
                 <span className="small muted" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{[p.job, p.neighborhood].filter(Boolean).join(' · ')}</span>
                 <BandPill band={p.band} trend={p.trend} />
               </div>
