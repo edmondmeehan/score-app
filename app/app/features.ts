@@ -83,6 +83,16 @@ export async function saveNotifyPrefs(form: FormData) {
   redirect('/app/settings?saved=notify#notifications');
 }
 
+// ---------- Support ----------
+export async function submitSupport(form: FormData) {
+  const { supabase } = await ctx();
+  const { error } = await supabase.rpc('submit_support_ticket', {
+    p_category: String(form.get('category') || 'other'), p_subject: String(form.get('subject') || ''), p_body: String(form.get('body') || ''),
+  });
+  if (error) back('/app/support', 'error', error.message);
+  redirect('/app/support?ok=1');
+}
+
 // ---------- Dates ----------
 export async function proposeDate(form: FormData) {
   const { supabase, user } = await ctx();

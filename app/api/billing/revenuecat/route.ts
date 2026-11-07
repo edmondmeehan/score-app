@@ -52,6 +52,13 @@ export async function POST(req: Request) {
     p_environment: e.environment ?? null,
   });
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  // Revenue for the admin command center. RevenueCat sends USD price (negative on refunds) and the share kept after store fees.
+  if (data === 'ok' && typeof e.price === 'number') {
+    await supabaseAnon().rpc('billing_event_amount', {
+      p_secret: process.env.SCORE_SERVER_SECRET, p_event_id: String(e.id), p_price: e.price,
+      p_takehome: typeof e.takehome_percentage === 'number' ? e.takehome_percentage : null, p_currency: e.currency ?? null, p_country: e.country_code ?? null,
+    }).then(() => null, () => null);
+  }
   if (data === 'ok' && plan === 'none' && e.type === 'EXPIRATION') {
     const c = await contactFor(userId);
     await sendEmail(c.email, 'plan_ended', { first_name: c.first_name });

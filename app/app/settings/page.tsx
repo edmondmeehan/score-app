@@ -50,6 +50,9 @@ export default async function Settings({ searchParams }: { searchParams: Promise
         <span className="small muted">On iPhone, subscriptions are managed in your App Store settings.</span>
       </div>
 
+      <Link href="/app/support" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="grow">Help &amp; support</span><span className="muted">›</span>
+      </Link>
       <Link href="/signin/new-password?from=settings" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="grow">Set or change password</span><span className="muted">›</span>
       </Link>
