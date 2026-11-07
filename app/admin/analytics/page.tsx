@@ -24,7 +24,7 @@ function Bars({ title, rows, unit, empty = 'No data yet.' }: { title: string; ro
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.k}</span>
             <span className="muted mono">{r.n.toLocaleString()}{unit ? ` ${unit}` : ''} · {Math.round((r.n / total) * 100)}%</span>
           </div>
-          <div style={{ height: 6, borderRadius: 3, background: '#232327' }}><div style={{ height: 6, borderRadius: 3, width: `${(r.n / max) * 100}%`, background: 'var(--gold)' }} /></div>
+          <div style={{ height: 6, borderRadius: 3, background: 'var(--track)' }}><div style={{ height: 6, borderRadius: 3, width: `${(r.n / max) * 100}%`, background: 'var(--gold)' }} /></div>
         </div>
       ))}
     </section>
@@ -94,7 +94,7 @@ export default async function Analytics({ searchParams }: { searchParams: Promis
           {funnel.map(([l, n]) => (
             <div key={l} className="stack" style={{ gap: 4 }}>
               <div className="row small" style={{ justifyContent: 'space-between' }}><span>{l}</span><span className="mono muted">{n.toLocaleString()}</span></div>
-              <div style={{ height: 10, borderRadius: 5, background: '#232327' }}><div style={{ height: 10, borderRadius: 5, width: `${(n / fmax) * 100}%`, background: 'var(--gold)' }} /></div>
+              <div style={{ height: 10, borderRadius: 5, background: 'var(--track)' }}><div style={{ height: 10, borderRadius: 5, width: `${(n / fmax) * 100}%`, background: 'var(--gold)' }} /></div>
             </div>
           ))}
           

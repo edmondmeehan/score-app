@@ -43,7 +43,7 @@ export default async function Waitlist({ searchParams }: { searchParams: Promise
             {areas.map((a) => (
               <tr key={a.name}>
                 <td><Link href={`/admin/waitlist?area=${encodeURIComponent(a.name)}`} style={{ fontWeight: sp.area === a.name ? 600 : 400 }}>{a.name}</Link></td>
-                <td style={{ color: a.status === 'open' ? '#7FC29B' : 'var(--muted)' }}>{a.status === 'open' ? 'Open' : 'Opening soon'}</td>
+                <td style={{ color: a.status === 'open' ? 'var(--rise)' : 'var(--muted)' }}>{a.status === 'open' ? 'Open' : 'Opening soon'}</td>
                 <td className="mono">{a.waiting.toLocaleString()}</td><td className="mono muted">{a.invited.toLocaleString()}</td><td className="mono muted">{a.joined.toLocaleString()}</td>
                 <td>
                   {a.waiting > 0 && (

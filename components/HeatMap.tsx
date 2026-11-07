@@ -1,5 +1,6 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { resolvedTheme } from './ThemeSwitch';
 import 'leaflet/dist/leaflet.css';
 
 export type Spot = {
@@ -25,6 +26,16 @@ const DEFAULT_TILES: Tiles = { url: 'https://{s}.basemaps.cartocdn.com/dark_all/
 
 export default function HeatMap({ spots, height = 360, center = [40.735, -73.97], zoom = 11, tiles = DEFAULT_TILES }: { spots: Spot[]; height?: number; center?: [number, number]; zoom?: number; tiles?: Tiles }) {
   const el = useRef<HTMLDivElement>(null);
+  const [light, setLight] = useState(false);
+  useEffect(() => {
+    const update = () => setLight(resolvedTheme() === 'light');
+    update();
+    const mq = window.matchMedia('(prefers-color-scheme: light)');
+    window.addEventListener('score-theme', update); mq.addEventListener('change', update);
+    return () => { window.removeEventListener('score-theme', update); mq.removeEventListener('change', update); };
+  }, []);
+  // Light theme swaps CARTO's dark basemap for its light one (same key, same URL shape).
+  const tileUrl = light ? tiles.url.replace('dark_all', 'light_all').replace('dark_nolabels', 'light_nolabels') : tiles.url;
   useEffect(() => {
     let map: import('leaflet').Map | null = null;
     let cancelled = false;
@@ -32,10 +43,10 @@ export default function HeatMap({ spots, height = 360, center = [40.735, -73.97]
       const L = (await import('leaflet')).default;
       if (cancelled || !el.current) return;
       map = L.map(el.current, { zoomControl: true, attributionControl: true, scrollWheelZoom: false }).setView(center, zoom);
-      L.tileLayer(tiles.url, { maxZoom: 15, minZoom: 8, subdomains: tiles.subdomains, attribution: tiles.attribution }).addTo(map);
+      L.tileLayer(tileUrl, { maxZoom: 15, minZoom: 8, subdomains: tiles.subdomains, attribution: tiles.attribution }).addTo(map);
       const maxW = Math.max(1, ...spots.map((s) => s.weight || 0));
       for (const s of spots) {
-        const color = s.level ? COLOR[s.level] : '#55545A';
+        const color = s.level ? COLOR[s.level] : light ? '#A39E92' : '#55545A';
         const r = s.weight !== undefined ? RADIUS[s.kind] * (0.5 + 0.9 * Math.sqrt(s.weight / maxW)) : RADIUS[s.kind] * (s.level === 'hot' ? 1.35 : s.level === 'busy' ? 1.15 : 1);
         // soft halo + core
         L.circle([s.lat, s.lng], { radius: r * 1.8, stroke: false, fillColor: color, fillOpacity: s.level ? 0.12 : 0.05, interactive: false }).addTo(map);
@@ -45,8 +56,8 @@ export default function HeatMap({ spots, height = 360, center = [40.735, -73.97]
       }
     })();
     return () => { cancelled = true; map?.remove(); };
-  }, [spots, center, zoom, tiles.url]);
-  return <div ref={el} className="heatmap" style={{ height, width: '100%', borderRadius: 18, overflow: 'hidden', border: '1px solid #26262A', background: '#0B0B0C' }} />;
+  }, [spots, center, zoom, tileUrl, light]);
+  return <div ref={el} className="heatmap" style={{ height, width: '100%', borderRadius: 18, overflow: 'hidden', border: '1px solid var(--line-soft)', background: 'var(--onyx)' }} />;
 }
 
 export function Legend() {

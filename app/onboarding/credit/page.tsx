@@ -13,11 +13,11 @@ export default async function Credit({ searchParams }: { searchParams: Promise<{
     return (
       <div className="phone" style={{ alignItems: 'center', textAlign: 'center' }}>
         <span className="label" style={{ paddingTop: 32 }}>Verified</span>
-        <Gauge fill={b.fill} color={b.color} size={220} track="#1F1F22" />
+        <Gauge fill={b.fill} color={b.color} size={220} track="var(--track)" />
         <span className="muted" style={{ marginTop: -50 }}>You&apos;re</span>
         <h1 className="serif" style={{ fontSize: 72, lineHeight: 1, color: b.color }}>{b.label}</h1>
         <span className="mono small muted">{b.range}</span>
-        {me.trend === 'up' && <span className="chip" style={{ color: 'var(--rise)', borderColor: '#2F5A45' }}>Trending up over 12 months</span>}
+        {me.trend === 'up' && <span className="chip" style={{ color: 'var(--rise)', borderColor: 'var(--rise-line)' }}>Trending up over 12 months</span>}
         <div className="card stack" style={{ width: '100%', textAlign: 'left' }}>
           <span className="small">Members see <strong>{b.label}</strong> and your trend.</span>
           <span className="small muted">Your exact score was never stored.</span>

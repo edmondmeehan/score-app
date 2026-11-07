@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import ThemeSwitch from '@/components/ThemeSwitch';
 import { Gauge, Logo } from '@/components/ui';
 import { BANDS, type Band } from '@/lib/types';
 import WaitlistForm from './WaitlistForm';
@@ -30,7 +31,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <section style={{ borderTop: '1px solid #1F1F22', borderBottom: '1px solid #1F1F22' }}>
+      <section style={{ borderTop: '1px solid var(--line-soft)', borderBottom: '1px solid var(--line-soft)' }}>
         <div className="page" style={{ padding: '36px 24px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 28 }}>
           {[
             ['Couples with similar credit scores are more likely to stay together.', 'Federal Reserve Board research'],
@@ -67,6 +68,7 @@ export default function Landing() {
       <footer className="page row small muted" style={{ justifyContent: 'space-between', padding: '32px 24px', flexWrap: 'wrap' }}>
         <span className="mono" style={{ letterSpacing: '.32em' }}>SCORE</span>
         <span className="row" style={{ gap: 20 }}><Link href="/partners" style={{ color: 'var(--faint)' }}>Partners</Link><Link href="/legal/privacy" style={{ color: 'var(--faint)' }}>Privacy</Link><Link href="/legal/terms" style={{ color: 'var(--faint)' }}>Terms</Link><Link href="/legal/biometric" style={{ color: 'var(--faint)' }}>Biometric policy</Link></span>
+        <ThemeSwitch />
       </footer>
     </div>
   );

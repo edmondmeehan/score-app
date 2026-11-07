@@ -45,7 +45,7 @@ export default async function AdminMap({ searchParams }: { searchParams: Promise
                 <tr key={r.key}>
                   <td>{r.name} <span className="small muted">{r.kind === 'neighborhood' ? '' : `· ${r.kind}`}</span></td>
                   <td className="mono">{r.live}</td><td className="mono">{r.women}</td><td className="mono">{r.men}</td><td className="mono muted">{r.nonbinary}</td>
-                  <td className="mono" style={{ color: pct === null ? 'var(--muted)' : pct < 35 || pct > 65 ? '#E58A7A' : '#7FC29B' }}>{pct === null ? '—' : `${pct}% W`}</td>
+                  <td className="mono" style={{ color: pct === null ? 'var(--muted)' : pct < 35 || pct > 65 ? 'var(--alert)' : 'var(--rise)' }}>{pct === null ? '—' : `${pct}% W`}</td>
                   <td className="mono">{r.paying}</td><td className="mono muted">{r.preview}</td><td className="mono muted">{r.onboarding}</td><td className="mono">{r.waiting}</td>
                 </tr>
               );

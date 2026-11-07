@@ -45,7 +45,7 @@ export default function DatePanel({ conversationId, meId, otherName, plan, share
         )}
 
         {plan.status === 'accepted' && (
-          <div className="stack" style={{ gap: 8, borderTop: '1px solid var(--line-soft, #26262A)', paddingTop: 10 }}>
+          <div className="stack" style={{ gap: 8, borderTop: '1px solid var(--line-soft)', paddingTop: 10 }}>
             <span className="small" style={{ fontWeight: 600 }}>Safety</span>
             {shareUrl ? (
               <>

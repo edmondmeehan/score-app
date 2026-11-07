@@ -24,7 +24,7 @@ export default async function AdminEvents() {
                 <td className="mono small">{when(e.starts_at)}</td>
                 <td><Link href={`/admin/events/${e.id}`}>{e.title}</Link></td>
                 <td className="muted">{e.venue}</td>
-                <td style={{ color: e.status === 'published' ? '#7FC29B' : e.status === 'cancelled' ? '#E58A7A' : 'var(--muted)' }}>{e.status}</td>
+                <td style={{ color: e.status === 'published' ? 'var(--rise)' : e.status === 'cancelled' ? 'var(--alert)' : 'var(--muted)' }}>{e.status}</td>
                 <td className="mono">{counts[i]?.going ?? 0} / {e.capacity}</td>
                 <td className="mono muted">{counts[i]?.waitlist ?? 0}</td>
               </tr>

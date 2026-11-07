@@ -11,10 +11,14 @@ export const metadata: Metadata = {
 };
 export const viewport: Viewport = { themeColor: '#0B0B0C', width: 'device-width', initialScale: 1, viewportFit: 'cover' };
 
+// Runs before first paint so there's no flash of the wrong theme.
+const THEME_SCRIPT = `(function(){try{var m=document.cookie.match(/(?:^|; )score_theme=(dark|light|system)/);var t=m?m[1]:'dark';var d=document.documentElement;d.dataset.theme=t;var l=t==='light'||(t==='system'&&matchMedia('(prefers-color-scheme: light)').matches);if(l){var e=document.querySelector('meta[name="theme-color"]');if(e)e.setAttribute('content','#F6F3EC');}}catch(e){}})();`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="dark" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
       </head>

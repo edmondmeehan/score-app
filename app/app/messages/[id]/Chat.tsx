@@ -34,7 +34,7 @@ export default function Chat({ conversationId, meId, initial, canSend }: { conve
         {msgs.map((m) => {
           const mine = m.sender_id === meId;
           return (
-            <div key={m.id} style={{ alignSelf: mine ? 'flex-end' : 'flex-start', maxWidth: '78%', padding: '11px 14px', fontSize: 15, lineHeight: 1.4, borderRadius: mine ? '18px 18px 4px 18px' : '18px 18px 18px 4px', background: mine ? 'var(--gold)' : '#1C1C1F', color: mine ? 'var(--onyx)' : 'var(--ivory)' }}>{m.body}</div>
+            <div key={m.id} style={{ alignSelf: mine ? 'flex-end' : 'flex-start', maxWidth: '78%', padding: '11px 14px', fontSize: 15, lineHeight: 1.4, borderRadius: mine ? '18px 18px 4px 18px' : '18px 18px 18px 4px', background: mine ? 'var(--gold)' : 'var(--bubble)', color: mine ? 'var(--on-gold)' : 'var(--ivory)' }}>{m.body}</div>
           );
         })}
         <div ref={end} />

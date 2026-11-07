@@ -31,8 +31,8 @@ export default async function Events() {
             <Link key={e.id} href={`/app/events/${e.id}`} className="card stack" style={{ textDecoration: 'none', color: 'inherit', gap: 6 }}>
               <span className="row" style={{ justifyContent: 'space-between' }}>
                 <span className="mono small" style={{ color: 'var(--gold-light)' }}>{when(e.starts_at)}</span>
-                {e.status === 'cancelled' ? <span className="small" style={{ color: '#E58A7A' }}>Cancelled</span>
-                  : r === 'going' ? <span className="small" style={{ color: '#7FC29B' }}>Going</span>
+                {e.status === 'cancelled' ? <span className="small" style={{ color: 'var(--alert)' }}>Cancelled</span>
+                  : r === 'going' ? <span className="small" style={{ color: 'var(--rise)' }}>Going</span>
                   : r === 'waitlist' ? <span className="small muted">Waitlist</span>
                   : early ? <span className="chip" style={{ fontSize: 11, padding: '2px 8px' }}>Reserve first</span> : null}
               </span>

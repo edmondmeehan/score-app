@@ -38,7 +38,7 @@ export default function SongPicker({ searchable }: { searchable: boolean }) {
             <form key={t.id} action={setSong}>
               <input type="hidden" name="track" value={t.id} />
               <button className="list-row" style={{ width: '100%', background: 'transparent', border: 0, color: 'inherit', textAlign: 'left', cursor: 'pointer', padding: '6px 0', display: 'flex', gap: 12, alignItems: 'center' }}>
-                {t.image ? <img src={t.image} alt="" width={44} height={44} style={{ borderRadius: 6 }} /> : <span style={{ width: 44, height: 44, borderRadius: 6, background: '#232327' }} />}
+                {t.image ? <img src={t.image} alt="" width={44} height={44} style={{ borderRadius: 6 }} /> : <span style={{ width: 44, height: 44, borderRadius: 6, background: 'var(--track)' }} />}
                 <span className="stack grow" style={{ gap: 2 }}><span>{t.title}</span><span className="small muted">{t.artist}</span></span>
                 <span className="small" style={{ color: 'var(--gold)' }}>Pick</span>
               </button>

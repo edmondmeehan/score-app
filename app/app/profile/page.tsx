@@ -46,7 +46,7 @@ export default async function EditProfile({ searchParams }: { searchParams: Prom
             return (
               <div key={p.id} className="stack" style={{ gap: 4 }}>
                 <div style={{ position: 'relative' }}>
-                  {signed?.[i]?.signedUrl ? <img src={signed[i].signedUrl} alt={`Photo ${i + 1}`} style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', borderRadius: 10, opacity: p.match_status === 'rejected' ? 0.4 : 1 }} /> : <div style={{ aspectRatio: '3/4', borderRadius: 10, background: '#232327' }} />}
+                  {signed?.[i]?.signedUrl ? <img src={signed[i].signedUrl} alt={`Photo ${i + 1}`} style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', borderRadius: 10, opacity: p.match_status === 'rejected' ? 0.4 : 1 }} /> : <div style={{ aspectRatio: '3/4', borderRadius: 10, background: 'var(--track)' }} />}
                   {i === 0 && <span className="small" style={{ position: 'absolute', top: 6, left: 6, background: 'rgba(0,0,0,.6)', padding: '2px 6px', borderRadius: 6 }}>Main</span>}
                 </div>
                 <span className="small" style={{ color }}>{label}</span>

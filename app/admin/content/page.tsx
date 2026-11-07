@@ -48,7 +48,7 @@ export default async function Content({ searchParams }: { searchParams: Promise<
               <tr key={p.id}>
                 <td className="muted small">{KIND_LABEL[p.kind]}{p.pinned ? ' · pinned' : ''}</td>
                 <td><Link href={`/admin/content/${p.id}`}>{p.title}</Link></td>
-                <td style={{ color: p.status === 'published' ? '#7FC29B' : 'var(--muted)' }}>{p.status}</td>
+                <td style={{ color: p.status === 'published' ? 'var(--rise)' : 'var(--muted)' }}>{p.status}</td>
                 <td className="mono small muted">{day(p.published_at)}</td>
               </tr>
             ))}</tbody>
@@ -63,7 +63,7 @@ export default async function Content({ searchParams }: { searchParams: Promise<
             <div key={s.id} className="card stack" style={{ gap: 8 }}>
               <div className="row" style={{ justifyContent: 'space-between' }}>
                 <strong>{s.headline}</strong>
-                <span className="small" style={{ color: s.status === 'approved' ? '#7FC29B' : s.status === 'rejected' ? '#E58A7A' : 'var(--gold)' }}>{s.status}</span>
+                <span className="small" style={{ color: s.status === 'approved' ? 'var(--rise)' : s.status === 'rejected' ? 'var(--alert)' : 'var(--gold)' }}>{s.status}</span>
               </div>
               <p className="muted" style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{s.story}</p>
               <span className="small muted">

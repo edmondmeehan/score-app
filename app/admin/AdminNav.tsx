@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Logo } from '@/components/ui';
+import ThemeSwitch from '@/components/ThemeSwitch';
 
 export default function AdminNav({ counts, email }: { counts: { rep: number; ver: number; del: number }; email: string }) {
   const path = usePathname();
@@ -18,6 +19,7 @@ export default function AdminNav({ counts, email }: { counts: { rep: number; ver
       })}
       <span className="small muted" style={{ padding: '18px 12px 0' }}>{email}</span>
       <Link href="/app" className="small" style={{ padding: '6px 12px' }}>Back to app</Link>
+      <div style={{ padding: '10px 8px' }}><ThemeSwitch /></div>
     </nav>
   );
 }

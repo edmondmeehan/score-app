@@ -79,7 +79,7 @@ export default async function EditEvent({ params, searchParams }: { params: Prom
                 <div key={r.user_id} className="row small" style={{ justifyContent: 'space-between' }}>
                   <Link href={`/admin/members/${r.user_id}`}>{r.name || 'Member'}</Link>
                   <span className="muted">{r.plan}{r.band ? ` · ${BANDS[r.band].label}` : ''}</span>
-                  <span style={{ color: r.status === 'going' ? '#7FC29B' : r.status === 'waitlist' ? 'var(--gold)' : 'var(--muted)' }}>{r.status}</span>
+                  <span style={{ color: r.status === 'going' ? 'var(--rise)' : r.status === 'waitlist' ? 'var(--gold)' : 'var(--muted)' }}>{r.status}</span>
                 </div>
               ))}
             </div>

@@ -43,7 +43,7 @@ export default async function Overview() {
           {(Object.keys(BANDS) as Band[]).map((b) => (
             <div key={b} className="stack" style={{ gap: 6 }}>
               <div className="row small" style={{ justifyContent: 'space-between' }}><span style={{ color: BANDS[b].color }}>{BANDS[b].label}</span><span className="muted">{share(b)}%</span></div>
-              <div style={{ height: 8, borderRadius: 4, background: '#232327' }}><div style={{ height: 8, borderRadius: 4, width: `${share(b)}%`, background: BANDS[b].color }} /></div>
+              <div style={{ height: 8, borderRadius: 4, background: 'var(--track)' }}><div style={{ height: 8, borderRadius: 4, width: `${share(b)}%`, background: BANDS[b].color }} /></div>
             </div>
           ))}
           <span className="small muted">Bands only. Exact scores are never stored.</span>

@@ -5,13 +5,13 @@ function arcPoint(fill: number) {
   return { x: 50 + 36 * Math.cos(a), y: 50 + 36 * Math.sin(a), large: fill * 270 > 180 ? 1 : 0 };
 }
 
-export function Gauge({ fill = 0.85, color = '#C9A961', size = 64, track = '#26262A', dot = true, label }: { fill?: number; color?: string; size?: number; track?: string; dot?: boolean; label?: string }) {
+export function Gauge({ fill = 0.85, color = '#C9A961', size = 64, track = 'var(--track)', dot = true, label }: { fill?: number; color?: string; size?: number; track?: string; dot?: boolean; label?: string }) {
   const p = arcPoint(fill);
   return (
     <svg width={size} height={size} viewBox="0 0 100 100" role={label ? 'img' : undefined} aria-label={label} aria-hidden={label ? undefined : true}>
-      <path d="M24.5 75.5 A36 36 0 1 1 75.5 75.5" fill="none" stroke={track} strokeWidth={9} strokeLinecap="round" />
+      <path d="M24.5 75.5 A36 36 0 1 1 75.5 75.5" fill="none" style={{ stroke: track }} strokeWidth={9} strokeLinecap="round" />
       <path d={`M24.5 75.5 A36 36 0 ${p.large} 1 ${p.x.toFixed(1)} ${p.y.toFixed(1)}`} fill="none" stroke={color} strokeWidth={9} strokeLinecap="round" />
-      {dot && <circle cx={p.x} cy={p.y} r={6.5} fill={color === '#C9A961' ? '#F2F0EB' : color} />}
+      {dot && <circle cx={p.x} cy={p.y} r={6.5} style={{ fill: color === '#C9A961' ? 'var(--ivory)' : color }} />}
     </svg>
   );
 }
