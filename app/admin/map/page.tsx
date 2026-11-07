@@ -1,4 +1,5 @@
 import { supabaseServer } from '@/lib/supabase/server';
+import { getBasemap } from '@/lib/basemap';
 import HeatMap, { type Spot } from '@/components/HeatMap';
 
 export const dynamic = 'force-dynamic';
@@ -32,7 +33,7 @@ export default async function AdminMap({ searchParams }: { searchParams: Promise
         <span><span className="serif" style={{ fontSize: 30 }}>{totals.women}/{totals.men}</span> <span className="small muted">women/men</span></span>
         <span><span className="serif" style={{ fontSize: 30 }}>{totals.waiting}</span> <span className="small muted">waiting</span></span>
       </div>
-      <HeatMap spots={spots} height={520} />
+      <HeatMap tiles={await getBasemap()} spots={spots} height={520} />
       <div className="card scroll-x">
         <table className="data" style={{ minWidth: 820 }}>
           <thead><tr><th>Place</th><th>Live</th><th>Women</th><th>Men</th><th>NB</th><th>Balance</th><th>Paying</th><th>Preview</th><th>Onboarding</th><th>Waiting</th></tr></thead>

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { requireMember } from '@/lib/session';
+import { getBasemap } from '@/lib/basemap';
 import HeatMap, { Legend, type Spot } from '@/components/HeatMap';
 
 export const dynamic = 'force-dynamic';
@@ -13,7 +14,7 @@ export default async function MemberMap() {
       <div className="row"><Link href="/app" aria-label="Back" className="btn ghost sm" style={{ width: 44, padding: 0 }}>‹</Link><span className="eyebrow">Members only</span></div>
       <h1 className="serif" style={{ fontSize: 40 }}>Where Score is busy</h1>
       <span className="muted small">Neighborhoods with the most members. Nobody&apos;s location is shown, only groups of {min ?? 25}+.</span>
-      <HeatMap spots={spots} height={420} />
+      <HeatMap tiles={await getBasemap()} spots={spots} height={420} />
       <Legend />
       {spots.length === 0 && <div className="notice">The map lights up as neighborhoods reach {min ?? 25} members. Invite someone you&apos;d vouch for to get yours on it.</div>}
       {spots.length > 0 && (

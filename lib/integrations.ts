@@ -1,7 +1,7 @@
 import 'server-only';
 import { supabaseAnon } from '@/lib/supabase/server';
 
-export type Provider = 'persona' | 'aws' | 'revenuecat' | 'apple' | 'google' | 'credit' | 'email' | 'spotify';
+export type Provider = 'persona' | 'aws' | 'revenuecat' | 'apple' | 'google' | 'credit' | 'email' | 'spotify' | 'carto';
 export type Integration = { enabled: boolean; config: Record<string, any>; secrets: Record<string, string> };
 
 /** Env vars win (useful for local dev); otherwise read from the admin Integrations settings (Vault). */

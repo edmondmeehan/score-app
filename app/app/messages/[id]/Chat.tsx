@@ -39,14 +39,14 @@ export default function Chat({ conversationId, meId, initial, canSend }: { conve
         })}
         <div ref={end} />
       </div>
-      <form onSubmit={send} style={{ position: 'fixed', left: 0, right: 0, bottom: 72, padding: '10px 16px', background: 'var(--onyx)', borderTop: '1px solid #1F1F22' }}>
-        <div className="row" style={{ maxWidth: 440, margin: '0 auto' }}>
+      <form onSubmit={send} className="composer">
+        <div className="row" style={{ gap: 6 }}>
           <label className="grow"><span style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden' }}>Message</span>
-            <input className="input" value={text} onChange={(e) => setText(e.target.value)} placeholder={canSend ? 'Message' : 'Become a member to message'} disabled={!canSend} maxLength={2000} style={{ borderRadius: 999 }} />
+            <input className="input" value={text} onChange={(e) => setText(e.target.value)} placeholder={canSend ? 'Message' : 'Become a member to message'} disabled={!canSend} maxLength={2000} />
           </label>
-          <button className="btn sm" disabled={!canSend || !text.trim()} aria-label="Send">Send</button>
+          <button className="btn sm" style={{ minHeight: 44 }} disabled={!canSend || !text.trim()} aria-label="Send">Send</button>
         </div>
-        {err && <div className="notice error" style={{ maxWidth: 440, margin: '8px auto 0' }}>{err}</div>}
+        {err && <div className="notice error" style={{ margin: '6px 4px 2px' }}>{err}</div>}
       </form>
     </>
   );

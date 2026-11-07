@@ -1,6 +1,6 @@
 export type Field = { key: string; label: string; secret?: boolean; placeholder?: string; help?: string; multiline?: boolean };
 export type Spec = {
-  provider: 'persona' | 'aws' | 'revenuecat' | 'apple' | 'google' | 'credit' | 'email' | 'spotify';
+  provider: 'persona' | 'aws' | 'revenuecat' | 'apple' | 'google' | 'credit' | 'email' | 'spotify' | 'carto';
   name: string;
   what: string;
   required: string[]; // keys that must be set for "Connected"
@@ -120,6 +120,20 @@ export const SPECS: Spec[] = [
     notes: [
       'Create an app at developer.spotify.com → Dashboard → Create app. Pick "Web API". No redirect URL is needed: Score only searches the catalog, members never connect their Spotify account.',
       'Without keys, members can still paste a Spotify song link. Search turns on once this is connected.',
+    ],
+  },
+  {
+    provider: 'carto', name: 'CARTO maps', what: 'The dark basemap behind the member, waitlist and admin heat maps.',
+    required: ['tile_url'],
+    testable: true,
+    fields: [
+      { key: 'style', label: 'Basemap style', placeholder: 'dark_all', help: 'dark_all (default), dark_nolabels, light_all, light_nolabels, rastertiles/voyager.' },
+      { key: 'tile_url', label: 'Tile URL from CARTO', placeholder: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?api_key={key}', help: 'Paste the raster tile URL from your CARTO account. Put {key} where the API key goes.' },
+      { key: 'api_key', label: 'API access token', secret: true, help: 'Use a token limited to basemaps and to scoredate.app. Map tiles load in the browser, so the token is visible in network requests.' },
+    ],
+    notes: [
+      'Until this is connected, maps use CARTO’s public basemap at the same style.',
+      'CARTO’s public basemaps are free for non-commercial use. A paying app needs a CARTO plan, so connect your account before launch.',
     ],
   },
 ];

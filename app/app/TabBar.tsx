@@ -12,6 +12,8 @@ const tabs = [
 
 export default function TabBar() {
   const path = usePathname();
+  // Inside a conversation the composer takes the bottom, like any messaging app.
+  if (/^\/app\/messages\/[^/]+/.test(path)) return null;
   return (
     <nav className="tabbar" aria-label="App">
       {tabs.map((t) => {

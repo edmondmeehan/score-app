@@ -30,8 +30,8 @@ export default async function Conversation({ params, searchParams }: { params: P
   const canSend = paid || (Boolean(conv.note_from) && conv.note_from !== me.id);
   const fromNote = conv.note_from && conv.note_from !== me.id;
   return (
-    <div className="phone" style={{ paddingBottom: 160 }}>
-      <div className="row">
+    <div className="phone" style={{ paddingBottom: 'calc(110px + env(safe-area-inset-bottom))' }}>
+      <div className="row appbar">
         <Link href="/app/messages" aria-label="Back" className="btn ghost sm" style={{ width: 44, padding: 0 }}>‹</Link>
         <Link href={`/app/u/${otherId}`} className="stack grow" style={{ gap: 4, textDecoration: 'none', color: 'inherit' }}><strong>{o?.first_name || 'Member'}</strong>{o && <BandPill band={o.band} trend={o.trend} />}</Link>
         <Link href={`/app/report/${otherId}`} className="small muted">Report</Link>

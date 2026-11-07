@@ -8,6 +8,7 @@ import { testPersona } from '@/lib/persona';
 import { testRevenueCat } from '@/lib/revenuecat';
 import { testResend } from '@/lib/mailer';
 import { testSpotify } from '@/lib/spotify';
+import { testCarto } from '@/lib/basemap';
 
 export async function saveIntegration(form: FormData) {
   const provider = String(form.get('provider'));
@@ -38,7 +39,7 @@ export async function testIntegration(form: FormData) {
   if (role !== 'owner') redirect('/admin/integrations?error=owner%20only');
   let ok = false; let msg = '';
   try {
-    msg = provider === 'persona' ? await testPersona() : provider === 'revenuecat' ? await testRevenueCat() : provider === 'email' ? await testResend() : provider === 'spotify' ? await testSpotify() : 'No test available';
+    msg = provider === 'persona' ? await testPersona() : provider === 'revenuecat' ? await testRevenueCat() : provider === 'email' ? await testResend() : provider === 'spotify' ? await testSpotify() : provider === 'carto' ? await testCarto() : 'No test available';
     ok = true;
   } catch (e) {
     msg = e instanceof Error ? e.message : 'Test failed';

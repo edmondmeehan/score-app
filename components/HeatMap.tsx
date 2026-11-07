@@ -20,7 +20,10 @@ const LABEL: Record<string, string> = { growing: 'Growing', busy: 'Busy', hot: '
 const RADIUS: Record<string, number> = { neighborhood: 650, borough: 2600, area: 9000 };
 
 /** Dark map with soft gold glows. Never plots people, only groups. */
-export default function HeatMap({ spots, height = 360, center = [40.735, -73.97], zoom = 11 }: { spots: Spot[]; height?: number; center?: [number, number]; zoom?: number }) {
+export type Tiles = { url: string; subdomains: string; attribution: string };
+const DEFAULT_TILES: Tiles = { url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', subdomains: 'abcd', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>' };
+
+export default function HeatMap({ spots, height = 360, center = [40.735, -73.97], zoom = 11, tiles = DEFAULT_TILES }: { spots: Spot[]; height?: number; center?: [number, number]; zoom?: number; tiles?: Tiles }) {
   const el = useRef<HTMLDivElement>(null);
   useEffect(() => {
     let map: import('leaflet').Map | null = null;
@@ -29,10 +32,7 @@ export default function HeatMap({ spots, height = 360, center = [40.735, -73.97]
       const L = (await import('leaflet')).default;
       if (cancelled || !el.current) return;
       map = L.map(el.current, { zoomControl: true, attributionControl: true, scrollWheelZoom: false }).setView(center, zoom);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        maxZoom: 15, minZoom: 8, subdomains: 'abcd',
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      }).addTo(map);
+      L.tileLayer(tiles.url, { maxZoom: 15, minZoom: 8, subdomains: tiles.subdomains, attribution: tiles.attribution }).addTo(map);
       const maxW = Math.max(1, ...spots.map((s) => s.weight || 0));
       for (const s of spots) {
         const color = s.level ? COLOR[s.level] : '#55545A';
@@ -45,7 +45,7 @@ export default function HeatMap({ spots, height = 360, center = [40.735, -73.97]
       }
     })();
     return () => { cancelled = true; map?.remove(); };
-  }, [spots, center, zoom]);
+  }, [spots, center, zoom, tiles.url]);
   return <div ref={el} className="heatmap" style={{ height, width: '100%', borderRadius: 18, overflow: 'hidden', border: '1px solid #26262A', background: '#0B0B0C' }} />;
 }
 
