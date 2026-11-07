@@ -5,6 +5,8 @@ import { getIntegration } from '@/lib/integrations';
 const BASE = 'https://api.withpersona.com/api/v1';
 
 export async function personaConfigured() {
+  // Off switch: set PERSONA_DISABLED=1 in Vercel to pause Persona (ID step falls back to test mode) without deleting keys.
+  if (process.env.PERSONA_DISABLED === '1') return false;
   const i = await getIntegration('persona');
   return Boolean(i.enabled && i.secrets.api_key && i.config.template_id);
 }
