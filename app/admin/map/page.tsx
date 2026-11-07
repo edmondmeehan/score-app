@@ -30,8 +30,8 @@ export default async function AdminMap({ searchParams }: { searchParams: Promise
       </div>
       <form action={setPublicMapDemo} className="card row" style={{ justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
         <span className="stack grow" style={{ gap: 2 }}>
-          <strong>Public map: {demoOn ? 'showing sample data' : 'real data only'}</strong>
-          <span className="small muted">{demoOn ? 'The home page map includes test accounts and shows a “Preview · sample data” tag.' : 'Turn on to include test accounts on the home page map while you launch. It is always labeled as sample data.'}</span>
+          <strong>Sign-up page map: {demoOn ? 'showing sample data' : 'real data only'}</strong>
+          <span className="small muted">{demoOn ? 'The sign-up page map includes test accounts. The home page map always shows real data only.' : 'Turn on to include test accounts on the sign-up page map while you launch. The home page map always shows real data only.'}</span>
         </span>
         <input type="hidden" name="on" value={demoOn ? 'false' : 'true'} />
         <button className={demoOn ? 'btn ghost sm' : 'btn sm'}>{demoOn ? 'Switch to real data' : 'Show sample data'}</button>

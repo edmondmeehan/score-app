@@ -5,7 +5,7 @@ import 'leaflet/dist/leaflet.css';
 
 export type Spot = {
   name: string;
-  kind: 'neighborhood' | 'borough' | 'area';
+  kind: 'neighborhood' | 'borough' | 'area' | 'state';
   lat: number;
   lng: number;
   level: 'growing' | 'busy' | 'hot' | null;
@@ -18,13 +18,13 @@ export type Spot = {
 
 const COLOR: Record<string, string> = { growing: '#8A7442', busy: '#C9A961', hot: '#F0C96A' };
 const LABEL: Record<string, string> = { growing: 'Growing', busy: 'Busy', hot: 'Hot' };
-const RADIUS: Record<string, number> = { neighborhood: 650, borough: 2600, area: 9000 };
+const RADIUS: Record<string, number> = { neighborhood: 650, borough: 2600, area: 9000, state: 60000 };
 
 /** Dark map with soft gold glows. Never plots people, only groups. */
 export type Tiles = { url: string; subdomains: string; attribution: string };
 const DEFAULT_TILES: Tiles = { url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', subdomains: 'abcd', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>' };
 
-export default function HeatMap({ spots, height = 360, center = [40.735, -73.97], zoom = 11, tiles = DEFAULT_TILES }: { spots: Spot[]; height?: number; center?: [number, number]; zoom?: number; tiles?: Tiles }) {
+export default function HeatMap({ spots, height = 360, center = [40.735, -73.97], zoom = 11, minZoom = 8, tiles = DEFAULT_TILES }: { spots: Spot[]; height?: number; center?: [number, number]; zoom?: number; minZoom?: number; tiles?: Tiles }) {
   const el = useRef<HTMLDivElement>(null);
   const [light, setLight] = useState(false);
   useEffect(() => {
@@ -43,7 +43,7 @@ export default function HeatMap({ spots, height = 360, center = [40.735, -73.97]
       const L = (await import('leaflet')).default;
       if (cancelled || !el.current) return;
       map = L.map(el.current, { zoomControl: true, attributionControl: true, scrollWheelZoom: false }).setView(center, zoom);
-      L.tileLayer(tileUrl, { maxZoom: 15, minZoom: 8, subdomains: tiles.subdomains, attribution: tiles.attribution }).addTo(map);
+      L.tileLayer(tileUrl, { maxZoom: 15, minZoom, subdomains: tiles.subdomains, attribution: tiles.attribution }).addTo(map);
       const maxW = Math.max(1, ...spots.map((s) => s.weight || 0));
       for (const s of spots) {
         const color = s.level ? COLOR[s.level] : light ? '#A39E92' : '#55545A';
@@ -56,7 +56,7 @@ export default function HeatMap({ spots, height = 360, center = [40.735, -73.97]
       }
     })();
     return () => { cancelled = true; map?.remove(); };
-  }, [spots, center, zoom, tileUrl, light]);
+  }, [spots, center, zoom, minZoom, tileUrl, light]);
   return <div ref={el} className="heatmap" style={{ height, width: '100%', borderRadius: 18, overflow: 'hidden', border: '1px solid var(--line-soft)', background: 'var(--onyx)' }} />;
 }
 

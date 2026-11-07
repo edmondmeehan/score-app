@@ -2,12 +2,13 @@ import Link from 'next/link';
 import { supabaseServer } from '@/lib/supabase/server';
 import { createInvites, emailInvite, inviteBatch, resendInvite, setAreaStatus, setPrefix, setZip, toggleFounder, saveFounderOffer } from '../actions';
 import { getFounderOffer } from '@/lib/founderOffer';
+import WaitlistMap from './WaitlistMap';
 
 const BOROUGHS = ['Manhattan', 'Brooklyn', 'Queens', 'Bronx', 'Staten Island'];
 type AreaRow = { name: string; status: 'open' | 'waitlist'; waiting: number; invited: number; joined: number };
 type ZipRow = { area: string; zip: string; sub: string; waiting: number; total: number };
 
-export default async function Waitlist({ searchParams }: { searchParams: Promise<{ codes?: string; error?: string; zip_saved?: string; invited?: string; area?: string; zip?: string }> }) {
+export default async function Waitlist({ searchParams }: { searchParams: Promise<{ codes?: string; error?: string; zip_saved?: string; invited?: string; area?: string; zip?: string; map?: string; test?: string }> }) {
   const sp = await searchParams;
   const supabase = await supabaseServer();
   let q = supabase.from('waitlist').select('*').order('created_at', { ascending: false }).limit(200);
@@ -32,6 +33,9 @@ export default async function Waitlist({ searchParams }: { searchParams: Promise
       {sp.zip_saved && <div className="notice">Saved zip {sp.zip_saved}.</div>}
       {sumErr && <div className="notice error">Run migration 0005 in Supabase to turn on areas. ({sumErr.message})</div>}
       {codes.length > 0 && <div className="card stack"><span className="label">New codes (valid 14 days)</span><pre className="mono small" style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{codes.join('\n')}</pre></div>}
+
+      <WaitlistMap supabase={supabase} view={sp.map === 'us' ? 'us' : 'nyc'} test={sp.test === '1'}
+        baseQuery={{ ...(sp.area ? { area: sp.area } : {}), ...(sp.zip ? { zip: sp.zip } : {}), ...(sp.map === 'us' ? { map: 'us' } : {}), ...(sp.test === '1' ? { test: '1' } : {}) }} />
 
       <form action={saveFounderOffer} className="card stack" style={{ gap: 10 }}>
         <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'wrap' }}>
