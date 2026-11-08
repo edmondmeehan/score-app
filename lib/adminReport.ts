@@ -2,6 +2,8 @@ import type { Block } from '@/lib/emails';
 
 export const REPORT_SECTIONS = [
   ['finance', 'Finance', 'Revenue, new subscriptions, cancellations, estimated MRR'],
+  ['traffic', 'Website traffic', 'Visitors, sessions, page views, top sources, pages and campaigns'],
+  ['campaigns', 'Ads & campaigns', 'Ad spend, sign-ups from ads, cost per sign-up, by channel'],
   ['members', 'Members', 'Sign-ups, ID checks, plans, paused'],
   ['waitlist', 'Waitlist', 'New joins, referrals, Founding Members, top areas'],
   ['engagement', 'Engagement', 'Daily and weekly actives, conversations, messages, dates'],
@@ -19,7 +21,8 @@ const PLAN: Record<string, string> = { membership: 'Membership', premium: 'Premi
 export function reportBlocks(d: D, sections: string[]): { blocks: Block[]; headline: string } {
   const out: Block[] = [];
   const has = (k: SectionKey) => sections.includes(k);
-  const f = d.finance || {}, m = d.members || {}, w = d.waitlist || {}, e = d.engagement || {}, s = d.safety || {};
+  const f = d.finance || {}, m = d.members || {}, w = d.waitlist || {}, e = d.engagement || {}, s = d.safety || {}, tr = d.traffic || {}, ca = d.campaigns || {};
+  const top = (rows: unknown) => ((rows as { k: string; n: number }[]) || []).map((r) => `${r.k} ${num(r.n)}`).join(' · ') || '—';
   if (has('finance')) {
     out.push({ p: 'Finance' }, { facts: [
       ['Revenue, last 24 hours', usd(f.gross_24h) + (f.avg_day_prev7 > 0 ? ` (7-day avg ${usd(f.avg_day_prev7)})` : '')],
@@ -31,6 +34,29 @@ export function reportBlocks(d: D, sections: string[]): { blocks: Block[]; headl
       ['Billing issues', num(f.billing_issues_24h)],
       ['Estimated MRR', usd(f.mrr_estimate)],
     ] });
+  }
+  if (has('traffic')) {
+    out.push({ p: 'Website traffic' }, { facts: [
+      ['Visitors, last 24 hours', num(tr.visitors_24h) + vs(tr.visitors_24h, tr.visitors_prev7_avg)],
+      ['Sessions', num(tr.sessions_24h)],
+      ['Page views', num(tr.pageviews_24h)],
+      ['On mobile', `${num(tr.mobile_share)}%`],
+      ['Top sources', top(tr.top_sources)],
+      ['Top pages', top(tr.top_pages)],
+      ['Top campaigns', top(tr.top_campaigns)],
+    ] });
+  }
+  if (has('campaigns')) {
+    const cps = (spend: number, n: number) => (spend > 0 && n > 0 ? usd(spend / n) : '—');
+    out.push({ p: 'Ads & campaigns' }, { facts: [
+      ['Ad spend, last 24 hours', usd(ca.spend_24h)],
+      ['Ad spend, month to date', usd(ca.spend_mtd)],
+      ['Waitlist joins from ads, last 24 hours', num(ca.paid_joins_24h)],
+      ['Waitlist joins from ads, month to date', num(ca.paid_joins_mtd)],
+      ['Cost per sign-up, month to date', cps(Number(ca.spend_mtd), Number(ca.paid_joins_mtd))],
+      ['By channel today', top(ca.by_channel_24h)],
+    ] });
+    if (!Number(ca.spend_mtd)) out.push({ note: 'No ad spend entered this month. Add it in Admin → Campaigns to see cost per sign-up.' });
   }
   if (has('members')) {
     const plans = Object.entries((m.by_plan || {}) as Record<string, number>).map(([k, v]) => `${PLAN[k] || k} ${num(v)}`).join(' · ') || 'None yet';
@@ -76,6 +102,7 @@ export function reportBlocks(d: D, sections: string[]): { blocks: Block[]; headl
   }
   const parts: string[] = [];
   if (has('finance')) parts.push(`${usd(f.gross_24h)} revenue`);
+  if (has('traffic')) parts.push(`${num(tr.visitors_24h)} visitors`);
   if (has('members')) parts.push(`${num(m.signups_24h)} sign-ups`);
   if (has('waitlist')) parts.push(`${num(w.joins_24h)} waitlist joins`);
   if (has('safety') && Number(s.open_reports) > 0) parts.push(`${num(s.open_reports)} open reports`);
