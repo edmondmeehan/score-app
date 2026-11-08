@@ -382,6 +382,20 @@ export const templates = {
     ],
   }) satisfies Email,
 
+  admin_daily: (d: { date: string; headline: string; blocks: Block[] }) => ({
+    subject: `Score daily report · ${d.date}`,
+    preheader: d.headline,
+    eyebrow: `Admin · ${d.date}`,
+    heading: 'Your daily report.',
+    kind: 'transactional',
+    blocks: [
+      { p: `Here’s the last 24 hours on Score: ${d.headline}. Test accounts are left out.` },
+      ...d.blocks,
+      { button: { label: 'Open admin', url: `${SITE_URL}/admin` } },
+      { note: 'You get this because you turned on the daily report. Change sections or turn it off in Admin → Daily report.' },
+    ],
+  }) satisfies Email,
+
   notification: (d: { first_name?: string | null; title: string; body: string; url: string; category: string }) => ({
     subject: d.title,
     preheader: d.body,
@@ -434,6 +448,7 @@ export const SAMPLES: { [K in TemplateName]: Parameters<(typeof templates)[K]>[0
   reverify_reminder: { first_name: 'Nadia', due: 'December 1' },
   report_received: { first_name: 'Nadia' },
   deletion_confirm: { first_name: 'Nadia' },
+  admin_daily: { date: 'Sun, Nov 8', headline: '$149.97 revenue · 12 sign-ups · 48 waitlist joins', blocks: [{ p: 'Finance' }, { facts: [['Revenue, last 24 hours', '$149.97'], ['New subscriptions', '3'], ['Estimated MRR', '$2,874.00']] }, { p: 'Waitlist' }, { facts: [['New joins', '48 (7-day avg 31.4)'], ['Total waitlist', '612']] }] },
   notification: { first_name: 'Nadia', title: 'Owen suggested a date', body: 'Via Carota · Sat Dec 6 at 7:30 pm', url: `${SITE_URL}/app/messages`, category: 'interaction' },
 };
 
@@ -460,6 +475,7 @@ export const TEMPLATE_INFO: Record<TemplateName, { label: string; when: string; 
   reverify_reminder: { label: 'Re-verify band', when: '2 weeks before the 6-month re-check (automatic)', live: true },
   report_received: { label: 'Report received', when: 'A member reports someone', live: true },
   deletion_confirm: { label: 'Account deletion', when: 'A member deletes their account', live: true },
+  admin_daily: { label: 'Admin daily report', when: 'Every morning to staff who turned it on in Admin → Daily report', live: true },
   notification: { label: 'Activity alert', when: 'Date plans, Notes, event and date reminders, weekly catch-up (automatic, respects settings)', live: true },
 };
 

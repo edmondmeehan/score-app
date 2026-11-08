@@ -23,7 +23,7 @@ async function query(q: Q, start: Date, end: Date, gran: object): Promise<Resp> 
     body: JSON.stringify({
       metric: q.metric, aggregation: q.aggregation, groupBy: q.groupBy, filter: q.filter, limit: q.limit ?? 10,
       scope: { type: 'project', ownerId: TEAM, projectIds: [PROJECT] },
-      startTime: start.toISOString(), endTime: end.toISOString(), granularity: gran, summaryOnly: !q.series,
+      startTime: start.toISOString(), endTime: end.toISOString(), granularity: gran,
     }),
     cache: 'no-store',
   });

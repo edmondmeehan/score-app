@@ -15,7 +15,7 @@ export default function AdminNav({ counts, email }: { counts: { rep: number; ver
     return () => { document.documentElement.style.overflow = ''; };
   }, [open]);
   const groups: { title: string; items: [string, string, number][] }[] = [
-    { title: 'Dashboard', items: [['/admin', 'Overview', 0], ['/admin/analytics', 'Analytics', 0], ['/admin/health', 'Site health', 0], ['/admin/map', 'Map', 0]] },
+    { title: 'Dashboard', items: [['/admin', 'Overview', 0], ['/admin/analytics', 'Analytics', 0], ['/admin/health', 'Site health', 0], ['/admin/reports', 'Daily report', 0], ['/admin/map', 'Map', 0]] },
     { title: 'Growth', items: [['/admin/waitlist', 'Waitlist & invites', 0], ['/admin/investors', 'Investors', 0]] },
     { title: 'Members', items: [['/admin/members', 'Members', 0], ['/admin/reserve', 'Reserve', 0], ['/admin/verification', 'Verification', counts.ver], ['/admin/support', 'Support', counts.sup], ['/admin/deletions', 'Deletions', counts.del]] },
     { title: 'Trust & safety', items: [['/admin/moderation', 'Moderation', counts.rep], ['/admin/security', 'Security', 0], ['/admin/audit', 'Audit log', 0]] },

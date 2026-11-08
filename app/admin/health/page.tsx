@@ -73,7 +73,12 @@ export default async function HealthPage({ searchParams }: { searchParams: Promi
       <span className="small muted">Live traffic and performance from Vercel for scoredate.app. Refresh the page for the latest numbers. <a href={`https://vercel.com/pleaseco/score-app/observability?period=${period}`} target="_blank" rel="noopener noreferrer">Open in Vercel ↗</a></span>
 
       {!h.configured && <div className="notice error">This page uses the same VERCEL_API_TOKEN as the Security page. It’s set for Production only, so it works on scoredate.app but not on preview links.</div>}
-      {h.error && <div className="notice error">Couldn’t load Vercel data: {h.error}. If it says 403, the token may need access to this team’s observability.</div>}
+      {h.error && (
+        <div className="notice error stack" style={{ gap: 6 }}>
+          <span>Couldn’t load Vercel data: {h.error}</span>
+          {/403/.test(h.error) && <span>Vercel turned the request down. This usually means the access token is scoped to your personal account instead of the <strong>pleaseco</strong> team. Create a new token in Vercel → Account Settings → Tokens with Scope set to the pleaseco team, replace VERCEL_API_TOKEN in the project’s environment variables, then redeploy. The Security page uses the same token.</span>}
+        </div>
+      )}
 
       {h.configured && !h.error && (
         <>
