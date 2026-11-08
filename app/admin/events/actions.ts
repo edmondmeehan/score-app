@@ -33,7 +33,22 @@ export async function saveEvent(form: FormData) {
   if (error) redirect(`${back}?error=` + encodeURIComponent(error.message));
   const num = (k: string) => { const v = Number(form.get(k)); return form.get(k) && Number.isFinite(v) ? v : null; };
   await supabase.rpc('staff_set_event_place', { p_id: data, p_place_id: String(form.get('place_id') || ''), p_lat: num('lat'), p_lng: num('lng') });
+  // Header image (optional): upload to the public 'events' bucket.
+  let imagePath = '';
+  const file = form.get('image');
+  if (file instanceof File && file.size > 0) {
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) redirect(`/admin/events/${data}?error=` + encodeURIComponent('Header image must be a JPG, PNG or WebP.'));
+    if (file.size > 4 * 1024 * 1024) redirect(`/admin/events/${data}?error=` + encodeURIComponent('Header image must be under 4 MB.'));
+    imagePath = `${data}/${crypto.randomUUID()}.${file.type.split('/')[1].replace('jpeg', 'jpg')}`;
+    const up = await supabase.storage.from('events').upload(imagePath, new Uint8Array(await file.arrayBuffer()), { contentType: file.type, cacheControl: '31536000' });
+    if (up.error) redirect(`/admin/events/${data}?error=` + encodeURIComponent('Saved, but the image didn’t upload: ' + up.error.message));
+  }
+  const extras = await supabase.rpc('staff_set_event_extras', {
+    p_id: data, p_image_path: imagePath, p_host: String(form.get('host') || ''), p_dress_code: String(form.get('dress_code') || ''), p_clear_image: form.get('clear_image') === 'on',
+  });
+  if (extras.error && !/Could not find the function|schema cache/i.test(extras.error.message)) redirect(`/admin/events/${data}?error=` + encodeURIComponent(extras.error.message));
   revalidatePath('/admin/events');
+  revalidatePath('/app/events');
   redirect(`/admin/events/${data}?saved=1`);
 }
 

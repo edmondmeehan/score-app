@@ -5,6 +5,7 @@ import { supabaseServer } from '@/lib/supabase/server';
 import { BANDS } from '@/lib/types';
 import type { EventRow } from '@/lib/events';
 import { announceEvent, saveEvent } from '../actions';
+import { eventImage } from '@/lib/events';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,6 +42,13 @@ export default async function EditEvent({ params, searchParams }: { params: Prom
         <form action={saveEvent} className="card stack" style={{ flex: '2 1 420px' }}>
           <input type="hidden" name="id" value={e?.id || ''} />
           <label className="field">Title<input className="input" name="title" required maxLength={100} defaultValue={e?.title} placeholder="Rooftop supper club" /></label>
+          <div className="stack" style={{ gap: 6 }}>
+            <span className="small" style={{ fontWeight: 600 }}>Header image</span>
+            {eventImage(e?.image_path) && <img src={eventImage(e?.image_path)!} alt="" style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: 12 }} />}
+            <input type="file" name="image" accept="image/jpeg,image/png,image/webp" style={{ fontSize: 14 }} />
+            <span className="small muted">Wide photo of the venue or the vibe, about 1600×900, JPG under 4 MB. Members see it full-width at the top of the event. No member photos without their OK.</span>
+            {e?.image_path && <label className="choice small"><input type="checkbox" name="clear_image" style={{ accentColor: 'var(--gold)' }} /> Remove the current image</label>}
+          </div>
           <label className="field">Description<textarea className="input" name="description" rows={5} maxLength={2000} defaultValue={e?.description || ''} placeholder="What to expect, dress code, who's hosting." /></label>
           <PlaceFields nameField="venue" nameLabel="Venue" namePlaceholder="Start typing to search places" addressLabel="Address (members see it after RSVP)"
             defaults={{ name: e?.venue, address: e?.address, place_id: e?.place_id, lat: e?.lat, lng: e?.lng }} />
@@ -52,6 +60,10 @@ export default async function EditEvent({ params, searchParams }: { params: Prom
             <label className="field" style={{ width: 120 }}>Capacity<input className="input" type="number" name="capacity" min={1} max={2000} defaultValue={e?.capacity ?? 40} /></label>
             <label className="field" style={{ width: 170 }}>Reserve first (hours)<input className="input" type="number" name="black_priority_hours" min={0} max={336} defaultValue={e?.black_priority_hours ?? 48} /></label>
             <label className="field grow">Price note<input className="input" name="price_note" maxLength={80} defaultValue={e?.price_note || ''} placeholder="Free for members" /></label>
+          </div>
+          <div className="row" style={{ gap: 10, flexWrap: 'wrap' }}>
+            <label className="field grow">Hosted by (optional)<input className="input" name="host" maxLength={80} defaultValue={e?.host || ''} placeholder="The ScoreDate team" /></label>
+            <label className="field grow">Dress code (optional)<input className="input" name="dress_code" maxLength={80} defaultValue={e?.dress_code || ''} placeholder="Cocktail" /></label>
           </div>
           <label className="choice" style={{ alignItems: 'flex-start' }}><input type="checkbox" name="founders_only" defaultChecked={Boolean(e?.founders_only)} style={{ accentColor: 'var(--gold)', marginTop: 4, width: 18, height: 18 }} /><span className="stack" style={{ gap: 2 }}><strong>Founding Members only</strong><span className="small muted">Only members with the Founding Member badge can RSVP. Others see it but can’t join.</span></span></label>
           <label className="field">Area<input className="input" name="area" defaultValue={e?.area || 'New York City'} /></label>
