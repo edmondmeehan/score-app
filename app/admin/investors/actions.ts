@@ -6,7 +6,7 @@ import { CONTENT_DEFAULT, hashPassword, newSalt, type InvestorContent } from '@/
 import { ASSUMPTIONS_DEFAULT, type Assumptions, type Market } from '@/lib/investorModel';
 
 const back = (q: string, hash = '') => redirect(`/admin/investors?${q}${hash}`);
-const msg = (e: { message: string }) => (/function|does not exist|schema cache/i.test(e.message) ? 'Run migration 0021 in the Score SQL Editor first.' : e.message);
+const msg = (e: { message: string }) => (/function|does not exist|schema cache/i.test(e.message) ? 'Run migration 0021 in the ScoreDate SQL Editor first.' : e.message);
 
 export async function setInvestorPassword(form: FormData) {
   const { supabase } = await requireStaff();

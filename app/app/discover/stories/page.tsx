@@ -19,7 +19,7 @@ export default async function Stories({ searchParams }: { searchParams: Promise<
         <Link href="/app/discover" aria-label="Back" className="btn ghost sm" style={{ width: 44, padding: 0 }}>‹</Link>
         <span className="label">Success stories</span>
       </div>
-      <h1 className="serif" style={{ fontSize: 40 }}>Met on Score</h1>
+      <h1 className="serif" style={{ fontSize: 40 }}>Met on ScoreDate</h1>
       {stories.length === 0 && <div className="notice">No stories yet. Be the first.</div>}
       {stories.map((s) => (
         <article key={s.id} className="card gold stack" style={{ gap: 8 }}>
@@ -39,7 +39,7 @@ export default async function Stories({ searchParams }: { searchParams: Promise<
         <label className="field">Their first name (optional)<input className="input" name="partner_first_name" maxLength={40} /></label>
         <label className="row small"><input type="checkbox" name="show_names" /> Show our first names</label>
         <label className="row small"><input type="checkbox" name="partner_consent" /> My partner agreed to share this too</label>
-        <label className="row small"><input type="checkbox" name="consent" required /> Score can share this story in the app, on its website and on social media. I can ask to remove it any time.</label>
+        <label className="row small"><input type="checkbox" name="consent" required /> ScoreDate can share this story in the app, on its website and on social media. I can ask to remove it any time.</label>
         <button className="btn">Send story</button>
       </form>
 

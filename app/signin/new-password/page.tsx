@@ -11,7 +11,7 @@ export default async function NewPassword({ searchParams }: { searchParams: Prom
   return (
     <div className="phone" style={{ justifyContent: 'center' }}>
       <div className="stack" style={{ alignItems: 'center', gap: 16, paddingBottom: 24 }}>
-        <Gauge size={72} label="Score" />
+        <Gauge size={72} label="ScoreDate" />
         <p className="serif" style={{ fontSize: 28, textAlign: 'center', margin: 0 }}>Choose a password.</p>
         <span className="small muted">{user.email}</span>
       </div>

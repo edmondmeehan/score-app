@@ -54,7 +54,7 @@ export default async function Credit({ searchParams }: { searchParams: Promise<{
         <label className="field">Date of birth<input className="input" name="dob" type="date" autoComplete="bday" required /></label>
         <label className="choice" style={{ alignItems: 'flex-start' }}>
           <input type="checkbox" name="consent" value="yes" required style={{ accentColor: 'var(--gold)', width: 18, height: 18, marginTop: 2 }} />
-          <span className="small">I authorize Score and its partner Spinwheel to get my credit information from a credit bureau with a soft inquiry, which does not affect my credit score, to confirm my credit band. Score keeps only the band, never my score or report.</span>
+          <span className="small">I authorize ScoreDate and its partner Spinwheel to get my credit information from a credit bureau with a soft inquiry, which does not affect my credit score, to confirm my credit band. ScoreDate keeps only the band, never my score or report.</span>
         </label>
         {sp.error && <div className="notice error">{sp.error}</div>}
         <button className="btn block">Text me a code</button>

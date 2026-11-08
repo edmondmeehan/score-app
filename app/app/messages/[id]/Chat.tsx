@@ -8,7 +8,7 @@ type Msg = { id: string; sender_id: string; body: string; created_at: string; fl
 
 const WARN: Record<string, string> = {
   money: 'Be careful: never send money, gift cards or crypto to someone you haven’t met, and don’t share bank details. If this feels off, tap More → Report.',
-  offplatform: 'Heads up: scammers often try to move chats off Score quickly. Take your time, and keep talking here until you’ve met.',
+  offplatform: 'Heads up: scammers often try to move chats off ScoreDate quickly. Take your time, and keep talking here until you’ve met.',
   harassment: 'This message may break our community guidelines. You can report or unmatch from More at the top.',
 };
 

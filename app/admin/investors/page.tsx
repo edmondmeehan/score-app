@@ -64,7 +64,7 @@ export default async function InvestorsAdmin({ searchParams }: { searchParams: P
       </div>
       {sp.ok && <div className="notice">{sp.ok}</div>}
       {sp.error && <div className="notice error">{sp.error}</div>}
-      {notReady && <div className="notice error">Run migration 0021 in the Score SQL Editor to turn on the investor room.</div>}
+      {notReady && <div className="notice error">Run migration 0021 in the ScoreDate SQL Editor to turn on the investor room.</div>}
       {error && !notReady && <div className="notice error">{/owner/i.test(error.message) ? 'Only owners can manage the investor room.' : error.message}</div>}
       <span className="small muted">A private page at scoredate.app/investors. It isn’t linked anywhere and search engines are told not to index it. Share the address and password directly.</span>
 

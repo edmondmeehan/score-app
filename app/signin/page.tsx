@@ -18,8 +18,8 @@ export default async function SignIn({ searchParams }: { searchParams: Promise<S
   return (
     <div className="phone" style={{ justifyContent: 'center' }}>
       <div className="stack" style={{ alignItems: 'center', gap: 16, paddingBottom: 24 }}>
-        <Gauge size={72} label="Score" />
-        <span className="mono" style={{ fontSize: 20, letterSpacing: '.42em' }}>SCORE</span>
+        <Gauge size={72} label="ScoreDate" />
+        <span className="mono" style={{ fontSize: 20, letterSpacing: '.28em' }}>SCOREDATE</span>
         <p className="serif" style={{ fontSize: 28, textAlign: 'center', margin: 0 }}>
           {mode === 'signup' ? 'Create your account.' : mode === 'reset' ? 'Reset your password.' : 'Date someone who has their act together.'}
         </p>

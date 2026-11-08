@@ -5,7 +5,7 @@ import { supabaseAnon } from '@/lib/supabase/server';
 import { verifyUnsub } from '@/lib/unsub';
 
 const LABEL: Record<string, string> = {
-  all: 'all Score emails except account and security emails',
+  all: 'all ScoreDate emails except account and security emails',
   daily_drop: 'Daily Drop emails',
   messages: 'new message emails',
   events: 'event announcements',
@@ -25,7 +25,7 @@ export default async function Unsubscribe({ searchParams }: { searchParams: Prom
   const valid = sp.u && sp.k && sp.s && verifyUnsub(sp.u, sp.k, sp.s);
   return (
     <div className="phone" style={{ justifyContent: 'center', textAlign: 'center' }}>
-      <div className="stack" style={{ alignItems: 'center', gap: 14 }}><Gauge size={56} label="Score" /></div>
+      <div className="stack" style={{ alignItems: 'center', gap: 14 }}><Gauge size={56} label="ScoreDate" /></div>
       {sp.done ? (
         <>
           <h1 className="serif" style={{ fontSize: 34 }}>You&apos;re unsubscribed.</h1>

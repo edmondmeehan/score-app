@@ -4,9 +4,9 @@ import { getIntegration } from '@/lib/integrations';
 import { activeEntitlements, isPreviewProduct, planFromEntitlements } from '@/lib/revenuecat';
 import { supabaseAnon } from '@/lib/supabase/server';
 
-// RevenueCat → Score. In RevenueCat: Project settings → Integrations → Webhooks.
+// RevenueCat → ScoreDate. In RevenueCat: Project settings → Integrations → Webhooks.
 //   URL: https://<domain>/api/billing/revenuecat
-//   Authorization header: the "Webhook authorization" value from Score admin → Integrations → RevenueCat.
+//   Authorization header: the "Webhook authorization" value from ScoreDate admin → Integrations → RevenueCat.
 // The iPhone/Android apps must log in to RevenueCat with the Supabase user ID as the app user ID.
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -23,7 +23,7 @@ export async function POST(req: Request) {
 
   const candidates: string[] = [e.app_user_id, e.original_app_user_id, ...(e.aliases || [])].filter(Boolean);
   const userId = candidates.find((c) => UUID.test(c));
-  if (!userId) return NextResponse.json({ ok: true, skipped: 'no Score user id' });
+  if (!userId) return NextResponse.json({ ok: true, skipped: 'no ScoreDate user id' });
 
   // Source of truth: ask RevenueCat what's active now. Fall back to the event itself.
   let plan: string;

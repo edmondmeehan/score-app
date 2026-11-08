@@ -65,7 +65,7 @@ export default async function Discover({ searchParams }: { searchParams: Promise
       <Section title="Success stories" more={{ href: '/app/discover/stories', label: st.length ? 'All stories' : 'Share yours' }}>
         {st.length === 0 ? (
           <div className="card stack" style={{ gap: 10 }}>
-            <span className="serif" style={{ fontSize: 22 }}>Met someone on Score?</span>
+            <span className="serif" style={{ fontSize: 22 }}>Met someone on ScoreDate?</span>
             <span className="small muted">Tell us how it happened. We only share stories with your permission.</span>
             <Link href="/app/discover/stories#share" className="btn ghost sm" style={{ alignSelf: 'flex-start' }}>Share your story</Link>
           </div>
@@ -89,7 +89,7 @@ export default async function Discover({ searchParams }: { searchParams: Promise
             ))}
           </div>
         )}
-        <Link href="/partners" className="small">Own a venue or brand? Partner with Score</Link>
+        <Link href="/partners" className="small">Own a venue or brand? Partner with ScoreDate</Link>
       </Section>
       <AppFooter />
     </div>

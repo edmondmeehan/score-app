@@ -62,8 +62,8 @@ export default function PushToggle({ compact = false, onDone }: { compact?: bool
 
   if (state === 'loading') return null;
   if (state === 'unsupported') return compact ? null : <span className="small muted">This browser doesn&apos;t support notifications.</span>;
-  if (state === 'ios-install') return <span className="small muted">On iPhone, tap Share → <strong>Add to Home Screen</strong>, open Score from your home screen, then turn on notifications here.</span>;
-  if (state === 'denied') return <span className="small muted">Notifications are blocked for Score. Turn them on in your browser or phone settings, then come back.</span>;
+  if (state === 'ios-install') return <span className="small muted">On iPhone, tap Share → <strong>Add to Home Screen</strong>, open ScoreDate from your home screen, then turn on notifications here.</span>;
+  if (state === 'denied') return <span className="small muted">Notifications are blocked for ScoreDate. Turn them on in your browser or phone settings, then come back.</span>;
   return (
     <div className="stack" style={{ gap: 6 }}>
       {state === 'on'

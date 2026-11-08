@@ -6,13 +6,13 @@ import { supabaseAnon } from '@/lib/supabase/server';
 import { sendContact } from './actions';
 
 export const dynamic = 'force-dynamic';
-export const metadata: Metadata = { title: 'Back soon · Score', robots: { index: false } };
+export const metadata: Metadata = { title: 'Back soon · ScoreDate', robots: { index: false } };
 
 const SUPPORT = 'support@scoredate.app';
 
 export default async function Maintenance({ searchParams }: { searchParams: Promise<{ sent?: string; error?: string }> }) {
   const sp = await searchParams;
-  let message = 'Score is down for scheduled maintenance. We’ll be back shortly.';
+  let message = 'ScoreDate is down for scheduled maintenance. We’ll be back shortly.';
   let on = true;
   try {
     const { data } = await supabaseAnon().from('app_config').select('value').eq('key', 'maintenance').maybeSingle();
@@ -25,9 +25,9 @@ export default async function Maintenance({ searchParams }: { searchParams: Prom
       <Logo />
       <div className="stack" style={{ gap: 10 }}>
         <span className="eyebrow">{on ? 'Maintenance' : 'All clear'}</span>
-        <h1 className="serif" style={{ fontSize: 46, lineHeight: 1.05, margin: 0 }}>{on ? 'We’ll be right back.' : 'Score is back.'}</h1>
+        <h1 className="serif" style={{ fontSize: 46, lineHeight: 1.05, margin: 0 }}>{on ? 'We’ll be right back.' : 'ScoreDate is back.'}</h1>
         <p className="muted" style={{ margin: 0, lineHeight: 1.6 }}>{on ? message : 'Maintenance is finished.'}</p>
-        {!on && <Link href="/" className="btn" style={{ alignSelf: 'flex-start' }}>Go to Score</Link>}
+        {!on && <Link href="/" className="btn" style={{ alignSelf: 'flex-start' }}>Go to ScoreDate</Link>}
       </div>
 
       {on && (

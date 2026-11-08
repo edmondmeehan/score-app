@@ -42,7 +42,7 @@ export default async function Member({ params, searchParams }: { params: Promise
         <div className="card gold row">
           <Gauge fill={b.fill} color={b.color} size={56} />
           <div className="stack grow" style={{ gap: 2 }}>
-            <span className="label">Score band</span>
+            <span className="label">ScoreDate band</span>
             <span className="serif" style={{ fontSize: 32, color: b.color }}>{b.label}</span>
             <span className="small muted">Verified{p.credit_verified_at ? ` ${new Date(p.credit_verified_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}` : ''}{inviter?.first_name ? ` · Invited by ${inviter.first_name}` : ''}</span>
           </div>

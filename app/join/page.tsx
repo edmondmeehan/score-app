@@ -15,7 +15,7 @@ export default async function Join({ searchParams }: { searchParams: Promise<{ c
       <Logo />
       <span className="eyebrow">Invite only · New York</span>
       <h1 className="serif" style={{ fontSize: 44, lineHeight: 1.02 }}>Someone thinks you have your act together.</h1>
-      {sp.need && <div className="notice">Score is invite only. Enter the code a member sent you, or join the waitlist below.</div>}
+      {sp.need && <div className="notice">ScoreDate is invite only. Enter the code a member sent you, or join the waitlist below.</div>}
       {sp.error && <div className="notice error">{sp.error}</div>}
       <form action={saveInvite} className="stack">
         <label className="field">Invite code
@@ -26,7 +26,7 @@ export default async function Join({ searchParams }: { searchParams: Promise<{ c
       <QuickWaitlist email={user?.email} />
       {spots.length > 0 && (
         <section className="stack" style={{ gap: 10 }}>
-          <span className="label">Where Score is growing</span>
+          <span className="label">Where ScoreDate is growing</span>
           <HeatMap tiles={await getBasemap()} spots={spots} height={280} center={[40.85, -73.85]} zoom={9} />
           <Legend />
           <span className="small muted">New York City is open now. Other areas open as their waitlists grow. Shown by area only.</span>

@@ -35,7 +35,7 @@ export default async function Matchmaker({ searchParams }: { searchParams: Promi
               // eslint-disable-next-line @next/next/no-img-element
               ? <img src={mm!.photo_url} alt="" width={64} height={64} style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover' }} />
               : <span className="serif" style={{ width: 64, height: 64, borderRadius: '50%', display: 'grid', placeItems: 'center', background: 'var(--gold-wash)', color: 'var(--gold-light)', fontSize: 28 }}>{name.slice(0, 1)}</span>}
-            <span className="stack" style={{ gap: 2 }}><strong style={{ fontSize: 18 }}>{name}</strong><span className="small muted">Your Score matchmaker</span></span>
+            <span className="stack" style={{ gap: 2 }}><strong style={{ fontSize: 18 }}>{name}</strong><span className="small muted">Your ScoreDate matchmaker</span></span>
           </div>
           {mm!.bio && <span className="small" style={{ lineHeight: 1.55 }}>{mm!.bio}</span>}
           <div className="row" style={{ gap: 8, flexWrap: 'wrap' }}>
@@ -58,7 +58,7 @@ export default async function Matchmaker({ searchParams }: { searchParams: Promi
         {thread.map((m) => (
           <div key={m.id} className="stack" style={{ gap: 2, alignItems: m.from_member ? 'flex-end' : 'flex-start' }}>
             <span style={{ maxWidth: '85%', padding: '10px 14px', borderRadius: 16, lineHeight: 1.45, whiteSpace: 'pre-wrap', background: m.from_member ? 'var(--gold-wash)' : 'var(--bubble)', color: m.from_member ? 'var(--gold-light)' : 'inherit' }}>{m.body}</span>
-            <span className="small muted" style={{ fontSize: 11 }}>{m.from_member ? 'You' : name || 'Score'} · {when(m.created_at)}</span>
+            <span className="small muted" style={{ fontSize: 11 }}>{m.from_member ? 'You' : name || 'ScoreDate'} · {when(m.created_at)}</span>
           </div>
         ))}
         <form action={messageMatchmaker} className="stack" style={{ gap: 8 }}>

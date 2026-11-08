@@ -7,7 +7,7 @@ import { SEASONS, type Effect, type SeasonConfig, type SeasonKey } from '@/lib/s
 
 const EFFECTS: Effect[] = ['none', 'snow', 'confetti', 'hearts', 'leaves', 'embers', 'sparks'];
 const MD = /^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
-const err = (m: string) => (/Could not find the function/i.test(m) ? 'Run migration 0027 in the Score SQL Editor first.' : m);
+const err = (m: string) => (/Could not find the function/i.test(m) ? 'Run migration 0027 in the ScoreDate SQL Editor first.' : m);
 
 export async function saveSeasons(form: FormData) {
   const { supabase } = await requireStaff();

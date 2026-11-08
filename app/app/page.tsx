@@ -19,7 +19,7 @@ export default async function Drop({ searchParams }: { searchParams: Promise<{ o
   if (me.status === 'paused' || me.status === 'taken') {
     return (
       <div className="phone" style={{ justifyContent: 'center', textAlign: 'center' }}>
-        <h1 className="serif" style={{ fontSize: 36 }}>{me.status === 'taken' ? 'Matched on Score' : 'You’re paused'}</h1>
+        <h1 className="serif" style={{ fontSize: 36 }}>{me.status === 'taken' ? 'Matched on ScoreDate' : 'You’re paused'}</h1>
         <p className="muted">You’re hidden from matching. Your chats and friends are still here.</p>
         <Link className="btn block" href="/app/settings">Change status</Link>
       </div>

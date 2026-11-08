@@ -109,7 +109,7 @@ export default async function EditProfile({ searchParams }: { searchParams: Prom
           <label className="field grow">I’ll splurge on…<input className="input" name="flag_splurge" maxLength={60} defaultValue={me.flag_splurge || ''} placeholder="concert tickets" /></label>
           <label className="field grow">…but always save on<input className="input" name="flag_save" maxLength={60} defaultValue={me.flag_save || ''} placeholder="takeout" /></label>
         </div>
-        <label className="choice" style={{ alignItems: 'flex-start' }}><input type="checkbox" name="show_verified" defaultChecked={me.show_verified !== false} style={{ accentColor: 'var(--gold)', marginTop: 4 }} /><span className="stack" style={{ gap: 2 }}><strong>Show my Verified badge</strong><span className="small muted">Shows you finished Score’s ID and credit checks. Never shows your score.</span></span></label>
+        <label className="choice" style={{ alignItems: 'flex-start' }}><input type="checkbox" name="show_verified" defaultChecked={me.show_verified !== false} style={{ accentColor: 'var(--gold)', marginTop: 4 }} /><span className="stack" style={{ gap: 2 }}><strong>Show my Verified badge</strong><span className="small muted">Shows you finished ScoreDate’s ID and credit checks. Never shows your score.</span></span></label>
         {sp.saved === 'flags' && <div className="notice">Saved.</div>}
         <button className="btn ghost sm" style={{ alignSelf: 'flex-start' }}>Save</button>
       </form>

@@ -69,7 +69,7 @@ export async function joinWaitlist(_: WaitlistState, form: FormData): Promise<Wa
     joined,
     message: open
       ? `You're on the waitlist for ${place}. We sent a confirmation to ${email} and will email you when your invite is ready.`
-      : `You're on the waitlist. Score is opening in ${place} soon, and we'll email ${email} as soon as invites go out in your area.`,
+      : `You're on the waitlist. ScoreDate is opening in ${place} soon, and we'll email ${email} as soon as invites go out in your area.`,
   };
 }
 
@@ -85,5 +85,5 @@ export async function notifyMe(_: unknown, form: FormData) {
   });
   if (error && !error.message.includes('duplicate')) return { ok: false, message: 'Something went wrong. Try again.' };
   if (!error) await Promise.all([sendEmail(email, 'notify_area', { first_name: String(form.get('first_name') || '') || null, zip }), trackEvent('notify_outside_nyc')]);
-  return { ok: true, message: "Thanks. We'll email you when Score opens near you." };
+  return { ok: true, message: "Thanks. We'll email you when ScoreDate opens near you." };
 }

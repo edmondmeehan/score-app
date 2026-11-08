@@ -5,7 +5,7 @@ import { requireStaff } from '@/lib/session';
 import { sendEmail } from '@/lib/mailer';
 import { reportBlocks } from '@/lib/adminReport';
 
-const err = (m: string) => (/Could not find the function/i.test(m) ? 'Run migration 0024 in the Score SQL Editor first.' : m);
+const err = (m: string) => (/Could not find the function/i.test(m) ? 'Run migration 0024 in the ScoreDate SQL Editor first.' : m);
 
 export async function saveReportPrefs(form: FormData) {
   const { supabase } = await requireStaff();

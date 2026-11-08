@@ -17,10 +17,10 @@ export default async function ReportsAdmin({ searchParams }: { searchParams: Pro
   return (
     <>
       <h1 className="serif" style={{ fontSize: 44 }}>Daily report</h1>
-      <span className="small muted">A morning email with the last 24 hours on Score. Each admin chooses their own sections. Test accounts are left out.</span>
+      <span className="small muted">A morning email with the last 24 hours on ScoreDate. Each admin chooses their own sections. Test accounts are left out.</span>
       {sp.ok && <div className="notice">{sp.ok}</div>}
       {sp.error && <div className="notice error">{sp.error}</div>}
-      {notReady && <div className="notice error">Run migration 0024 in the Score SQL Editor to turn on daily reports.</div>}
+      {notReady && <div className="notice error">Run migration 0024 in the ScoreDate SQL Editor to turn on daily reports.</div>}
 
       <form action={saveReportPrefs} className="card stack" style={{ gap: 14 }}>
         <label className="row" style={{ gap: 10, alignItems: 'center' }}>

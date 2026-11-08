@@ -54,7 +54,7 @@ export default async function ReserveAdmin({ searchParams }: { searchParams: Pro
       <h1 className="serif" style={{ fontSize: 44 }}>Reserve</h1>
       {sp.ok && <div className="notice">{sp.ok}</div>}
       {sp.error && <div className="notice error">{sp.error}</div>}
-      {notReady && <div className="notice error">Run migration 0022 in the Score SQL Editor to turn on matchmakers. ({(e1 || e2)?.message})</div>}
+      {notReady && <div className="notice error">Run migration 0022 in the ScoreDate SQL Editor to turn on matchmakers. ({(e1 || e2)?.message})</div>}
       {otherError && <div className="notice error">Couldn’t load Reserve data: {otherError.message}{otherError.code ? ` (${otherError.code})` : ''}</div>}
 
       <section className="card stack" style={{ gap: 10 }}>
@@ -115,7 +115,7 @@ export default async function ReserveAdmin({ searchParams }: { searchParams: Pro
 
       <section id="matchmakers" className="card stack" style={{ gap: 14 }}>
         <strong>Matchmakers</strong>
-        <span className="small muted">Members see the name, photo, bio and booking link. They reach the matchmaker by messaging in Score or at the email shown, so no one’s personal inbox is exposed.</span>
+        <span className="small muted">Members see the name, photo, bio and booking link. They reach the matchmaker by messaging in ScoreDate or at the email shown, so no one’s personal inbox is exposed.</span>
         {list.map((m) => (
           <details key={m.id} className="card" style={{ background: 'var(--onyx)' }}>
             <summary style={{ cursor: 'pointer' }}><strong>{m.name}</strong> <span className="small muted">{m.active ? '' : '· inactive'} {m.booking_url ? '' : '· no booking link'}</span></summary>

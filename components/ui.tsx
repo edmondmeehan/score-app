@@ -19,8 +19,8 @@ export function Gauge({ fill = 0.85, color = 'var(--gold)', size = 64, track = '
 export function Logo({ size = 18 }: { size?: number }) {
   return (
     <span className="row" style={{ gap: 10 }}>
-      <Gauge size={size * 1.6} label="Score" />
-      <span className="mono" style={{ fontSize: size, letterSpacing: '.42em', fontWeight: 500 }}>SCORE</span>
+      <Gauge size={size * 1.6} label="ScoreDate" />
+      <span className="mono" style={{ fontSize: size, letterSpacing: '.28em', fontWeight: 500 }}>SCOREDATE</span>
     </span>
   );
 }

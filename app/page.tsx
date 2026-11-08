@@ -19,14 +19,14 @@ export default async function Landing() {
         <div className="stack" style={{ flex: '1 1 480px', gap: 26 }}>
           <span className="eyebrow">Invite only · New York</span>
           <h1 className="serif" style={{ fontSize: 'clamp(48px, 8vw, 88px)', lineHeight: 0.98 }}>Date someone who has their act together.</h1>
-          <p style={{ fontSize: 19, lineHeight: 1.55, color: 'var(--muted)', maxWidth: 520, margin: 0 }}>Score is the dating app where every member has verified their credit and their identity. Every band is welcome. Honesty about money is required.</p>
+          <p style={{ fontSize: 19, lineHeight: 1.55, color: 'var(--muted)', maxWidth: 520, margin: 0 }}>ScoreDate is the dating app where every member has verified their credit and their identity. Every band is welcome. Honesty about money is required.</p>
           <div className="row" style={{ flexWrap: 'wrap' }}>
             <a href="#invite" className="btn">Request an invite</a>
             <Link href="/join" className="btn ghost">I have an invite code</Link>
           </div>
         </div>
         <div className="hero-glow" style={{ flex: '1 1 320px', display: 'flex', justifyContent: 'center', isolation: 'isolate' }}>
-          <Gauge size={280} label="Score gauge" />
+          <Gauge size={280} label="ScoreDate gauge" />
         </div>
       </section>
 

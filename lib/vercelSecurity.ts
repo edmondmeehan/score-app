@@ -4,7 +4,7 @@ import 'server-only';
 const API = 'https://api.vercel.com';
 const TEAM = process.env.VERCEL_TEAM_ID || 'team_NgoNLTCpkZJtMvofpxa0DBqB';
 const PROJECT = process.env.SCORE_VERCEL_PROJECT_ID || process.env.VERCEL_PROJECT_ID || 'prj_MKOzvdqJYuJiHTgqBGhUwpgfJGAc';
-export const BYPASS_RULE_NAME = 'Score: let webhooks and cron through';
+export const BYPASS_RULE_NAME = 'ScoreDate: let webhooks and cron through';
 
 // Server-to-server endpoints that must never get a browser challenge (RevenueCat, ID verification, cron, email unsubscribe).
 const SERVER_PATHS = ['/api/billing/', '/api/verify/webhook', '/api/cron', '/api/unsubscribe'];

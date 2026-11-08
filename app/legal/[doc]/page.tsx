@@ -12,7 +12,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ doc: string }> }): Promise<Metadata> {
   const { doc } = await params;
   const d = DOCS[doc];
-  return d ? { title: `${d.title} · Score`, description: d.summary } : {};
+  return d ? { title: `${d.title} · ScoreDate`, description: d.summary } : {};
 }
 
 export default async function Legal({ params }: { params: Promise<{ doc: string }> }) {

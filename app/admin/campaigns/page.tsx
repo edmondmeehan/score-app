@@ -41,7 +41,7 @@ export default async function Campaigns({ searchParams }: { searchParams: Promis
       <span className="small muted">Waitlist signups by where they first came from, against what you spent. A signup is credited to the first campaign link that brought that browser to scoredate.app. Qualified = a zip code in an open area.</span>
       {sp.ok && <div className="notice">{sp.ok}</div>}
       {sp.error && <div className="notice error">{sp.error}</div>}
-      {notReady && <div className="notice error">Run migration 0029 in the Score SQL Editor first.</div>}
+      {notReady && <div className="notice error">Run migration 0029 in the ScoreDate SQL Editor first.</div>}
 
       <form className="row" style={{ gap: 8, flexWrap: 'wrap', alignItems: 'flex-end' }}>
         <label className="stack small" style={{ gap: 4 }}>From<input className="input" type="date" name="from" defaultValue={from} /></label>

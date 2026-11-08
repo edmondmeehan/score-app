@@ -31,7 +31,7 @@ export default async function MemberDetail({ params, searchParams }: { params: P
           <h2 style={{ fontSize: 16, fontWeight: 600 }}>Verification</h2>
           <span className="small">ID: {p.id_status} · Photos: {p.photo_status}</span>
           <span className="small">Band verified: {p.credit_verified_at ? new Date(p.credit_verified_at).toLocaleDateString() : 'not yet'}</span>
-          <div className="notice">Score never stores exact credit scores, reports, or ID images.</div>
+          <div className="notice">ScoreDate never stores exact credit scores, reports, or ID images.</div>
           {(ver || []).map((v, i) => <span key={i} className="small muted">{new Date(v.created_at).toLocaleString()} · {v.kind} · {v.provider} · {v.status} {v.detail ? `· ${v.detail}` : ''}</span>)}
         </section>
         <section className="card stack" style={{ flex: '1 1 300px' }}>

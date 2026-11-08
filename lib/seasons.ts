@@ -15,7 +15,7 @@ export const SEASONS: SeasonDef[] = [
   { key: 'fourth_of_july', name: '4th of July', start: '07-01', end: '07-05', accent: '#D96B6B', accentLight: '#8FB4E8', glow: 'rgba(143,180,232,.14)', banner: 'Happy 4th. Financial independence looks good on you.', effect: 'sparks', enabled: true },
   { key: 'halloween', name: 'Halloween', start: '10-24', end: '10-31', accent: '#E8893A', accentLight: '#F4B57E', glow: 'rgba(232,137,58,.16)', banner: 'The only scary thing here is your ex’s credit.', effect: 'embers', enabled: true },
   { key: 'thanksgiving', name: 'Thanksgiving', start: 'auto', end: 'auto', accent: '#C98E62', accentLight: '#E3B48D', glow: 'rgba(201,142,98,.16)', banner: 'Grateful for every member, in every band.', effect: 'leaves', enabled: true },
-  { key: 'holidays', name: 'Holidays', start: '12-15', end: '12-30', accent: '#C9A961', accentLight: '#E4CC8E', glow: 'rgba(201,169,97,.16)', banner: 'Happy holidays from Score.', effect: 'snow', enabled: true },
+  { key: 'holidays', name: 'Holidays', start: '12-15', end: '12-30', accent: '#C9A961', accentLight: '#E4CC8E', glow: 'rgba(201,169,97,.16)', banner: 'Happy holidays from ScoreDate.', effect: 'snow', enabled: true },
 ];
 
 export type SeasonOverride = Partial<Pick<SeasonDef, 'start' | 'end' | 'banner' | 'effect' | 'enabled'>>;

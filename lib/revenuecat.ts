@@ -4,7 +4,7 @@ import { getIntegration } from '@/lib/integrations';
 const RANK = ['none', 'preview', 'paused', 'membership', 'premium', 'black'] as const;
 export type Plan = (typeof RANK)[number];
 
-/** Map active entitlement IDs (as named in RevenueCat) to Score's highest plan. */
+/** Map active entitlement IDs (as named in RevenueCat) to ScoreDate's highest plan. */
 export async function planFromEntitlements(active: string[]): Promise<Plan> {
   const rc = await getIntegration('revenuecat');
   const map: Record<string, string> = rc.config.entitlements || {};

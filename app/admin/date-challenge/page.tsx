@@ -27,7 +27,7 @@ export default async function DateChallenge({ searchParams }: { searchParams: Pr
     <>
       <h1 className="serif" style={{ fontSize: 44 }}>$50 Date Challenge</h1>
       <span className="small muted">Stories members shared after a $50 Date Challenge. Only entries marked “OK to feature” can be featured, using first names only.</span>
-      {(sp.error || (error && /relation|schema cache/i.test(error.message))) && <div className="notice error">{sp.error || 'Run migration 0026 in the Score SQL Editor first.'}</div>}
+      {(sp.error || (error && /relation|schema cache/i.test(error.message))) && <div className="notice error">{sp.error || 'Run migration 0026 in the ScoreDate SQL Editor first.'}</div>}
       {rows.length === 0 && <div className="card small muted">No entries yet.</div>}
       {rows.map((r) => (
         <div key={r.id} className="card stack" style={{ gap: 6 }}>

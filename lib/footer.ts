@@ -20,13 +20,13 @@ export const FOOTER_DEFAULT: FooterConfig = {
   address: '1133 Broadway, Suite 1301\nNew York, NY 10010',
   email: 'support@scoredate.app',
   columns: [
-    { title: 'Score', links: [{ label: 'How it works', href: '/#how' }, { label: 'Where we’re live', href: '/#where' }, { label: 'Request an invite', href: '/#invite' }, { label: 'I have a code', href: '/join' }, { label: 'Sign in', href: '/signin' }, { label: 'Help center', href: '/help' }] },
+    { title: 'ScoreDate', links: [{ label: 'How it works', href: '/#how' }, { label: 'Where we’re live', href: '/#where' }, { label: 'Request an invite', href: '/#invite' }, { label: 'I have a code', href: '/join' }, { label: 'Sign in', href: '/signin' }, { label: 'Help center', href: '/help' }] },
     { title: 'Trust & safety', links: [{ label: 'Safety center', href: '/safety' }, { label: 'Community guidelines', href: '/legal/community' }, { label: 'Biometric data policy', href: '/legal/biometric' }, { label: 'Report a concern', href: '/safety#report' }] },
     { title: 'Company', links: [{ label: 'Partners', href: '/partners' }, { label: 'Press', href: '/press' }, { label: 'Brand & marketing', href: '/brand' }, { label: 'Contact', href: '/contact' }] },
     { title: 'Legal', links: [{ label: 'Terms of Service', href: '/legal/terms' }, { label: 'Privacy Policy', href: '/legal/privacy' }, { label: 'Your privacy choices', href: '/legal/choices' }, { label: 'Cookie notice', href: '/legal/cookies' }] },
   ],
   copyright: '© {year} Please & Thank You, Inc. All rights reserved. Members must be 25+.',
-  disclaimer: 'Score is not a credit bureau, lender or credit repair service. Checking your band uses a soft inquiry that does not affect your credit score. Score never sees or stores your exact score or credit report. In an emergency, call 911.',
+  disclaimer: 'ScoreDate is not a credit bureau, lender or credit repair service. Checking your band uses a soft inquiry that does not affect your credit score. ScoreDate never sees or stores your exact score or credit report. In an emergency, call 911.',
   app_links: [{ label: 'Partners', href: '/partners' }, { label: 'Privacy', href: '/legal/privacy' }, { label: 'Terms', href: '/legal/terms' }, { label: 'Biometric policy', href: '/legal/biometric' }],
 };
 

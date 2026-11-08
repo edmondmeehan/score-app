@@ -11,26 +11,26 @@ const DRAFT = true; // flip to false once counsel has reviewed
 export const DOCS: Record<string, Doc> = {
   terms: {
     title: 'Terms of Service', eyebrow: 'Legal', updated: UPDATED, draft: DRAFT,
-    summary: 'The agreement between you and Score. Plain English where we can, precise where we have to be.',
+    summary: 'The agreement between you and ScoreDate. Plain English where we can, precise where we have to be.',
     sections: [
       { id: 'who', h: 'Who we are', body: [
-        `Score is an invite-only dating service operated by ${COMPANY} (“Score,” “we,” “us”), ${ADDRESS}. These Terms apply to the Score website at scoredate.app, the Score apps, and everything you can do in them (together, the “Service”).`,
-        'By creating an account, joining the waitlist, or using the Service, you agree to these Terms, our [Privacy Policy](/legal/privacy), our [Community Guidelines](/legal/community) and our [Biometric Data Policy](/legal/biometric). If you don’t agree, please don’t use Score.',
+        `ScoreDate is an invite-only dating service operated by ${COMPANY} (“ScoreDate,” “we,” “us”), ${ADDRESS}. These Terms apply to the ScoreDate website at scoredate.app, the ScoreDate apps, and everything you can do in them (together, the “Service”).`,
+        'By creating an account, joining the waitlist, or using the Service, you agree to these Terms, our [Privacy Policy](/legal/privacy), our [Community Guidelines](/legal/community) and our [Biometric Data Policy](/legal/biometric). If you don’t agree, please don’t use ScoreDate.',
       ] },
       { id: 'eligibility', h: 'Who can join', body: [
         'To be a member you must:',
         { ul: [
           'be at least **25 years old**;',
-          'live in, or regularly spend time in, an area where Score is open;',
+          'live in, or regularly spend time in, an area where ScoreDate is open;',
           'be legally able to enter a contract and not be barred from using the Service under any law;',
           'not be required to register as a sex offender anywhere, and not have been convicted of a violent or sexual crime;',
-          'not have been removed from Score before, unless we’ve said in writing you can come back;',
+          'not have been removed from ScoreDate before, unless we’ve said in writing you can come back;',
           'be single or in an arrangement where dating is honest and consensual for everyone involved.',
         ] },
         'Membership is by invitation. Joining the waitlist does not guarantee an invite, and we decide who receives invites and when.',
       ] },
       { id: 'verification', h: 'Verification', body: [
-        'Score is built on verification. Before you can match or message, we ask you to:',
+        'ScoreDate is built on verification. Before you can match or message, we ask you to:',
         { ul: [
           '**Confirm your identity** with a government ID and a live selfie through our identity verification partner.',
           '**Verify your credit band** through a soft credit inquiry by our credit data partner. A soft inquiry does not affect your credit score. We receive only your band (Elite, Strong, Solid or Building) and a 12-month trend, never your exact score or your credit report.',
@@ -45,24 +45,24 @@ export const DOCS: Record<string, Doc> = {
       { id: 'conduct', h: 'How you agree to behave', body: [
         'You agree to follow the [Community Guidelines](/legal/community). In short, you won’t:',
         { ul: [
-          'harass, threaten, stalk, bully, or intimidate anyone, on or off Score;',
+          'harass, threaten, stalk, bully, or intimidate anyone, on or off ScoreDate;',
           'ask any member for money, gifts, crypto, investments, loans or financial account details;',
           'post nudity, sexual content, hate speech, or anything violent or illegal;',
-          'share another member’s band, messages, photos or personal information outside Score, including by screenshot or screen recording;',
+          'share another member’s band, messages, photos or personal information outside ScoreDate, including by screenshot or screen recording;',
           'send photos in chat that are sexual, violent, or of someone who hasn’t agreed to be shared;',
           'promote a business, sell anything, recruit, or solicit;',
           'use bots, scrape the Service, reverse-engineer it, or try to get around our security or limits;',
-          'use Score if you’re under 25 or for anyone else.',
+          'use ScoreDate if you’re under 25 or for anyone else.',
         ] },
         'Where your device lets us detect it, we record when someone takes a screenshot of a profile or chat. Our team reviews repeated screenshots, which can lead to a warning or suspension.',
       ] },
       { id: 'content', h: 'Your content', body: [
-        'You own what you post (photos, prompts, messages). You give us a worldwide, non-exclusive, royalty-free license to host, store, display and process it only to run, improve and promote the Service to you and other members, and to keep Score safe. This license ends when you delete the content or your account, except where we must keep something for safety, legal or backup reasons for a limited time.',
-        'We will only feature your story (for example, from the $50 Date Challenge) in Score marketing if you give us permission at the time, and you can withdraw it later.',
+        'You own what you post (photos, prompts, messages). You give us a worldwide, non-exclusive, royalty-free license to host, store, display and process it only to run, improve and promote the Service to you and other members, and to keep ScoreDate safe. This license ends when you delete the content or your account, except where we must keep something for safety, legal or backup reasons for a limited time.',
+        'We will only feature your story (for example, from the $50 Date Challenge) in ScoreDate marketing if you give us permission at the time, and you can withdraw it later.',
         'We may remove any content or account that we believe breaks these Terms or puts anyone at risk.',
       ] },
       { id: 'billing', h: 'Memberships, purchases and billing', body: [
-        'Score offers paid plans (such as Membership, Premium and Reserve), a one-time Preview, Paused or Taken plans, and optional add-ons. Prices are shown before you buy.',
+        'ScoreDate offers paid plans (such as Membership, Premium and Reserve), a one-time Preview, Paused or Taken plans, and optional add-ons. Prices are shown before you buy.',
         { ul: [
           '**Subscriptions renew automatically** at the end of each period unless you cancel at least 24 hours before it ends.',
           'If you subscribe through the **Apple App Store or Google Play**, that store bills you and handles cancellations and refunds under its own terms. Cancel in your device’s subscription settings. Deleting the app or your account does not cancel a store subscription.',
@@ -72,7 +72,7 @@ export const DOCS: Record<string, Doc> = {
         'If we change a price, we’ll tell you in advance, and the new price applies from your next renewal.',
       ] },
       { id: 'safety', h: 'Safety and your interactions', body: [
-        'You’re responsible for your interactions with other members. Score does not run criminal background checks, and we can’t guarantee anyone’s identity, intentions or behavior, even with verification. Meet in public, tell a friend, and use the tools in our [Safety Center](/safety). If you’re in danger, call 911.',
+        'You’re responsible for your interactions with other members. ScoreDate does not run criminal background checks, and we can’t guarantee anyone’s identity, intentions or behavior, even with verification. Meet in public, tell a friend, and use the tools in our [Safety Center](/safety). If you’re in danger, call 911.',
         'Report anyone who makes you uncomfortable. A person on our team reviews every report and may warn, suspend or remove members. We’ll let you know when we’ve acted on your report, and we cooperate with law enforcement when required.',
         'Chat messages are scanned automatically for signs of scams (like requests for money or crypto) and harassment so we can show you a safety warning. Our team may review flagged messages. You can unmatch anyone at any time, which ends the chat for both of you.',
       ] },
@@ -80,18 +80,18 @@ export const DOCS: Record<string, Doc> = {
         'You can pause or delete your account at any time in Settings. We may suspend or remove an account, with or without notice, if we believe it breaks these Terms, creates risk, or is required by law. If we remove you for breaking these Terms, you won’t be entitled to a refund of unused time, except where the law or the store requires.',
       ] },
       { id: 'disclaimers', h: 'Disclaimers', body: [
-        'The Service is provided “as is” and “as available.” To the fullest extent the law allows, we disclaim all warranties, express or implied, including fitness for a particular purpose and non-infringement. We don’t promise you’ll find a match, and we aren’t responsible for the conduct of any member on or off Score.',
-        'Score is not a credit bureau, lender or credit repair service, and nothing on Score is financial advice.',
+        'The Service is provided “as is” and “as available.” To the fullest extent the law allows, we disclaim all warranties, express or implied, including fitness for a particular purpose and non-infringement. We don’t promise you’ll find a match, and we aren’t responsible for the conduct of any member on or off ScoreDate.',
+        'ScoreDate is not a credit bureau, lender or credit repair service, and nothing on ScoreDate is financial advice.',
       ] },
       { id: 'liability', h: 'Limits on our liability', body: [
-        'To the fullest extent the law allows, Score will not be liable for indirect, incidental, special, consequential or punitive damages, or for lost profits, data or goodwill. Our total liability for any claim relating to the Service is limited to the greater of the amount you paid us in the 12 months before the claim or $100. Some places don’t allow these limits, so they may not apply to you.',
+        'To the fullest extent the law allows, ScoreDate will not be liable for indirect, incidental, special, consequential or punitive damages, or for lost profits, data or goodwill. Our total liability for any claim relating to the Service is limited to the greater of the amount you paid us in the 12 months before the claim or $100. Some places don’t allow these limits, so they may not apply to you.',
       ] },
       { id: 'disputes', h: 'Disputes', body: [
         'Most concerns can be solved quickly. Before filing any claim, email legal@scoredate.app with a description, and give us 30 days to try to resolve it informally.',
         'These Terms are governed by the laws of the State of New York, without regard to conflict-of-law rules. Any claim not resolved informally will be brought in the state or federal courts located in New York County, New York, and you and we consent to that jurisdiction, except where the law of your place of residence gives you the right to bring a claim locally.',
       ] },
       { id: 'changes', h: 'Changes to these Terms', body: [
-        'We may update these Terms as Score grows. If a change is material, we’ll tell you by email or in the app before it takes effect. Continuing to use Score after that means you accept the updated Terms.',
+        'We may update these Terms as ScoreDate grows. If a change is material, we’ll tell you by email or in the app before it takes effect. Continuing to use ScoreDate after that means you accept the updated Terms.',
       ] },
       { id: 'contact', h: 'Contact', body: [
         `${COMPANY}, ${ADDRESS}. Email support@scoredate.app for help or legal@scoredate.app for legal notices.`,
@@ -101,13 +101,13 @@ export const DOCS: Record<string, Doc> = {
 
   privacy: {
     title: 'Privacy Policy', eyebrow: 'Legal', updated: UPDATED, draft: DRAFT,
-    summary: 'What we collect, why, who we share it with, and the choices you have. We built Score to know as little as it needs to.',
+    summary: 'What we collect, why, who we share it with, and the choices you have. We built ScoreDate to know as little as it needs to.',
     sections: [
       { id: 'short', h: 'The short version', body: [
         { ul: [
           'We store your **credit band and 12-month trend**, never your exact score or credit report.',
-          'Your **ID images and ID selfie stay with our verification partner**, not on Score’s servers.',
-          'We **don’t sell** your personal information. On our public website we use Meta and Google ad tags to measure whether our ads bring people to the waitlist, and you can opt out any time. They never run inside the Score app.',
+          'Your **ID images and ID selfie stay with our verification partner**, not on ScoreDate’s servers.',
+          'We **don’t sell** your personal information. On our public website we use Meta and Google ad tags to measure whether our ads bring people to the waitlist, and you can opt out any time. They never run inside the ScoreDate app.',
           'Other members only ever see what’s on your profile. The member map shows **neighborhoods, never people**, and only for groups of 25 or more.',
           'You can delete your account any time in Settings.',
         ] },
@@ -117,7 +117,7 @@ export const DOCS: Record<string, Doc> = {
         { ul: [
           'Waitlist details: name, email, zip code, what you do, and an invite or referral code if you have one.',
           'Account and profile: name, birth year, gender, who you’d like to meet, photos, job, neighborhood, prompts, money values, optional song and Instagram handle.',
-          'Messages, photos you send in chat, Notes, likes, date plans and event RSVPs you send through Score.',
+          'Messages, photos you send in chat, Notes, likes, date plans and event RSVPs you send through ScoreDate.',
           'Answers you give in Hot or Financially Compatible rounds, and any $50 Date Challenge story you choose to submit.',
           'Event and date locations you enter, which are completed using Google Places.',
           'Support requests and reports you file.',
@@ -135,18 +135,18 @@ export const DOCS: Record<string, Doc> = {
           'Screenshot events, where your device lets us detect them: who took one, on which screen, and when.',
           'Campaign details from the link that brought you to our website (such as utm tags, and whether you came from a Google, Meta or TikTok ad), saved with your waitlist signup.',
           'Error reports when something breaks on our servers: the page, the error message and the time. These don’t include your messages.',
-          'If you allow notifications in the Score app, a push token from Apple or Google so we can deliver them.',
+          'If you allow notifications in the ScoreDate app, a push token from Apple or Google so we can deliver them.',
           'Purchase records from Apple, Google and RevenueCat: product, price, store and renewal status. We never see your card number.',
         ] },
       ] },
       { id: 'use', h: 'How we use it', body: [
         { ul: [
-          'To run Score: create your account, verify you, build your Daily Drop, deliver messages, and process memberships.',
+          'To run ScoreDate: create your account, verify you, build your Daily Drop, deliver messages, and process memberships.',
           'To keep members safe: detect fake accounts and scams, automatically flag chat messages that look like scams or harassment and show a warning, review reports and screenshot activity, enforce our Guidelines, and respond to legal requests. These automated flags never suspend anyone on their own; a person on our team decides.',
           'To show compatibility: compare your blind-round answers with a match’s to show a for-fun percentage to the two of you.',
           'To fix problems: use error reports to find and repair bugs.',
           'To communicate: account emails, notifications you’ve turned on, and occasional updates you can unsubscribe from.',
-          'To improve Score: understand which features help people meet, in aggregate.',
+          'To improve ScoreDate: understand which features help people meet, in aggregate.',
           'To comply with law and protect our rights.',
         ] },
       ] },
@@ -165,7 +165,7 @@ export const DOCS: Record<string, Doc> = {
         ] },
         '**Advertising partners:** on our public website only (never in the app or your account), Meta (the Meta Pixel and Conversions API) and Google (the Google tag) receive your visit, your browser and device details, your IP address and, when you join the waitlist, a scrambled (hashed) copy of your email, so we can measure which ads work and show ads to people likely to be interested. Under some state laws this counts as “sharing” for targeted advertising. We never send them your credit band, verification results, profile or messages. Opt out at [Your Privacy Choices](/legal/choices); we also honor Global Privacy Control. Meta and Google use this data under their own privacy policies.',
         '**Legal and safety:** when required by law, or when we believe in good faith it’s necessary to prevent harm or fraud.',
-        '**Business changes:** if Score is involved in a merger or sale, data may transfer under this policy.',
+        '**Business changes:** if ScoreDate is involved in a merger or sale, data may transfer under this policy.',
         'We do not sell personal information for money.',
       ] },
       { id: 'retention', h: 'How long we keep it', body: [
@@ -180,7 +180,7 @@ export const DOCS: Record<string, Doc> = {
         ] },
       ] },
       { id: 'rights', h: 'Your rights and choices', body: [
-        'Depending on where you live (including California, Colorado, Connecticut, Virginia and other states), you may have the right to access, correct, delete or get a copy of your personal information, and to opt out of sale, sharing or targeted advertising. Score doesn’t sell personal information. To opt out of the ad measurement on our website (“sharing” under some state laws), use the switch on [Your Privacy Choices](/legal/choices). We honor Global Privacy Control signals.',
+        'Depending on where you live (including California, Colorado, Connecticut, Virginia and other states), you may have the right to access, correct, delete or get a copy of your personal information, and to opt out of sale, sharing or targeted advertising. ScoreDate doesn’t sell personal information. To opt out of the ad measurement on our website (“sharing” under some state laws), use the switch on [Your Privacy Choices](/legal/choices). We honor Global Privacy Control signals.',
         'You can download a copy of your data any time in **Settings → Your data → Download my data**.',
         'We won’t treat you differently for exercising your rights.',
       ] },
@@ -188,7 +188,7 @@ export const DOCS: Record<string, Doc> = {
         'We use encryption in transit, row-level access controls on our database, encrypted secrets, and least-privilege staff access. Staff actions on member accounts are logged. No system is perfect; if we ever learn of a breach affecting you, we’ll notify you as the law requires.',
       ] },
       { id: 'age', h: 'Age', body: [
-        'Score is for adults 25 and older. We don’t knowingly collect information from anyone under 18. If you believe a minor has joined, tell us at support@scoredate.app and we’ll remove the account.',
+        'ScoreDate is for adults 25 and older. We don’t knowingly collect information from anyone under 18. If you believe a minor has joined, tell us at support@scoredate.app and we’ll remove the account.',
       ] },
       { id: 'changes', h: 'Changes', body: [
         'We’ll post updates here and tell you about material changes by email or in the app before they take effect.',
@@ -204,7 +204,7 @@ export const DOCS: Record<string, Doc> = {
     summary: 'Every control you have over your data, and how to use it.',
     sections: [
       { id: 'sell', h: 'Opt out of sale and sharing', body: [
-        'Score does not sell personal information. On our public website (never inside the app), we use the Meta Pixel, Meta’s Conversions API and the Google tag to measure whether our ads bring people to the waitlist. Some state laws call this “sharing” for targeted advertising. Use the switch above to opt out on this browser. We never share your credit band, verification results, profile or messages with advertisers.',
+        'ScoreDate does not sell personal information. On our public website (never inside the app), we use the Meta Pixel, Meta’s Conversions API and the Google tag to measure whether our ads bring people to the waitlist. Some state laws call this “sharing” for targeted advertising. Use the switch above to opt out on this browser. We never share your credit band, verification results, profile or messages with advertisers.',
       ] },
       { id: 'in-app', h: 'Controls in the app', body: [
         { ul: [
@@ -237,10 +237,10 @@ export const DOCS: Record<string, Doc> = {
 
   cookies: {
     title: 'Cookie Notice', eyebrow: 'Legal', updated: UPDATED, draft: DRAFT,
-    summary: 'A short list, because we only use the cookies Score actually needs.',
+    summary: 'A short list, because we only use the cookies ScoreDate actually needs.',
     sections: [
       { id: 'what', h: 'The cookies we use', body: [
-        'These are first-party cookies set by scoredate.app. On our public website we also use advertising cookies from Meta and Google (listed below), unless you opt out at [Your Privacy Choices](/legal/choices). None of them run inside the Score app.',
+        'These are first-party cookies set by scoredate.app. On our public website we also use advertising cookies from Meta and Google (listed below), unless you opt out at [Your Privacy Choices](/legal/choices). None of them run inside the ScoreDate app.',
         { ul: [
           '**Sign-in** (Supabase auth): keeps you signed in. Essential.',
           '**score_theme:** remembers light, dark or system theme. Up to 1 year.',
@@ -264,7 +264,7 @@ export const DOCS: Record<string, Doc> = {
 
   community: {
     title: 'Community Guidelines', eyebrow: 'Trust & safety', updated: UPDATED,
-    summary: 'Score works because everyone here is who they say they are and treats each other well. These are the rules every member agrees to.',
+    summary: 'ScoreDate works because everyone here is who they say they are and treats each other well. These are the rules every member agrees to.',
     sections: [
       { id: 'real', h: 'Be real', body: [
         'Use your real first name, recent photos that clearly show you, and an honest profile. Your identity and band are verified, so everything else should be true too. No group photos as your first picture, no filters that change how you look, no photos of anyone else.',
@@ -279,10 +279,10 @@ export const DOCS: Record<string, Doc> = {
         'No unsolicited sexual messages or images, ever. Consent is ongoing and can be withdrawn at any time, in messages and in person.',
       ] },
       { id: 'private', h: 'Keep it private', body: [
-        'Don’t screenshot or share another member’s band, profile, messages or photos outside Score. Don’t try to find someone’s home, workplace or social accounts without their permission.',
+        'Don’t screenshot or share another member’s band, profile, messages or photos outside ScoreDate. Don’t try to find someone’s home, workplace or social accounts without their permission.',
       ] },
       { id: 'no-selling', h: 'No selling or recruiting', body: [
-        'Score isn’t for promoting a business, selling products or services, recruiting for anything, or sending people to other apps or sites for money.',
+        'ScoreDate isn’t for promoting a business, selling products or services, recruiting for anything, or sending people to other apps or sites for money.',
       ] },
       { id: 'illegal', h: 'Nothing hateful, violent or illegal', body: [
         'No hate speech or discrimination based on race, ethnicity, religion, disability, gender, gender identity or sexual orientation. No violence, threats, weapons, drugs, or anything illegal.',
@@ -314,10 +314,10 @@ export const DOCS: Record<string, Doc> = {
         'Only to confirm you are who you say you are and that your photos are really you. We never use face data for advertising, to identify you anywhere else, or to train models, and we never sell, lease, trade or profit from it.',
       ] },
       { id: 'where', h: 'Who holds it', body: [
-        'ID images and the ID selfie are held by our identity verification partner, not by Score. The photo-check selfie is processed in memory and not stored. Score keeps only the results (approved, declined or needs review) and a similarity score for each profile photo.',
+        'ID images and the ID selfie are held by our identity verification partner, not by ScoreDate. The photo-check selfie is processed in memory and not stored. ScoreDate keeps only the results (approved, declined or needs review) and a similarity score for each profile photo.',
       ] },
       { id: 'retention', h: 'How long it’s kept', body: [
-        'Biometric data held by our partners is permanently destroyed within 30 days after verification is complete, immediately when you delete your account, and in all cases no later than the law allows (including no later than three years after your last interaction with Score where Illinois law applies).',
+        'Biometric data held by our partners is permanently destroyed within 30 days after verification is complete, immediately when you delete your account, and in all cases no later than the law allows (including no later than three years after your last interaction with ScoreDate where Illinois law applies).',
       ] },
       { id: 'consent', h: 'Your consent', body: [
         'We ask for your written consent before any face comparison, and we keep a record of it. You can withdraw consent at any time by deleting your account. Without it, we can’t verify you, so you can’t match or message.',

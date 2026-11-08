@@ -2,7 +2,7 @@ import 'server-only';
 import { createSign } from 'node:crypto';
 
 /**
- * Native push for the Score iPhone and Android apps via Firebase Cloud Messaging (HTTP v1).
+ * Native push for the ScoreDate iPhone and Android apps via Firebase Cloud Messaging (HTTP v1).
  * Set FCM_SERVICE_ACCOUNT (the Firebase service-account JSON, as a sensitive env var). iPhone delivery
  * works once the APNs key is uploaded in Firebase → Project settings → Cloud Messaging.
  */

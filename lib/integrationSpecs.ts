@@ -44,7 +44,7 @@ export const SPECS: Spec[] = [
     notes: ['Use an IAM user that can only call rekognition:CompareFaces.'],
   },
   {
-    provider: 'revenuecat', name: 'RevenueCat', what: 'Subscriptions and purchases for the iPhone and Android apps. Keeps Score’s plans in sync with the App Store and Google Play.',
+    provider: 'revenuecat', name: 'RevenueCat', what: 'Subscriptions and purchases for the iPhone and Android apps. Keeps ScoreDate’s plans in sync with the App Store and Google Play.',
     required: ['secret_api_key', 'webhook_auth'], webhookPath: '/api/billing/revenuecat', testable: true,
     fields: [
       { key: 'entitlements.membership', label: 'Membership entitlement ID', placeholder: 'membership' },
@@ -56,7 +56,7 @@ export const SPECS: Spec[] = [
       { key: 'secret_api_key', label: 'Secret API key (v1)', secret: true, placeholder: 'sk_…' },
       { key: 'webhook_auth', label: 'Webhook authorization value', secret: true, help: 'Make up a long random value. Paste the same value in RevenueCat’s webhook “Authorization header”.' },
     ],
-    notes: ['In the apps, log in to RevenueCat with the member’s Score user ID.', 'App Store and Google Play credentials are uploaded to RevenueCat, not here.'],
+    notes: ['In the apps, log in to RevenueCat with the member’s ScoreDate user ID.', 'App Store and Google Play credentials are uploaded to RevenueCat, not here.'],
   },
   {
     provider: 'apple', name: 'Apple App Store', what: 'iPhone app listing and in-app purchase products.',
@@ -100,13 +100,13 @@ export const SPECS: Spec[] = [
     fields: [
       { key: 'resend_api_key', label: 'Resend API key', secret: true, placeholder: 're_…', help: 'Resend → API Keys → Create (Sending access is enough).' },
       { key: 'from', label: 'From address', placeholder: 'hello@score.app', help: 'Must be on a domain verified in Resend → Domains.' },
-      { key: 'from_name', label: 'From name', placeholder: 'Score' },
+      { key: 'from_name', label: 'From name', placeholder: 'ScoreDate' },
       { key: 'reply_to', label: 'Reply-to address', placeholder: 'support@score.app' },
     ],
     notes: [
       'Verify your sending domain in Resend → Domains (add the DNS records it gives you), then use an address on that domain as From.',
       'Sign-in links come from Supabase Auth. In Supabase → Authentication → SMTP Settings, turn on custom SMTP with host smtp.resend.com, port 465, user "resend", and your Resend API key as the password.',
-      'Then paste the Score sign-in template from admin → Emails into Supabase → Authentication → Email Templates → Magic Link.',
+      'Then paste the ScoreDate sign-in template from admin → Emails into Supabase → Authentication → Email Templates → Magic Link.',
     ],
   },
   {
@@ -118,7 +118,7 @@ export const SPECS: Spec[] = [
       { key: 'client_secret', label: 'Client secret', secret: true },
     ],
     notes: [
-      'Create an app at developer.spotify.com → Dashboard → Create app. Pick "Web API". No redirect URL is needed: Score only searches the catalog, members never connect their Spotify account.',
+      'Create an app at developer.spotify.com → Dashboard → Create app. Pick "Web API". No redirect URL is needed: ScoreDate only searches the catalog, members never connect their Spotify account.',
       'Without keys, members can still paste a Spotify song link. Search turns on once this is connected.',
     ],
   },

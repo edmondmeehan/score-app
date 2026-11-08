@@ -8,8 +8,8 @@ import { supabaseServer } from '@/lib/supabase/server';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Brand & marketing · Score',
-  description: 'The Score brand guide: logo, color, type, voice, messaging and approved assets for press, partners and our team.',
+  title: 'Brand & marketing · ScoreDate',
+  description: 'The ScoreDate brand guide: logo, color, type, voice, messaging and approved assets for press, partners and our team.',
 };
 
 const TOC = [
@@ -85,7 +85,7 @@ export default async function Brand() {
   const toc = staff ? [...TOC.slice(0, -1), { id: 'concepts', h: 'Upcoming campaigns (staff)' }, TOC[TOC.length - 1]] : TOC;
   return (
     <DocLayout eyebrow="Company" title="Brand & marketing" toc={toc} updated="November 2026"
-      summary="How Score looks, sounds and talks about itself. For our team, press, partners and anyone making something with our name on it.">
+      summary="How ScoreDate looks, sounds and talks about itself. For our team, press, partners and anyone making something with our name on it.">
 
       <section>
         <div className="card row" style={{ justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 8 }}>
@@ -96,7 +96,7 @@ export default async function Brand() {
 
       <section id="essence">
         <h2>Brand essence</h2>
-        <p><strong>Score is the dating app where every member has verified their credit and their identity.</strong> We exist because money is one of the biggest sources of friction in relationships, and the honest conversation about it usually comes far too late.</p>
+        <p><strong>ScoreDate is the dating app where every member has verified their credit and their identity.</strong> We exist because money is one of the biggest sources of friction in relationships, and the honest conversation about it usually comes far too late.</p>
         <div className="tool-grid">
           <div className="tool-card"><h3>Promise</h3><p>Date someone who has their act together.</p></div>
           <div className="tool-card"><h3>Belief</h3><p>Every band is welcome. Honesty about money is required.</p></div>
@@ -107,11 +107,11 @@ export default async function Brand() {
 
       <section id="logo">
         <h2>Logo</h2>
-        <p>The Score logo is the <strong>gauge mark</strong> with the <strong>SCORE wordmark</strong> set in JetBrains Mono with wide letter spacing. The gauge is a credit dial, three-quarters full, with a dot at the tip. Use the full logo wherever you can; use the gauge mark alone only where space is tight (avatars, favicons, small placements).</p>
+        <p>The ScoreDate logo is the <strong>gauge mark</strong> with the <strong>SCOREDATE wordmark</strong> set in JetBrains Mono with wide letter spacing. The gauge is a credit dial, three-quarters full, with a dot at the tip. Use the full logo wherever you can; use the gauge mark alone only where space is tight (avatars, favicons, small placements).</p>
         <div className="tool-grid" style={{ marginBottom: 14 }}>
           <div className="tool-card" style={{ alignItems: 'center', justifyContent: 'center', minHeight: 140, background: '#0B0B0C' }}><span style={{ color: '#F2F0EB' }}><Logo size={20} /></span></div>
           <div className="tool-card" style={{ alignItems: 'center', justifyContent: 'center', minHeight: 140, background: '#F6F3EC' }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, color: '#1A1916' }}><Gauge size={32} color="#A07F2E" track="#E6E0D2" /><span className="mono" style={{ fontSize: 20, letterSpacing: '.42em', fontWeight: 500 }}>SCORE</span></span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, color: '#1A1916' }}><Gauge size={32} color="#A07F2E" track="#E6E0D2" /><span className="mono" style={{ fontSize: 20, letterSpacing: '.28em', fontWeight: 500 }}>SCOREDATE</span></span>
           </div>
         </div>
         <h3>Clear space and size</h3>
@@ -125,7 +125,7 @@ export default async function Brand() {
 
       <section id="color">
         <h2>Color</h2>
-        <p>Score is dark-first: onyx and graphite with ivory type and a single gold accent. Gold is precious, so use it sparingly: one button, one highlight, the gauge. Roughly 80% onyx, 15% ivory and stone, 5% gold.</p>
+        <p>ScoreDate is dark-first: onyx and graphite with ivory type and a single gold accent. Gold is precious, so use it sparingly: one button, one highlight, the gauge. Roughly 80% onyx, 15% ivory and stone, 5% gold.</p>
         {SWATCHES.map((g) => (
           <div key={g.group} style={{ marginBottom: 16 }}>
             <span className="label" style={{ display: 'block', marginBottom: 8 }}>{g.group}</span>
@@ -179,7 +179,7 @@ export default async function Brand() {
         <h3>Style</h3>
         <ul>
           <li>Sentence case for headlines and buttons (“Request an invite”, not “Request An Invite”).</li>
-          <li>The product is “Score”, never “SCORE” in running text (the uppercase wordmark is only in the logo).</li>
+          <li>The product is “ScoreDate”, never “SCOREDATE” in running text (the uppercase wordmark is only in the logo).</li>
           <li>Ages: members are 25 and older. Location: “New York City first”.</li>
           <li>Use the Oxford comma. Spell out numbers one to nine; use numerals for 10 and up, prices and bands’ ranges.</li>
         </ul>
@@ -197,19 +197,19 @@ export default async function Brand() {
           <li>Invite only. New York first.</li>
         </ul>
         <h3>Boilerplate (short)</h3>
-        <p className="card" style={{ padding: 16 }}>Score is an invite-only dating app where every member verifies their identity and their credit band. Launching in New York City, Score makes honesty about money part of dating from the start, without ever showing anyone’s exact score.</p>
+        <p className="card" style={{ padding: 16 }}>ScoreDate is an invite-only dating app where every member verifies their identity and their credit band. Launching in New York City, ScoreDate makes honesty about money part of dating from the start, without ever showing anyone’s exact score.</p>
         <h3>Boilerplate (long)</h3>
-        <p className="card" style={{ padding: 16 }}>Score is an invite-only dating app for adults 25 and older who want a partner with their act together. Every member verifies a government ID, a live selfie and their credit band through a soft inquiry that never affects their credit score. Members see each other’s band (Elite, Strong, Solid or Building) and 12-month trend, never the number. Score is launching in New York City and expanding area by area as demand grows. Score is built by Please &amp; Thank You, Inc., based in New York.</p>
+        <p className="card" style={{ padding: 16 }}>ScoreDate is an invite-only dating app for adults 25 and older who want a partner with their act together. Every member verifies a government ID, a live selfie and their credit band through a soft inquiry that never affects their credit score. Members see each other’s band (Elite, Strong, Solid or Building) and 12-month trend, never the number. ScoreDate is launching in New York City and expanding area by area as demand grows. ScoreDate is built by Please &amp; Thank You, Inc., based in New York.</p>
       </section>
 
       <section id="claims">
         <h2>Claims & compliance</h2>
-        <p>Score touches credit, so a few rules are non-negotiable in every ad, post, email and partner placement.</p>
+        <p>ScoreDate touches credit, so a few rules are non-negotiable in every ad, post, email and partner placement.</p>
         <DoDont
-          dos={['“Checking your band is a soft inquiry and won’t affect your credit score.”', '“Members see a band and a trend, never the number.”', '“Score never sees or stores your exact score or credit report.”', 'Show real prices with “auto-renews, cancel anytime” where a price appears']}
-          donts={['Describe Score as a credit bureau, lender, credit repair or financial advice service', 'Promise better credit, matches, relationships or outcomes', 'Use fake reviews, invented testimonials or made-up member counts', 'Imply we share credit data with other members or partners', 'Target anyone under 25 or use imagery that looks under 25']}
+          dos={['“Checking your band is a soft inquiry and won’t affect your credit score.”', '“Members see a band and a trend, never the number.”', '“ScoreDate never sees or stores your exact score or credit report.”', 'Show real prices with “auto-renews, cancel anytime” where a price appears']}
+          donts={['Describe ScoreDate as a credit bureau, lender, credit repair or financial advice service', 'Promise better credit, matches, relationships or outcomes', 'Use fake reviews, invented testimonials or made-up member counts', 'Imply we share credit data with other members or partners', 'Target anyone under 25 or use imagery that looks under 25']}
         />
-        <p className="small muted">Statistics need a source. Our approved one: Federal Reserve research has found that couples with similar credit scores are more likely to stay together. Anything new goes through the Score team before it runs.</p>
+        <p className="small muted">Statistics need a source. Our approved one: Federal Reserve research has found that couples with similar credit scores are more likely to stay together. Anything new goes through the ScoreDate team before it runs.</p>
       </section>
 
       <section id="imagery">
@@ -217,7 +217,7 @@ export default async function Brand() {
         <ul>
           <li><strong>Mood:</strong> warm evening light, city textures, real moments (a shared table, a walk across a bridge), shallow depth of field.</li>
           <li><strong>People:</strong> confident, relaxed adults 25 and older, styled but not glossy. Diverse in every sense.</li>
-          <li><strong>Members:</strong> never use a member’s photo or story without written consent, and never present models, stock photos or AI-generated people as Score members.</li>
+          <li><strong>Members:</strong> never use a member’s photo or story without written consent, and never present models, stock photos or AI-generated people as ScoreDate members.</li>
           <li><strong>Avoid:</strong> cash, luxury logos, credit cards, “money shots”, and anything that suggests buying affection.</li>
           <li><strong>Graphics:</strong> when in doubt, use type and the gauge on onyx. It’s our most recognizable look.</li>
         </ul>
@@ -270,7 +270,7 @@ export default async function Brand() {
         </div>
         <h3>Suggested captions</h3>
         <ul>
-          <li>Date someone who has their act together. Score opens in New York first, and new members get their first 60 days free. Get on the list at scoredate.app.</li>
+          <li>Date someone who has their act together. ScoreDate opens in New York first, and new members get their first 60 days free. Get on the list at scoredate.app.</li>
           <li>Every member verified. Every band welcome. Your first two months are on us when your invite arrives. Link in bio.</li>
           <li>Invite only. New York first. 60 days free for new members. scoredate.app</li>
         </ul>
@@ -279,7 +279,7 @@ export default async function Brand() {
       {staff && (
       <section id="concepts">
         <h2>Upcoming campaigns <span className="mono small" style={{ color: 'var(--gold)', letterSpacing: '.12em', verticalAlign: 'middle' }}>STAFF ONLY</span></h2>
-        <div className="doc-draft">Only signed-in Score staff can see this section. Nothing here is live. Don’t share outside the team until it ships.</div>
+        <div className="doc-draft">Only signed-in ScoreDate staff can see this section. Nothing here is live. Don’t share outside the team until it ships.</div>
 
         <h3>Big idea: make financial compatibility something people flirt about</h3>
         <p>The credit band gets attention. How someone handles money gives people a reason to connect.</p>
@@ -287,7 +287,7 @@ export default async function Brand() {
         <div className="card stack" style={{ gap: 10, marginBottom: 16 }}>
           <span className="label">Lead feature</span>
           <strong style={{ fontSize: 22, fontFamily: 'var(--serif)', fontWeight: 400 }}>Hot or Financially Compatible?</strong>
-          <p style={{ margin: 0 }}>Two people answer five quick questions before seeing each other’s photos. Score reveals their money compatibility first, then their photos, and both choose whether to connect.</p>
+          <p style={{ margin: 0 }}>Two people answer five quick questions before seeing each other’s photos. ScoreDate reveals their money compatibility first, then their photos, and both choose whether to connect.</p>
           <ol style={{ margin: 0, paddingLeft: 20, display: 'grid', gap: 4 }}>
             <li>Would you rather have a luxury vacation or a bigger down payment?</li>
             <li>Split the check, alternate, or whoever invites pays?</li>
@@ -315,7 +315,7 @@ export default async function Brand() {
 
         <h3>Supporting features</h3>
         <div className="tool-grid" style={{ marginBottom: 14 }}>
-          <div className="tool-card"><h3>Verified badge</h3><p>An optional badge showing someone has completed Score’s ID and credit verification, for every band. Never shows the score, and never limited to people above a cutoff, so it doesn’t mark anyone as a red flag.</p></div>
+          <div className="tool-card"><h3>Verified badge</h3><p>An optional badge showing someone has completed ScoreDate’s ID and credit verification, for every band. Never shows the score, and never limited to people above a cutoff, so it doesn’t mark anyone as a red flag.</p></div>
           <div className="tool-card"><h3>The $50 Date Challenge</h3><p>Matches plan the best date under $50, then share the results. Makes being thoughtful and resourceful attractive. Builds on in-app date planning.</p></div>
           <div className="tool-card"><h3>Financial Green Flags</h3><p>Profile prompts like “My sexiest money habit” and “I’ll splurge on ___, but always save on ___” give people natural conversation starters.</p></div>
         </div>
@@ -326,8 +326,8 @@ export default async function Brand() {
       <section id="partners">
         <h2>Partners & press</h2>
         <ul>
-          <li><strong>Co-branding:</strong> place the Score logo and the partner logo at equal visual weight, separated by a thin divider or “×”, with clear space around both.</li>
-          <li><strong>Approval:</strong> anything using the Score name, logo or claims needs a sign-off from us first. We usually reply within one business day.</li>
+          <li><strong>Co-branding:</strong> place the ScoreDate logo and the partner logo at equal visual weight, separated by a thin divider or “×”, with clear space around both.</li>
+          <li><strong>Approval:</strong> anything using the ScoreDate name, logo or claims needs a sign-off from us first. We usually reply within one business day.</li>
           <li><strong>Press:</strong> fast facts, background and interview requests are on the <Link href="/press">Press page</Link>.</li>
           <li><strong>Partnerships:</strong> brands, venues and events can reach us through <Link href="/partners">Partners</Link>.</li>
         </ul>
@@ -336,7 +336,7 @@ export default async function Brand() {
           <span className="small muted">Email the team and include where and when the piece will run.</span>
           <a className="btn sm" href="mailto:press@scoredate.app?subject=Brand%20approval" style={{ alignSelf: 'flex-start' }}>press@scoredate.app</a>
         </div>
-        <p className="small muted" style={{ marginTop: 14 }}>Score and the Score logo are trademarks of Please &amp; Thank You, Inc. Using these assets doesn’t imply endorsement or partnership.</p>
+        <p className="small muted" style={{ marginTop: 14 }}>ScoreDate and the ScoreDate logo are trademarks of Please &amp; Thank You, Inc. Using these assets doesn’t imply endorsement or partnership.</p>
       </section>
     </DocLayout>
   );

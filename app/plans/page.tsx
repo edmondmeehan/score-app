@@ -23,7 +23,7 @@ export default async function Plans({ searchParams }: { searchParams: Promise<{ 
           <FounderBadge size="md" />
           <strong>Your Founding Member price</strong>
           <span className="small">{offer.intro}, then Membership at {offer.monthly} (regularly {offer.regular}) for as long as you stay subscribed.</span>
-          <span className="small muted">Applied automatically when you subscribe in the Score iPhone app.</span>
+          <span className="small muted">Applied automatically when you subscribe in the ScoreDate iPhone app.</span>
         </div>
       )}
       <div className="stack" role="radiogroup" aria-label="Plan">

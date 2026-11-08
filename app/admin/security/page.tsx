@@ -33,10 +33,10 @@ export default async function Security({ searchParams }: { searchParams: Promise
           <strong>Maintenance mode</strong>
           <State on={Boolean(maint.on)} label={maint.on ? `On${maint.since ? ` since ${fmt(new Date(maint.since).getTime())}` : ''}` : 'Off'} />
         </div>
-        <span className="small muted">Turns Score off for members and visitors. They see a page with the Score logo, your message, the build number and a contact form (messages go to Support). Staff stay signed in and can use everything, and sign-in, legal pages, billing webhooks and scheduled jobs keep running.</span>
+        <span className="small muted">Turns ScoreDate off for members and visitors. They see a page with the ScoreDate logo, your message, the build number and a contact form (messages go to Support). Staff stay signed in and can use everything, and sign-in, legal pages, billing webhooks and scheduled jobs keep running.</span>
         <form action={setMaintenance} className="stack" style={{ gap: 10 }}>
           <input type="hidden" name="on" value={maint.on ? 'false' : 'true'} />
-          <label className="field">Message visitors see<textarea className="input" name="message" rows={2} maxLength={400} defaultValue={maint.message || 'Score is down for scheduled maintenance. We’ll be back shortly.'} /></label>
+          <label className="field">Message visitors see<textarea className="input" name="message" rows={2} maxLength={400} defaultValue={maint.message || 'ScoreDate is down for scheduled maintenance. We’ll be back shortly.'} /></label>
           <div className="row" style={{ gap: 10, flexWrap: 'wrap' }}>
             <button className={maint.on ? 'btn sm' : 'btn ghost sm'}>{maint.on ? 'Turn off maintenance' : 'Turn on maintenance'}</button>
             <a className="small" href="/maintenance" target="_blank" rel="noopener noreferrer">Preview the page ↗</a>

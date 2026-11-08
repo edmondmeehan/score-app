@@ -17,7 +17,7 @@ export default async function Screenshots({ searchParams }: { searchParams: Prom
       <h1 className="serif" style={{ fontSize: 44 }}>Screenshots</h1>
       <span className="small muted">Members whose screenshots we detected in the last 7 days. Review threshold: {r.threshold}. Nothing happens automatically. Look at the context (a lot of different profiles is a warning sign; a few of their own matches usually isn’t) before warning or suspending.</span>
       {sp.error && <div className="notice error">{sp.error}</div>}
-      {notReady && <div className="notice error">Run migration 0026 in the Score SQL Editor first.</div>}
+      {notReady && <div className="notice error">Run migration 0026 in the ScoreDate SQL Editor first.</div>}
       {r.members.length === 0 && !notReady && <div className="card small muted">No one is near the threshold.</div>}
       {r.members.length > 0 && (
         <div className="card scroll-x" style={{ overflowX: 'auto' }}>
@@ -46,7 +46,7 @@ export default async function Screenshots({ searchParams }: { searchParams: Prom
           </table>
         </div>
       )}
-      <span className="small muted">What’s detected: PrintScreen and screenshot shortcuts on computers, and screenshots in the Score iPhone and Android apps. In the Android app, screenshots of the app are blocked outright. Phone browsers can’t detect screenshots.</span>
+      <span className="small muted">What’s detected: PrintScreen and screenshot shortcuts on computers, and screenshots in the ScoreDate iPhone and Android apps. In the Android app, screenshots of the app are blocked outright. Phone browsers can’t detect screenshots.</span>
     </>
   );
 }

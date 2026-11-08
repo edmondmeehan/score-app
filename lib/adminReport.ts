@@ -79,5 +79,5 @@ export function reportBlocks(d: D, sections: string[]): { blocks: Block[]; headl
   if (has('members')) parts.push(`${num(m.signups_24h)} sign-ups`);
   if (has('waitlist')) parts.push(`${num(w.joins_24h)} waitlist joins`);
   if (has('safety') && Number(s.open_reports) > 0) parts.push(`${num(s.open_reports)} open reports`);
-  return { blocks: out, headline: parts.join(' · ') || 'Your daily Score report' };
+  return { blocks: out, headline: parts.join(' · ') || 'Your daily ScoreDate report' };
 }

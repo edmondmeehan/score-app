@@ -6,7 +6,7 @@ export default function SiteHeader({ cta = true }: { cta?: boolean }) {
   return (
     <header className="site-header">
       <div className="page row" style={{ justifyContent: 'space-between', padding: '18px 20px', gap: 12 }}>
-        <Link href="/" aria-label="Score home" style={{ color: 'inherit', textDecoration: 'none' }}><Logo size={15} /></Link>
+        <Link href="/" aria-label="ScoreDate home" style={{ color: 'inherit', textDecoration: 'none' }}><Logo size={15} /></Link>
         <nav className="row" style={{ gap: 18 }} aria-label="Main">
           <Link href="/#how" className="hide-sm" style={{ color: 'var(--muted)', textDecoration: 'none' }}>How it works</Link>
           <Link href="/safety" className="hide-sm" style={{ color: 'var(--muted)', textDecoration: 'none' }}>Safety</Link>

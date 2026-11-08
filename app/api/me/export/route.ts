@@ -3,7 +3,7 @@ import { supabaseServer } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
-/** "Download my data": a JSON copy of everything Score keeps about the signed-in member. */
+/** "Download my data": a JSON copy of everything ScoreDate keeps about the signed-in member. */
 export async function GET() {
   const supabase = await supabaseServer();
   const { data: { user } } = await supabase.auth.getUser();

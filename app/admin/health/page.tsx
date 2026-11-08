@@ -77,7 +77,7 @@ export default async function HealthPage({ searchParams }: { searchParams: Promi
       <span className="small muted">Live traffic and performance from Vercel for scoredate.app. Refresh the page for the latest numbers. <a href={`https://vercel.com/pleaseco/score-app/observability?period=${period}`} target="_blank" rel="noopener noreferrer">Open in Vercel ↗</a></span>
 
       <section className="card stack" style={{ gap: 8 }}>
-        <div className="row" style={{ justifyContent: 'space-between' }}><strong>Server errors recorded by Score (24 hours)</strong><span className="small" style={{ color: appErrors.length ? 'var(--alert)' : 'var(--rise)' }}>{appErrors.length ? `${appErrors.length} recent` : 'None'}</span></div>
+        <div className="row" style={{ justifyContent: 'space-between' }}><strong>Server errors recorded by ScoreDate (24 hours)</strong><span className="small" style={{ color: appErrors.length ? 'var(--alert)' : 'var(--rise)' }}>{appErrors.length ? `${appErrors.length} recent` : 'None'}</span></div>
         {appErrors.slice(0, 10).map((e, i) => (
           <div key={i} className="row small" style={{ justifyContent: 'space-between', gap: 12, borderBottom: '1px solid var(--line-soft)', paddingBottom: 6 }}>
             <span className="mono" style={{ overflowWrap: 'anywhere' }}>{e.path}</span>

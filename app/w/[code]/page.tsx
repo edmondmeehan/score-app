@@ -8,7 +8,7 @@ import { SITE_URL } from '@/lib/emails';
 import { getFounderOffer } from '@/lib/founderOffer';
 
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'Your spot · Score', robots: { index: false } };
+export const metadata = { title: 'Your spot · ScoreDate', robots: { index: false } };
 
 type Status = {
   first_name: string | null; status: string; share_code: string; position: number | null; total: number | null; referrals: number;
@@ -31,8 +31,8 @@ export default async function Spot({ params }: { params: Promise<{ code: string 
       {invited ? (
         <div className="card gold stack">
           <p className="serif" style={{ fontSize: 34, margin: 0 }}>{s.status === 'joined' ? 'You’re in.' : 'Your invite is out.'}</p>
-          <span className="muted">{s.status === 'joined' ? 'Welcome to Score.' : 'Check your email for your invite code, then sign in.'}</span>
-          <Link href={s.status === 'joined' ? '/app' : '/join'} className="btn">{s.status === 'joined' ? 'Open Score' : 'Enter my code'}</Link>
+          <span className="muted">{s.status === 'joined' ? 'Welcome to ScoreDate.' : 'Check your email for your invite code, then sign in.'}</span>
+          <Link href={s.status === 'joined' ? '/app' : '/join'} className="btn">{s.status === 'joined' ? 'Open ScoreDate' : 'Enter my code'}</Link>
         </div>
       ) : (
         <div className="card stack" style={{ gap: 6 }}>

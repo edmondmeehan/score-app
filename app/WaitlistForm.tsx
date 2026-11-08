@@ -9,7 +9,7 @@ export function NotifyMe({ first_name, email, zip, message }: { first_name: stri
   return (
     <form action={action} className="card stack">
       <p className="serif" style={{ fontSize: 26, margin: 0 }}>Not in your area yet</p>
-      <p className="muted" style={{ margin: 0 }}>{message} Want us to email you when Score opens near you?</p>
+      <p className="muted" style={{ margin: 0 }}>{message} Want us to email you when ScoreDate opens near you?</p>
       <input type="hidden" name="first_name" value={first_name} />
       <input type="hidden" name="email" value={email} />
       <input type="hidden" name="zip" value={zip} />

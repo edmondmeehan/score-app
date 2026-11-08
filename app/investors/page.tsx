@@ -9,14 +9,14 @@ import { PLANS } from '@/lib/types';
 import { investorLogin, investorLogout } from './actions';
 
 export const dynamic = 'force-dynamic';
-export const metadata: Metadata = { title: 'Investors · Score', robots: { index: false, follow: false, nocache: true } };
+export const metadata: Metadata = { title: 'Investors · ScoreDate', robots: { index: false, follow: false, nocache: true } };
 
 type Live = { waitlist: number; waitlist_30d: number; referred: number; founders: number; members: number; by_area: { area: string; n: number }[]; as_of: string };
 type Room = { content: unknown; model: unknown; live: Live; viewer: string | null };
 
 const ERR: Record<string, string> = {
   missing: 'Enter your name and the password.',
-  wrong: 'That password isn’t right. Check with the Score team.',
+  wrong: 'That password isn’t right. Check with the ScoreDate team.',
   locked: 'Too many tries. Please wait 15 minutes and try again.',
   closed: 'The investor room isn’t open yet.',
   setup: 'The investor room is being set up. Please try again soon.',
@@ -37,11 +37,11 @@ export default async function Investors({ searchParams }: { searchParams: Promis
 function Gate({ error }: { error: string | null }) {
   return (
     <main className="page stack" style={{ maxWidth: 420, padding: '12vh 20px 80px', gap: 20 }}>
-      <Link href="/" aria-label="Score home" style={{ color: 'inherit', textDecoration: 'none' }}><Logo /></Link>
+      <Link href="/" aria-label="ScoreDate home" style={{ color: 'inherit', textDecoration: 'none' }}><Logo /></Link>
       <div className="stack" style={{ gap: 6 }}>
         <span className="eyebrow">Investors</span>
         <h1 className="serif" style={{ fontSize: 40, margin: 0 }}>Investor room</h1>
-        <span className="muted small">Private and confidential. Enter the password the Score team shared with you.</span>
+        <span className="muted small">Private and confidential. Enter the password the ScoreDate team shared with you.</span>
       </div>
       {error && <div className="notice error">{error}</div>}
       <form action={investorLogin} className="card stack" style={{ gap: 12 }}>
@@ -124,7 +124,7 @@ function RoomView({ room }: { room: Room }) {
             </div>
           </Section>
 
-          <Section id="product" eyebrow="Product" title="How Score works">
+          <Section id="product" eyebrow="Product" title="How ScoreDate works">
             <ol className="stack" style={{ gap: 10, margin: 0, paddingLeft: 20 }}>{lines(c.how).map((l) => <li key={l} style={{ lineHeight: 1.55 }}>{l}</li>)}</ol>
             <div className="row" style={{ gap: 20, flexWrap: 'wrap', alignItems: 'flex-start' }}>
               <div className="card stack" style={{ gap: 8, flex: '1 1 300px' }}><strong>Why now</strong><P>{c.why_now}</P></div>
@@ -192,7 +192,7 @@ function RoomView({ room }: { room: Room }) {
             <Bullets text={c.trust} />
           </Section>
 
-          <Section id="team" eyebrow="Team" title="Who’s building Score">
+          <Section id="team" eyebrow="Team" title="Who’s building ScoreDate">
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12 }}>
               {cells(c.team).map((t) => (
                 <div key={t.a} className="card stack" style={{ gap: 6 }}>
@@ -227,7 +227,7 @@ function RoomView({ room }: { room: Room }) {
             </div>
             <div className="card row" style={{ justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
               <span>Questions or next steps? <strong>{c.contact_name}</strong></span>
-              <a className="btn sm" href={`mailto:${c.contact_email}?subject=${encodeURIComponent('Score investor inquiry')}`}>{c.contact_email}</a>
+              <a className="btn sm" href={`mailto:${c.contact_email}?subject=${encodeURIComponent('ScoreDate investor inquiry')}`}>{c.contact_email}</a>
             </div>
           </Section>
 

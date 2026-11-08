@@ -7,7 +7,7 @@ import { staffAct } from '@/app/admin/actions';
 type Target = { id: string; first_name: string | null; status: string; id_status: string; photo_status: string; open_reports: number };
 type Me = { staff: boolean; email?: string; target?: Target | null; maintenance?: boolean };
 
-/** Thin bar shown only to signed-in Score staff, on the site and in the app. Moderation tools appear on member profiles. */
+/** Thin bar shown only to signed-in ScoreDate staff, on the site and in the app. Moderation tools appear on member profiles. */
 export default function AdminBar() {
   const path = usePathname() || '/';
   const [me, setMe] = useState<Me | null>(null);
@@ -58,7 +58,7 @@ export default function AdminBar() {
             {t.photo_status === 'review' && <button className="btn ghost sm" name="action" value="approve_photos">Approve photos</button>}
             {t.status !== 'removed' && (
               <button className="btn ghost sm danger" name="action" value="remove"
-                onClick={(e) => { if (!window.confirm(`Remove ${t.first_name || 'this member'} from Score? They lose access and are hidden everywhere.`)) e.preventDefault(); }}>Remove</button>
+                onClick={(e) => { if (!window.confirm(`Remove ${t.first_name || 'this member'} from ScoreDate? They lose access and are hidden everywhere.`)) e.preventDefault(); }}>Remove</button>
             )}
           </div>
           <span className="small muted">Suspend hides them and stops messaging right away; Reinstate undoes it. Every action is recorded with your email.</span>

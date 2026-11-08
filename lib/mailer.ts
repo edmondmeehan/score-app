@@ -7,7 +7,7 @@ import { build, type TemplateName } from '@/lib/emails';
 const unsubHeaders = (url?: string) => (url ? { 'List-Unsubscribe': `<${url.replace('/unsubscribe?', '/api/unsubscribe?')}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' } : undefined);
 
 /**
- * Send a Score email through Resend. Never throws: a failed email must not break sign-up,
+ * Send a ScoreDate email through Resend. Never throws: a failed email must not break sign-up,
  * billing or verification. Every attempt is written to email_log for the admin.
  */
 export async function sendEmail<K extends TemplateName>(

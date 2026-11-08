@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { requireStaff } from '@/lib/session';
 
-const err = (m: string) => (/Could not find the (table|function)/i.test(m) ? `Run migration 0022 in the Score SQL Editor first. (${m})` : m);
+const err = (m: string) => (/Could not find the (table|function)/i.test(m) ? `Run migration 0022 in the ScoreDate SQL Editor first. (${m})` : m);
 const back = (path: string, q: string) => redirect(`${path}${path.includes('?') ? '&' : '?'}${q}`);
 
 export async function setReserveVisible(form: FormData) {

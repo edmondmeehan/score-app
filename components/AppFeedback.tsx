@@ -33,7 +33,7 @@ export default function AppFeedback() {
       setTimeout(() => setNotice(false), 5000);
     };
     (window as any).scoreScreenshot = (source: 'ios' | 'android' = 'ios') => report(source);
-    // Inside the Score iPhone/Android app: block screenshots on Android and hide content in the app switcher
+    // Inside the ScoreDate iPhone/Android app: block screenshots on Android and hide content in the app switcher
     // (needs the @capacitor-community/privacy-screen plugin in the native build; harmless if it isn't there).
     (window as any).Capacitor?.Plugins?.PrivacyScreen?.enable?.().catch?.(() => null);
     const onNative = (e: Event) => report(((e as CustomEvent).detail === 'android' ? 'android' : 'ios'));

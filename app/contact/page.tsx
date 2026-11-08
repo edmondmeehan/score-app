@@ -2,14 +2,14 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import DocLayout from '@/components/DocLayout';
 
-export const metadata: Metadata = { title: 'Contact · Score', description: 'How to reach Score: member support, safety, privacy, press and partnerships.' };
+export const metadata: Metadata = { title: 'Contact · ScoreDate', description: 'How to reach ScoreDate: member support, safety, privacy, press and partnerships.' };
 
 const WAYS: [string, string, string, string][] = [
   ['Member support', 'Account, billing, verification or something not working. Members can also use Help & support in Settings.', 'support@scoredate.app', 'mailto:support@scoredate.app'],
   ['Safety concern', 'Report a member from their profile or chat for the fastest response, or email us with details.', 'Report a concern', '/safety#report'],
   ['Privacy requests', 'Access, correct, delete or get a copy of your data.', 'privacy@scoredate.app', 'mailto:privacy@scoredate.app'],
   ['Press', 'Interviews, data and assets.', 'press@scoredate.app', 'mailto:press@scoredate.app'],
-  ['Partnerships', 'Venues, member perks, financial wellness and brands.', 'Partner with Score', '/partners'],
+  ['Partnerships', 'Venues, member perks, financial wellness and brands.', 'Partner with ScoreDate', '/partners'],
   ['Legal notices', 'Formal legal correspondence.', 'legal@scoredate.app', 'mailto:legal@scoredate.app'],
 ];
 

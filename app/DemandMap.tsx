@@ -24,7 +24,7 @@ export default async function DemandMap() {
     <section id="where" className="page" style={{ padding: '72px 24px 24px' }}>
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
         <div className="stack" style={{ gap: 8 }}>
-          <span className="eyebrow">Where Score is live</span>
+          <span className="eyebrow">Where ScoreDate is live</span>
           <h2 className="serif" style={{ fontSize: 'clamp(36px, 6vw, 52px)', lineHeight: 1.02, margin: 0 }}>
             {total ? `${total.toLocaleString('en-US')}+ New Yorkers are waiting.` : 'Opening neighborhood by neighborhood.'}
           </h2>

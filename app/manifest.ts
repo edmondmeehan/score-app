@@ -2,8 +2,8 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Score',
-    short_name: 'Score',
+    name: 'ScoreDate',
+    short_name: 'ScoreDate',
     description: 'Invite-only dating where every member has verified their credit band.',
     start_url: '/app',
     scope: '/',

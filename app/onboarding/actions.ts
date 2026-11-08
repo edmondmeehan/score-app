@@ -21,7 +21,7 @@ export async function saveBasics(form: FormData) {
   const { supabase, user } = await ctx();
   const year = Number(form.get('birth_year'));
   const minAge = 25;
-  if (!year || new Date().getFullYear() - year < minAge) redirect('/onboarding/basics?error=' + encodeURIComponent('Score members must be 25 or older.'));
+  if (!year || new Date().getFullYear() - year < minAge) redirect('/onboarding/basics?error=' + encodeURIComponent('ScoreDate members must be 25 or older.'));
   const zip = String(form.get('zip') || '').trim();
   if (!/^[0-9]{5}$/.test(zip)) redirect('/onboarding/basics?error=' + encodeURIComponent('Add your 5-digit home zip code.'));
   const { error } = await supabase.from('profiles').update({

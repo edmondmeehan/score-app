@@ -47,14 +47,14 @@ export async function saveFooter(form: FormData): Promise<SaveResult> {
   for (const r of REQUIRED_LINKS) {
     if (!footer.app_links.some((l) => l.href === r.href)) errors.push(`In-app footer must keep a link to ${r.label} (${r.href})`);
   }
-  if (!footer.disclaimer) errors.push('Keep the credit disclaimer. It tells people Score isn’t a lender or credit bureau.');
+  if (!footer.disclaimer) errors.push('Keep the credit disclaimer. It tells people ScoreDate isn’t a lender or credit bureau.');
   if (!footer.company) errors.push('Company name is required');
   if (columns.length === 0) errors.push('Add at least one link column');
 
   if (errors.length) return { errors };
 
   const { error } = await supabase.rpc('staff_set_footer', { p_footer: footer });
-  if (error) return { errors: [/function|does not exist|schema cache/i.test(error.message) ? 'Run migration 0020 in the Score SQL Editor first.' : error.message] };
+  if (error) return { errors: [/function|does not exist|schema cache/i.test(error.message) ? 'Run migration 0020 in the ScoreDate SQL Editor first.' : error.message] };
   revalidateTag('footer');
   revalidatePath('/', 'layout');
   return { ok: 'Saved. The footer is updated across the site and app.' };
@@ -63,7 +63,7 @@ export async function saveFooter(form: FormData): Promise<SaveResult> {
 export async function resetFooter(): Promise<SaveResult> {
   const { supabase } = await requireStaff();
   const { error } = await supabase.rpc('staff_set_footer', { p_footer: null });
-  if (error) return { errors: [/function|does not exist|schema cache/i.test(error.message) ? 'Run migration 0020 in the Score SQL Editor first.' : error.message] };
+  if (error) return { errors: [/function|does not exist|schema cache/i.test(error.message) ? 'Run migration 0020 in the ScoreDate SQL Editor first.' : error.message] };
   revalidateTag('footer');
   revalidatePath('/', 'layout');
   return { ok: 'Footer reset to the default.' };

@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/** Inside the Score iPhone/Android app (Capacitor): ask for push permission once and register the device. */
+/** Inside the ScoreDate iPhone/Android app (Capacitor): ask for push permission once and register the device. */
 export default function NativePush() {
   useEffect(() => {
     const C = (window as any).Capacitor;

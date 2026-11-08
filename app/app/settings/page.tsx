@@ -39,7 +39,7 @@ export default async function Settings({ searchParams }: { searchParams: Promise
       {['membership', 'premium', 'black', 'paused'].includes(me.plan) && (
         <form action={setStatus} className="card stack">
           <span className="label">Status</span>
-          {[['active', 'Active', 'In the Daily Drop, matching and messaging.'], ['paused', 'Paused · $4.99/mo', 'Hidden from matching. Keep chats and friends.'], ['taken', 'Taken · $4.99/mo', 'You met someone. Friends see Matched on Score.']].map(([v, l, d]) => (
+          {[['active', 'Active', 'In the Daily Drop, matching and messaging.'], ['paused', 'Paused · $4.99/mo', 'Hidden from matching. Keep chats and friends.'], ['taken', 'Taken · $4.99/mo', 'You met someone. Friends see Matched on ScoreDate.']].map(([v, l, d]) => (
             <label key={v} className="choice" style={{ alignItems: 'flex-start' }}><input type="radio" name="status" value={v} defaultChecked={current === v} style={{ accentColor: 'var(--gold)', marginTop: 4 }} /><span className="stack" style={{ gap: 2 }}><strong>{l}</strong><span className="small muted">{d}</span></span></label>
           ))}
           <input type="hidden" name="plan" value="membership" />
@@ -105,7 +105,7 @@ export default async function Settings({ searchParams }: { searchParams: Promise
       </form>
       <div className="card stack">
         <span className="label">Your data</span>
-        <span className="small muted">Download a copy of your profile, messages you sent, matches, plans and settings. Score never stores your exact credit score or report.</span>
+        <span className="small muted">Download a copy of your profile, messages you sent, matches, plans and settings. ScoreDate never stores your exact credit score or report.</span>
         <a className="btn ghost sm" href="/api/me/export" download style={{ alignSelf: 'flex-start' }}>Download my data</a>
       </div>
       <form action={deleteAccount} className="card stack" style={{ borderColor: 'var(--danger-line)' }}>

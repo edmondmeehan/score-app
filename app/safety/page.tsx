@@ -3,8 +3,8 @@ import Link from 'next/link';
 import DocLayout from '@/components/DocLayout';
 
 export const metadata: Metadata = {
-  title: 'Safety Center · Score',
-  description: 'How Score verifies every member, the safety tools built into the app, dating safety tips, and where to get help.',
+  title: 'Safety Center · ScoreDate',
+  description: 'How ScoreDate verifies every member, the safety tools built into the app, dating safety tips, and where to get help.',
 };
 
 const I = {
@@ -27,21 +27,21 @@ const Icon = ({ d }: { d: string }) => (
 
 const TOOLS: [keyof typeof I, string, string][] = [
   ['invite', 'Invite-only', 'Every member is invited by another member or let in from the waitlist by our team. No open sign-ups, no bulk accounts.'],
-  ['id', 'ID + live selfie check', 'Members verify a government ID and a live selfie with our identity verification partner before they can match or message. ID images stay with the partner, not on Score.'],
+  ['id', 'ID + live selfie check', 'Members verify a government ID and a live selfie with our identity verification partner before they can match or message. ID images stay with the partner, not on ScoreDate.'],
   ['photo', 'Photo matching', 'Every profile photo is compared with a live selfie, so the face you see is the person you meet. Photos that don’t match go to human review.'],
   ['band', 'Verified credit band', 'A soft credit check (it never affects your score) confirms each member’s band. Members see the band, never the number, and bands are re-checked every six months.'],
   ['money', 'Zero tolerance for money requests', 'Asking any member for money, gifts, crypto or investments means immediate removal. It’s the most common romance-scam tactic, so we don’t give it a second chance.'],
   ['flag', 'Report and block anywhere', 'Report or block from any profile or chat. They can’t see or message you afterward, and they never learn it was you.'],
   ['share', 'Share your date with a friend', 'On any confirmed date, send a friend a private link with the where and when. It shows nothing else and expires after the date.'],
-  ['check', 'After-date check-in', 'After a date, Score asks how it went. One tap to say all good, or to tell us something was wrong so we can follow up.'],
+  ['check', 'After-date check-in', 'After a date, ScoreDate asks how it went. One tap to say all good, or to tell us something was wrong so we can follow up.'],
   ['team', 'Real people reviewing reports', 'Our trust and safety team reviews every report, usually within 24 hours. Anything involving money or harassment goes to the front of the line.'],
-  ['chat', 'Messaging stays in Score', 'You never have to share your number or social accounts to talk. Keep it in the app until you’re ready.'],
+  ['chat', 'Messaging stays in ScoreDate', 'You never have to share your number or social accounts to talk. Keep it in the app until you’re ready.'],
   ['lock', 'Event addresses on a need-to-know basis', 'Exact venue addresses for member events are only shown to people who are going.'],
   ['map', 'Neighborhoods, never people', 'The member map shows neighborhood heat only, for groups of 25 or more, and you can leave yourself off it entirely.'],
 ];
 
 const TOC = [
-  { id: 'tools', h: 'How Score keeps you safe' },
+  { id: 'tools', h: 'How ScoreDate keeps you safe' },
   { id: 'dating', h: 'Dating safety tips' },
   { id: 'scams', h: 'Spotting romance scams' },
   { id: 'report', h: 'Report a concern' },
@@ -51,14 +51,14 @@ const TOC = [
 export default function Safety() {
   return (
     <DocLayout eyebrow="Trust & safety" title="Safety Center" toc={TOC}
-      summary="Verified isn’t a slogan at Score. Every member’s identity, photos and credit band are checked before they can say hello. Here’s everything we do to keep you safe, and what you can do too.">
+      summary="Verified isn’t a slogan at ScoreDate. Every member’s identity, photos and credit band are checked before they can say hello. Here’s everything we do to keep you safe, and what you can do too.">
       <div className="card" style={{ display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', marginBottom: 32, borderColor: 'var(--alert)' }}>
         <span><strong>In immediate danger?</strong> <span className="muted">Call 911.</span></span>
         <a href="tel:911" className="btn sm">Call 911</a>
       </div>
 
       <section id="tools">
-        <h2>How Score keeps you safe</h2>
+        <h2>How ScoreDate keeps you safe</h2>
         <p>Safety is built into every step, from who gets in to what happens after a date.</p>
         <div className="tool-grid" style={{ marginTop: 18 }}>
           {TOOLS.map(([icon, title, body]) => (
@@ -75,7 +75,7 @@ export default function Safety() {
         <h2>Dating safety tips</h2>
         <h3>Before you meet</h3>
         <ul>
-          <li>Take your time. Chat in Score until you feel comfortable, and suggest a video call if you want to be sure.</li>
+          <li>Take your time. Chat in ScoreDate until you feel comfortable, and suggest a video call if you want to be sure.</li>
           <li>Look them up a little: does their profile, job and story hang together?</li>
           <li>Keep personal details (home address, workplace, last name, financial information) to yourself until you trust someone.</li>
         </ul>
@@ -96,11 +96,11 @@ export default function Safety() {
 
       <section id="scams">
         <h2>Spotting romance scams</h2>
-        <p>Verification makes scams rare on Score, but no system is perfect. Be cautious if someone:</p>
+        <p>Verification makes scams rare on ScoreDate, but no system is perfect. Be cautious if someone:</p>
         <ul>
           <li>asks for money, gift cards, crypto, or help with a bill, a visa, a medical emergency or travel, for any reason;</li>
           <li>pitches an investment, trading platform or “opportunity,” even a small one;</li>
-          <li>pushes to move the conversation off Score very quickly;</li>
+          <li>pushes to move the conversation off ScoreDate very quickly;</li>
           <li>professes strong feelings fast but always has a reason not to meet or video chat;</li>
           <li>asks for your account logins, codes or personal financial details.</li>
         </ul>

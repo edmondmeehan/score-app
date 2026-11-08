@@ -12,7 +12,7 @@ export default async function MemberMap() {
   return (
     <div className="phone">
       <div className="row"><Link href="/app" aria-label="Back" className="btn ghost sm" style={{ width: 44, padding: 0 }}>‹</Link><span className="eyebrow">Members only</span></div>
-      <h1 className="serif" style={{ fontSize: 40 }}>Where Score is busy</h1>
+      <h1 className="serif" style={{ fontSize: 40 }}>Where ScoreDate is busy</h1>
       <span className="muted small">Neighborhoods with the most members. Nobody&apos;s location is shown, only groups of {min ?? 25}+.</span>
       <HeatMap tiles={await getBasemap()} spots={spots} height={420} />
       <Legend />

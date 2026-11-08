@@ -11,12 +11,12 @@ import { activeSeason, seasonsWith, type SeasonKey } from '@/lib/seasons';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.scoredate.app'),
-  openGraph: { type: 'website', siteName: 'Score', images: [{ url: '/brand/score-share-card-dark.png', width: 1200, height: 630, alt: 'Score: Date someone who has their act together.' }] },
+  openGraph: { type: 'website', siteName: 'ScoreDate', images: [{ url: '/brand/score-share-card-dark.png', width: 1200, height: 630, alt: 'ScoreDate: Date someone who has their act together.' }] },
   twitter: { card: 'summary_large_image', images: ['/brand/score-share-card-dark.png'] },
-  title: 'Score — Date someone who has their act together',
+  title: 'ScoreDate — Date someone who has their act together',
   description: 'Invite-only dating where every member has verified their credit band.',
-  applicationName: 'Score',
-  appleWebApp: { capable: true, title: 'Score', statusBarStyle: 'black-translucent' },
+  applicationName: 'ScoreDate',
+  appleWebApp: { capable: true, title: 'ScoreDate', statusBarStyle: 'black-translucent' },
   formatDetection: { telephone: false },
 };
 export const viewport: Viewport = { themeColor: '#0B0B0C', width: 'device-width', initialScale: 1, viewportFit: 'cover' };

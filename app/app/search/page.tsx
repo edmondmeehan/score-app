@@ -81,7 +81,7 @@ export default async function Search({ searchParams }: { searchParams: Promise<S
                 })}
               </select>
             </label>
-            <fieldset className="filter-group"><legend>Score band</legend>
+            <fieldset className="filter-group"><legend>ScoreDate band</legend>
               {(Object.keys(BANDS) as Band[]).map((b) => <Check key={b} name="band" value={b} label={BANDS[b].label} on={f.bands.includes(b)} />)}
               <Check name="trend_up" value="1" label="Trending up" on={f.trend_up} />
             </fieldset>

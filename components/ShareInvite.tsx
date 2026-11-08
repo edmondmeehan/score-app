@@ -4,10 +4,10 @@ import { useState } from 'react';
 /** Copy / native-share for a waitlist referral link. */
 export default function ShareInvite({ url, compact = false }: { url: string; compact?: boolean }) {
   const [copied, setCopied] = useState(false);
-  const text = 'I just joined the waitlist for Score, the invite-only dating app where everyone’s credit and ID are verified. Join with my link:';
+  const text = 'I just joined the waitlist for ScoreDate, the invite-only dating app where everyone’s credit and ID are verified. Join with my link:';
   async function share() {
     if (typeof navigator !== 'undefined' && navigator.share) {
-      try { await navigator.share({ title: 'Score', text, url }); return; } catch { /* cancelled */ }
+      try { await navigator.share({ title: 'ScoreDate', text, url }); return; } catch { /* cancelled */ }
     }
     copy();
   }
@@ -25,7 +25,7 @@ export default function ShareInvite({ url, compact = false }: { url: string; com
         <button type="button" className="btn sm" onClick={share}>Share my link</button>
         {!compact && <>
           <a className="btn ghost sm" href={`sms:?&body=${enc(text + ' ' + url)}`}>Text</a>
-          <a className="btn ghost sm" href={`mailto:?subject=${enc('Join me on Score')}&body=${enc(text + '\n\n' + url)}`}>Email</a>
+          <a className="btn ghost sm" href={`mailto:?subject=${enc('Join me on ScoreDate')}&body=${enc(text + '\n\n' + url)}`}>Email</a>
           <a className="btn ghost sm" href={`https://wa.me/?text=${enc(text + ' ' + url)}`} target="_blank" rel="noopener noreferrer">WhatsApp</a>
         </>}
       </div>

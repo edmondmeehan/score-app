@@ -54,7 +54,7 @@ export default function DatePanel({ conversationId, meId, otherName, plan, share
               <label className="field">Give it a title<input className="input" name="title" required minLength={3} maxLength={80} placeholder="Dumplings, then the High Line at sunset" /></label>
               <label className="field">What you spent<input className="input" name="spent" required inputMode="decimal" placeholder="$38" /></label>
               <label className="field">What made it great<textarea className="input" name="story" required minLength={10} maxLength={1000} rows={3} /></label>
-              <label className="choice" style={{ alignItems: 'flex-start' }}><input type="checkbox" name="share_ok" style={{ accentColor: 'var(--gold)', marginTop: 4 }} /><span className="small">Score can feature this (first names only, never photos or last names)</span></label>
+              <label className="choice" style={{ alignItems: 'flex-start' }}><input type="checkbox" name="share_ok" style={{ accentColor: 'var(--gold)', marginTop: 4 }} /><span className="small">ScoreDate can feature this (first names only, never photos or last names)</span></label>
               <button className="btn sm" data-haptic="success">Share</button>
             </form>
           </details>

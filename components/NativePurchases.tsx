@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 
 /**
- * Inside the iPhone/Android app (Capacitor), connect RevenueCat as the signed-in Score member.
+ * Inside the iPhone/Android app (Capacitor), connect RevenueCat as the signed-in ScoreDate member.
  * On the website this does nothing and the RevenueCat code is never downloaded.
  */
 export default function NativePurchases({ userId, iosKey, androidKey }: { userId: string; iosKey?: string; androidKey?: string }) {
@@ -18,7 +18,7 @@ export default function NativePurchases({ userId, iosKey, androidKey }: { userId
       if (apiKey.startsWith('test_')) await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
       const { isConfigured } = await Purchases.isConfigured();
       if (!isConfigured) {
-        // appUserID = Score user id, so the RevenueCat webhook upgrades the right member.
+        // appUserID = ScoreDate user id, so the RevenueCat webhook upgrades the right member.
         await Purchases.configure({ apiKey, appUserID: userId });
       } else {
         await Purchases.logIn({ appUserID: userId });

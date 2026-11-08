@@ -5,7 +5,7 @@ import { staffAct } from '../actions';
 export const dynamic = 'force-dynamic';
 
 type Row = { sender: string; first_name: string | null; status: string; n: number; kinds: string[]; last_at: string; sample: string };
-const KIND: Record<string, string> = { money: 'Money / scam', offplatform: 'Moving off Score', harassment: 'Harassment' };
+const KIND: Record<string, string> = { money: 'Money / scam', offplatform: 'Moving off ScoreDate', harassment: 'Harassment' };
 
 export default async function Flags({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const sp = await searchParams;
@@ -17,7 +17,7 @@ export default async function Flags({ searchParams }: { searchParams: Promise<{ 
       <h1 className="serif" style={{ fontSize: 44 }}>Flagged messages</h1>
       <span className="small muted">Messages from the last 14 days that matched scam or harassment patterns. The person receiving them saw a safety warning. Nothing is blocked automatically: review the sender before acting.</span>
       {sp.error && <div className="notice error">{sp.error}</div>}
-      {error && /Could not find the function/i.test(error.message) && <div className="notice error">Run migration 0028 in the Score SQL Editor first.</div>}
+      {error && /Could not find the function/i.test(error.message) && <div className="notice error">Run migration 0028 in the ScoreDate SQL Editor first.</div>}
       {!error && rows.length === 0 && <div className="card small muted">Nothing flagged.</div>}
       {rows.map((r) => (
         <div key={r.sender} className="card stack" style={{ gap: 8 }}>

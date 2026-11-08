@@ -4,10 +4,10 @@ import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 import { submitInquiry } from './actions';
 
-export const metadata: Metadata = { title: 'Partner with Score', description: 'Host members, offer a perk, or teach financial wellness to verified, invite-only daters in New York.' };
+export const metadata: Metadata = { title: 'Partner with ScoreDate', description: 'Host members, offer a perk, or teach financial wellness to verified, invite-only daters in New York.' };
 
 const WAYS = [
-  ['Venues', 'Host a Score night. Supper clubs, wine bars, rooftops and listening rooms that want a full room of verified members on a quiet weeknight.'],
+  ['Venues', 'Host a ScoreDate night. Supper clubs, wine bars, rooftops and listening rooms that want a full room of verified members on a quiet weeknight.'],
   ['Member perks', 'Offer something to members: a welcome drink, a tasting menu, early reservations. It shows up in the Discover tab with your name on it.'],
   ['Financial wellness', 'Banks, advisors and credit educators who want to teach. Workshops and expert tips for members who already care about their finances.'],
   ['Brands & events', 'Sponsor an event series, a date-night collection or a city launch. We keep it tasteful and in line with what members actually want.'],
@@ -27,7 +27,7 @@ export default async function Partners({ searchParams }: { searchParams: Promise
       <section className="page stack" style={{ gap: 18, padding: '48px 24px 24px', maxWidth: 820 }}>
         <span className="eyebrow">Partnerships</span>
         <h1 className="serif" style={{ fontSize: 'clamp(44px, 8vw, 76px)', lineHeight: 1 }}>Meet members who have their act together.</h1>
-        <p className="muted" style={{ fontSize: 18, lineHeight: 1.6, maxWidth: 620 }}>Score is invite-only dating for people who&apos;ve verified their credit band. We partner with a small number of venues and brands members will love.</p>
+        <p className="muted" style={{ fontSize: 18, lineHeight: 1.6, maxWidth: 620 }}>ScoreDate is invite-only dating for people who&apos;ve verified their credit band. We partner with a small number of venues and brands members will love.</p>
       </section>
       <section className="page" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14, padding: '12px 24px' }}>
         {FACTS.map(([big, small]) => (
