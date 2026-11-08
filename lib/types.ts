@@ -39,6 +39,7 @@ export type Profile = {
   last_active_at?: string | null;
   invited_by: string | null;
   created_at: string;
+  flag_habit?: string | null; flag_splurge?: string | null; flag_save?: string | null; show_verified?: boolean;
 };
 
 export const BANDS: Record<Band, { label: string; range: string; color: string; fill: number }> = {

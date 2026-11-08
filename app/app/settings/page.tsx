@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { getMe } from '@/lib/session';
 import { BandPill } from '@/components/ui';
 import ThemeSwitch from '@/components/ThemeSwitch';
+import HapticsToggle from '@/components/HapticsToggle';
 import AppFooter from '@/components/AppFooter';
 import { signOut } from '../../signin/actions';
 import { deleteAccount, setStatus } from '../actions';
@@ -66,6 +67,7 @@ export default async function Settings({ searchParams }: { searchParams: Promise
       <div className="card stack" id="appearance">
         <span className="label">Appearance</span>
         <ThemeSwitch />
+        <HapticsToggle />
         <span className="small muted">System follows your phone&apos;s light or dark mode.</span>
       </div>
       <form action={saveNotifyPrefs} className="card stack" id="notifications">

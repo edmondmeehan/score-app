@@ -8,6 +8,8 @@ import { photoUrls } from '@/lib/photos';
 import { sayHello } from '../../actions';
 import { sendNote } from '../../features';
 import { detailChips } from '@/lib/profileDetails';
+import VerifiedBadge, { isVerified } from '@/components/VerifiedBadge';
+import ScreenshotContext from '@/components/ScreenshotContext';
 
 export default async function Member({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string }> }) {
   const { id } = await params;
@@ -28,8 +30,9 @@ export default async function Member({ params, searchParams }: { params: Promise
   const notes: number = mine?.included ? Infinity : (mine?.note ?? 0);
   return (
     <div className="phone" style={{ paddingTop: 0 }}>
+      <ScreenshotContext context="profile" target={p.id === me.id ? null : p.id} />
       <div className="photo" style={{ margin: '0 -20px', borderRadius: 0, aspectRatio: '4/5' }}>{photos[0] ? <img src={photos[0]} alt={`${p.first_name}`} /> : <span className="serif" style={{ fontSize: 64 }}>{p.first_name?.[0]}</span>}</div>
-      <div><span className="serif" style={{ fontSize: 40 }}>{p.first_name}</span> <span className="muted" style={{ fontSize: 20 }}>{age(p.birth_year)}</span>{p.is_founder && <span style={{ marginLeft: 10, verticalAlign: 'middle' }}><FounderBadge /></span>}<div className="muted small">{[p.job, p.neighborhood].filter(Boolean).join(' · ')}</div></div>
+      <div><span className="serif" style={{ fontSize: 40 }}>{p.first_name}</span> <span className="muted" style={{ fontSize: 20 }}>{age(p.birth_year)}</span>{p.is_founder && <span style={{ marginLeft: 10, verticalAlign: 'middle' }}><FounderBadge /></span>}{isVerified(p) && <span style={{ marginLeft: 8 }}><VerifiedBadge /></span>}<div className="muted small">{[p.job, p.neighborhood].filter(Boolean).join(' · ')}</div></div>
       {b && (
         <div className="card gold row">
           <Gauge fill={b.fill} color={b.color} size={56} />
@@ -46,6 +49,13 @@ export default async function Member({ params, searchParams }: { params: Promise
       )}
       {p.money_values?.length > 0 && (
         <div className="stack" style={{ gap: 8 }}><span className="label">Money values</span><div className="row" style={{ flexWrap: 'wrap', gap: 8 }}>{p.money_values.map((v) => <span key={v} className="chip">{v}</span>)}</div></div>
+      )}
+      {(p.flag_habit || (p.flag_splurge && p.flag_save)) && (
+        <div className="card stack" style={{ gap: 10 }}>
+          <span className="label" style={{ color: 'var(--rise)' }}>Financial green flags</span>
+          {p.flag_habit && <div className="stack" style={{ gap: 2 }}><span className="small muted">My sexiest money habit</span><span className="serif" style={{ fontSize: 22 }}>{p.flag_habit}</span></div>}
+          {p.flag_splurge && p.flag_save && <div className="stack" style={{ gap: 2 }}><span className="small muted">I’ll splurge on {p.flag_splurge}, but always save on…</span><span className="serif" style={{ fontSize: 22 }}>{p.flag_save}</span></div>}
+        </div>
       )}
       {p.prompt_a && <div className="card stack" style={{ gap: 6 }}><span className="small muted">{p.prompt_q}</span><span className="serif" style={{ fontSize: 22 }}>{p.prompt_a}</span></div>}
       {p.song_id && (

@@ -6,7 +6,7 @@ import { TestBanner } from '@/components/ui';
 import PhotoUploader from '../../onboarding/photos/PhotoUploader';
 import SongPicker from './SongPicker';
 import { PROMPTS } from '@/lib/prompts';
-import { clearSong, movePhoto, removePhoto, saveAbout, saveDetails, saveInstagram } from './actions';
+import { clearSong, movePhoto, removePhoto, saveAbout, saveDetails, saveFlags, saveInstagram } from './actions';
 import { DRINKING, EDUCATION, EXERCISE, HAS_KIDS, HEIGHTS, SMOKING, WANTS_KIDS } from '@/lib/profileDetails';
 
 export const dynamic = 'force-dynamic';
@@ -98,6 +98,20 @@ export default async function EditProfile({ searchParams }: { searchParams: Prom
         <label className="field">Prompt<select className="input" name="prompt_q" defaultValue={me.prompt_q || PROMPTS[0]}>{PROMPTS.map((p) => <option key={p}>{p}</option>)}</select></label>
         <label className="field">Your answer<textarea className="input" name="prompt_a" rows={2} maxLength={160} defaultValue={me.prompt_a || ''} /></label>
         <div className="row"><button className="btn ghost sm">Save</button><Link href="/onboarding/quiz" className="small">Retake money quiz</Link></div>
+      </form>
+
+      {/* Financial Green Flags */}
+      <form id="flags" action={saveFlags} className="card stack">
+        <span className="label">Financial green flags</span>
+        <span className="small muted">Conversation starters about money. Shown on your profile when you fill them in.</span>
+        <label className="field">My sexiest money habit<input className="input" name="flag_habit" maxLength={120} defaultValue={me.flag_habit || ''} placeholder="I pay my card off in full every month" /></label>
+        <div className="row" style={{ gap: 10, flexWrap: 'wrap' }}>
+          <label className="field grow">I’ll splurge on…<input className="input" name="flag_splurge" maxLength={60} defaultValue={me.flag_splurge || ''} placeholder="concert tickets" /></label>
+          <label className="field grow">…but always save on<input className="input" name="flag_save" maxLength={60} defaultValue={me.flag_save || ''} placeholder="takeout" /></label>
+        </div>
+        <label className="choice" style={{ alignItems: 'flex-start' }}><input type="checkbox" name="show_verified" defaultChecked={me.show_verified !== false} style={{ accentColor: 'var(--gold)', marginTop: 4 }} /><span className="stack" style={{ gap: 2 }}><strong>Show my Verified badge</strong><span className="small muted">Shows you finished Score’s ID and credit checks. Never shows your score.</span></span></label>
+        {sp.saved === 'flags' && <div className="notice">Saved.</div>}
+        <button className="btn ghost sm" style={{ alignSelf: 'flex-start' }}>Save</button>
       </form>
 
       {/* Song */}

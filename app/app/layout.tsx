@@ -1,5 +1,6 @@
 import TabBar from './TabBar';
 import NativePurchases from '@/components/NativePurchases';
+import AppFeedback from '@/components/AppFeedback';
 import { supabaseServer } from '@/lib/supabase/server';
 import { getIntegration } from '@/lib/integrations';
 
@@ -12,6 +13,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <>
       {children}
       <TabBar />
+      <AppFeedback />
       {user && (iosKey || androidKey) && <NativePurchases userId={user.id} iosKey={iosKey} androidKey={androidKey} />}
     </>
   );

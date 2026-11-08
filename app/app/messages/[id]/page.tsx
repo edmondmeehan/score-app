@@ -1,3 +1,4 @@
+import ScreenshotContext from '@/components/ScreenshotContext';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireMember } from '@/lib/session';
@@ -9,7 +10,7 @@ import DatePanel, { type Plan } from './DatePanel';
 
 export const dynamic = 'force-dynamic';
 
-export default async function Conversation({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string; shared?: string }> }) {
+export default async function Conversation({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string; shared?: string; ok?: string }> }) {
   const { id } = await params;
   const sp = await searchParams;
   const { supabase, me } = await requireMember();
@@ -31,6 +32,7 @@ export default async function Conversation({ params, searchParams }: { params: P
   const fromNote = conv.note_from && conv.note_from !== me.id;
   return (
     <div className="phone" style={{ paddingBottom: 'calc(110px + env(safe-area-inset-bottom))' }}>
+      <ScreenshotContext context="chat" target={otherId} />
       <div className="row appbar">
         <Link href="/app/messages" aria-label="Back" className="btn ghost sm" style={{ width: 44, padding: 0 }}>‹</Link>
         <Link href={`/app/u/${otherId}`} className="stack grow" style={{ gap: 4, textDecoration: 'none', color: 'inherit' }}><strong>{o?.first_name || 'Member'}</strong>{o && <BandPill band={o.band} trend={o.trend} />}</Link>
@@ -38,6 +40,7 @@ export default async function Conversation({ params, searchParams }: { params: P
       </div>
       {fromNote && <div className="notice">{o?.first_name} sent you a Note. Reply any time{me.plan === 'preview' ? ', even on Preview' : ''}.</div>}
       {sp.error && <div className="notice error">{sp.error}</div>}
+      {sp.ok && <div className="notice">{sp.ok}</div>}
       {shared.length > 0 && <div className="card stack" style={{ gap: 8 }}><span className="small muted">You both said</span><div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>{shared.map((v) => <span key={v} className="chip">{v}</span>)}</div></div>}
       <DatePanel
         conversationId={id}

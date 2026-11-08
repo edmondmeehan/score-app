@@ -1,9 +1,9 @@
 'use client';
 import { useState } from 'react';
-import { proposeDate, respondDate, revokeShare, shareDate } from '../../features';
+import { proposeDate, respondDate, revokeShare, shareDate, submitDateChallenge } from '../../features';
 import PlaceFields, { PlaceMap } from '@/components/PlaceFields';
 
-export type Plan = { id: string; proposer_id: string; place: string; address: string | null; starts_at: string; note: string | null; status: 'proposed' | 'accepted' | 'declined' | 'cancelled'; place_id?: string | null; lat?: number | null; lng?: number | null };
+export type Plan = { id: string; proposer_id: string; place: string; address: string | null; starts_at: string; note: string | null; status: 'proposed' | 'accepted' | 'declined' | 'cancelled'; place_id?: string | null; lat?: number | null; lng?: number | null; budget_challenge?: boolean };
 
 const fmt = (iso: string) => new Date(iso).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 
@@ -34,6 +34,7 @@ export default function DatePanel({ conversationId, meId, otherName, plan, share
       <div className="card gold stack" style={{ gap: 10 }}>
         <span className="label">{plan.status === 'accepted' ? 'Date confirmed' : mine ? `Waiting on ${otherName}` : `${otherName} suggested a date`}</span>
         <span className="serif" style={{ fontSize: 24 }}>{plan.place}</span>
+        {plan.budget_challenge && <span className="chip small" style={{ alignSelf: 'flex-start', color: 'var(--rise)', borderColor: 'var(--rise-line)' }}>$50 Date Challenge</span>}
         <span className="small">{fmt(plan.starts_at)}{plan.address ? ` · ${plan.address}` : ''}</span>
         {(plan.address || plan.place_id) && <PlaceMap placeId={plan.place_id} lat={plan.lat} lng={plan.lng} label={plan.place} address={plan.address} height={plan.status === 'accepted' ? 180 : 140} />}
         {plan.note && <span className="small muted">“{plan.note}”</span>}
@@ -43,6 +44,20 @@ export default function DatePanel({ conversationId, meId, otherName, plan, share
             <form action={respondDate} className="grow"><Hidden v={{ ...ids, status: 'accepted' }} /><button className="btn block">Sounds good</button></form>
             <form action={respondDate}><Hidden v={{ ...ids, status: 'declined' }} /><button className="btn ghost">Not this time</button></form>
           </div>
+        )}
+
+        {plan.status === 'accepted' && plan.budget_challenge && new Date(plan.starts_at).getTime() < Date.now() && (
+          <details className="stack" style={{ borderTop: '1px solid var(--line-soft)', paddingTop: 10 }}>
+            <summary className="small" style={{ fontWeight: 600, cursor: 'pointer' }}>How was your $50 date? Share it</summary>
+            <form action={submitDateChallenge} className="stack" style={{ gap: 8, marginTop: 10 }}>
+              <Hidden v={ids} />
+              <label className="field">Give it a title<input className="input" name="title" required minLength={3} maxLength={80} placeholder="Dumplings, then the High Line at sunset" /></label>
+              <label className="field">What you spent<input className="input" name="spent" required inputMode="decimal" placeholder="$38" /></label>
+              <label className="field">What made it great<textarea className="input" name="story" required minLength={10} maxLength={1000} rows={3} /></label>
+              <label className="choice" style={{ alignItems: 'flex-start' }}><input type="checkbox" name="share_ok" style={{ accentColor: 'var(--gold)', marginTop: 4 }} /><span className="small">Score can feature this (first names only, never photos or last names)</span></label>
+              <button className="btn sm" data-haptic="success">Share</button>
+            </form>
+          </details>
         )}
 
         {plan.status === 'accepted' && (
@@ -81,6 +96,7 @@ export default function DatePanel({ conversationId, meId, otherName, plan, share
       <PlaceFields compact nameField="place" nameLabel="Where" namePlaceholder="Bar Pisellino" addressLabel="Address (optional)" addressPlaceholder="52 Grove St" />
       <label className="field">When<input className="input" type="datetime-local" name="starts_at" required min={minLocal} /></label>
       <label className="field">Note (optional)<input className="input" name="note" maxLength={300} placeholder="Drinks after work?" /></label>
+      <label className="choice" style={{ alignItems: 'flex-start' }}><input type="checkbox" name="budget_challenge" style={{ accentColor: 'var(--gold)', marginTop: 4 }} /><span className="stack" style={{ gap: 2 }}><strong>Make it a $50 Date Challenge</strong><span className="small muted">Plan the best date you can for under $50, then share how it went.</span></span></label>
       <span className="small muted">Pick somewhere public for a first date.</span>
       <div className="row" style={{ gap: 8 }}><button className="btn grow">Send suggestion</button><button type="button" className="btn ghost" onClick={() => setOpen(false)}>Cancel</button></div>
     </form>

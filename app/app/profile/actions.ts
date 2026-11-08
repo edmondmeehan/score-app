@@ -27,6 +27,16 @@ export async function saveAbout(form: FormData) {
   back(error ? 'error=' + encodeURIComponent(error.message) : 'saved=about');
 }
 
+export async function saveFlags(form: FormData) {
+  const { supabase, user } = await ctx();
+  const t = (k: string, n: number) => String(form.get(k) || '').trim().slice(0, n) || null;
+  const { error } = await supabase.from('profiles').update({
+    flag_habit: t('flag_habit', 120), flag_splurge: t('flag_splurge', 60), flag_save: t('flag_save', 60),
+    show_verified: form.get('show_verified') === 'on',
+  }).eq('id', user.id);
+  back(error ? 'error=' + encodeURIComponent(error.message) : 'saved=flags');
+}
+
 export async function setSong(form: FormData) {
   const { supabase, user } = await ctx();
   const id = parseTrackId(String(form.get('track') || ''));

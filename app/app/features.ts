@@ -107,6 +107,7 @@ export async function proposeDate(form: FormData) {
     p_starts_at: utc, p_note: String(form.get('note') || ''),
   });
   if (error) back(`/app/messages/${conv}`, 'error', error.message);
+  if (dateId && form.get('budget_challenge') === 'on') await supabase.rpc('set_date_challenge', { p_date: dateId });
   if (dateId && form.get('place_id')) {
     const n = (k: string) => { const v = Number(form.get(k)); return form.get(k) && Number.isFinite(v) ? v : null; };
     await supabase.rpc('set_date_place', { p_date: dateId, p_place_id: String(form.get('place_id')), p_lat: n('lat'), p_lng: n('lng') });
@@ -168,4 +169,17 @@ export async function saveMapPrivacy(form: FormData) {
   const { error } = await supabase.from('profiles').update({ map_opt_out: form.get('map_opt_out') === 'on' }).eq('id', user.id);
   if (error) back('/app/settings', 'error', error.message);
   redirect('/app/settings?saved=privacy#privacy');
+}
+
+// ---------- $50 Date Challenge ----------
+export async function submitDateChallenge(form: FormData) {
+  const { supabase } = await ctx();
+  const conv = String(form.get('conversation_id'));
+  const spent = Number(String(form.get('spent') || '').replace(/[$,\s]/g, ''));
+  const { error } = await supabase.rpc('submit_date_challenge', {
+    p_date: String(form.get('plan_id')), p_title: String(form.get('title') || ''), p_spent: Number.isFinite(spent) ? spent : -1,
+    p_story: String(form.get('story') || ''), p_share: form.get('share_ok') === 'on',
+  });
+  if (error) back(`/app/messages/${conv}`, 'error', /spent/.test(error.message) ? 'Keep it at $50 or under.' : error.message);
+  redirect(`/app/messages/${conv}?ok=` + encodeURIComponent('Thanks for sharing your $50 date.'));
 }
