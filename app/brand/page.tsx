@@ -3,6 +3,9 @@ import Link from 'next/link';
 import DocLayout from '@/components/DocLayout';
 import { Gauge, Logo, BandPill } from '@/components/ui';
 import { BANDS, type Band } from '@/lib/types';
+import { supabaseServer } from '@/lib/supabase/server';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Brand & marketing · Score',
@@ -72,9 +75,16 @@ function DoDont({ dos, donts }: { dos: string[]; donts: string[] }) {
   );
 }
 
-export default function Brand() {
+export default async function Brand() {
+  let staff = false;
+  try {
+    const sb = await supabaseServer();
+    const { data: { user } } = await sb.auth.getUser();
+    if (user) staff = (await sb.rpc('is_staff')).data === true;
+  } catch { /* public view */ }
+  const toc = staff ? [...TOC.slice(0, -1), { id: 'concepts', h: 'Upcoming campaigns (staff)' }, TOC[TOC.length - 1]] : TOC;
   return (
-    <DocLayout eyebrow="Company" title="Brand & marketing" toc={TOC} updated="November 2026"
+    <DocLayout eyebrow="Company" title="Brand & marketing" toc={toc} updated="November 2026"
       summary="How Score looks, sounds and talks about itself. For our team, press, partners and anyone making something with our name on it.">
 
       <section>
@@ -265,6 +275,53 @@ export default function Brand() {
           <li>Invite only. New York first. 60 days free for new members. scoredate.app</li>
         </ul>
       </section>
+
+      {staff && (
+      <section id="concepts">
+        <h2>Upcoming campaigns <span className="mono small" style={{ color: 'var(--gold)', letterSpacing: '.12em', verticalAlign: 'middle' }}>STAFF ONLY</span></h2>
+        <div className="doc-draft">Only signed-in Score staff can see this section. Nothing here is live. Don’t share outside the team until it ships.</div>
+
+        <h3>Big idea: make financial compatibility something people flirt about</h3>
+        <p>The credit band gets attention. How someone handles money gives people a reason to connect.</p>
+
+        <div className="card stack" style={{ gap: 10, marginBottom: 16 }}>
+          <span className="label">Lead feature</span>
+          <strong style={{ fontSize: 22, fontFamily: 'var(--serif)', fontWeight: 400 }}>Hot or Financially Compatible?</strong>
+          <p style={{ margin: 0 }}>Two people answer five quick questions before seeing each other’s photos. Score reveals their money compatibility first, then their photos, and both choose whether to connect.</p>
+          <ol style={{ margin: 0, paddingLeft: 20, display: 'grid', gap: 4 }}>
+            <li>Would you rather have a luxury vacation or a bigger down payment?</li>
+            <li>Split the check, alternate, or whoever invites pays?</li>
+            <li>What purchase would you never give up?</li>
+            <li>How much spending needs a conversation with your partner?</li>
+            <li>Would you date someone who earns less but saves more?</li>
+          </ol>
+          <p style={{ margin: 0 }}><strong>The shareable moment:</strong> “We’re 96% financially compatible. Now let’s see if there’s chemistry.”</p>
+          <ul style={{ margin: 0 }}>
+            <li>Keep the percentage playful and clearly labeled as based on their five answers.</li>
+            <li>Share cards show only your own result unless both people agree to share together.</li>
+          </ul>
+        </div>
+
+        <div className="card stack" style={{ gap: 10, marginBottom: 16 }}>
+          <span className="label">Launch campaign</span>
+          <strong style={{ fontSize: 26, fontFamily: 'var(--serif)', fontWeight: 400 }}>Good Credit. <em>Questionable Taste in Exes.</em></strong>
+          <p style={{ margin: 0 }}>Singles share their funniest dating mistake alongside one money habit they’re proud of. The best submissions become short videos and billboards.</p>
+          <ul style={{ margin: 0 }}>
+            <li>Signed release from everyone featured, before anything runs.</li>
+            <li>No names, photos or identifying details about exes.</li>
+            <li>Real submissions only: no scripted stories presented as real members.</li>
+          </ul>
+        </div>
+
+        <h3>Supporting features</h3>
+        <div className="tool-grid" style={{ marginBottom: 14 }}>
+          <div className="tool-card"><h3>Verified badge</h3><p>An optional badge showing someone has completed Score’s ID and credit verification, for every band. Never shows the score, and never limited to people above a cutoff, so it doesn’t mark anyone as a red flag.</p></div>
+          <div className="tool-card"><h3>The $50 Date Challenge</h3><p>Matches plan the best date under $50, then share the results. Makes being thoughtful and resourceful attractive. Builds on in-app date planning.</p></div>
+          <div className="tool-card"><h3>Financial Green Flags</h3><p>Profile prompts like “My sexiest money habit” and “I’ll splurge on ___, but always save on ___” give people natural conversation starters.</p></div>
+        </div>
+        <p className="small muted">Suggested order: Financial Green Flags prompts (quick win), then the blind compatibility reveal with share cards, then the $50 Date Challenge, then the campaign.</p>
+      </section>
+      )}
 
       <section id="partners">
         <h2>Partners & press</h2>
