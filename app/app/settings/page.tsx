@@ -27,6 +27,12 @@ export default async function Settings({ searchParams }: { searchParams: Promise
       {me.status === 'suspended' && <div className="notice error">Your account is suspended. Check your email for details and how to appeal.</div>}
       {sp.error && <div className="notice error">{sp.error}</div>}
       {sp.saved && <div className="notice">Saved.</div>}
+      {me.plan === 'black' && (
+        <Link href="/app/matchmaker" className="card gold row" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <span className="stack grow" style={{ gap: 2 }}><strong>Your matchmaker</strong><span className="small muted">Book a call, message or email</span></span>
+          <span style={{ color: 'var(--gold)' }}>→</span>
+        </Link>
+      )}
       <Link href="/app/shop" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}><span className="grow">Add-ons <span className="small muted">· Spotlight, Extra connections, Notes</span></span><span className="muted">›</span></Link>
 
       {['membership', 'premium', 'black', 'paused'].includes(me.plan) && (

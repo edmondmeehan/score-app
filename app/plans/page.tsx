@@ -3,6 +3,7 @@ import { getMe } from '@/lib/session';
 import { TestBanner } from '@/components/ui';
 import { PLANS } from '@/lib/types';
 import { getFounderOffer } from '@/lib/founderOffer';
+import { getReserveVisible } from '@/lib/reserve';
 import FounderBadge from '@/components/FounderBadge';
 import { choosePlan } from '../onboarding/actions';
 
@@ -10,6 +11,8 @@ export default async function Plans({ searchParams }: { searchParams: Promise<{ 
   const { me, supabase } = await getMe();
   if (!me) redirect('/signin');
   const offer = me.is_founder ? await getFounderOffer(supabase) : null;
+  const showReserve = me.plan === 'black' || (await getReserveVisible(supabase));
+  const planKeys = (Object.keys(PLANS) as (keyof typeof PLANS)[]).filter((k) => k !== 'black' || showReserve);
   const sp = await searchParams;
   return (
     <form action={choosePlan} className="phone">
@@ -24,7 +27,7 @@ export default async function Plans({ searchParams }: { searchParams: Promise<{ 
         </div>
       )}
       <div className="stack" role="radiogroup" aria-label="Plan">
-        {(Object.keys(PLANS) as (keyof typeof PLANS)[]).map((k, i) => (
+        {planKeys.map((k, i) => (
           <label key={k} className="choice" style={{ alignItems: 'flex-start' }}>
             <input type="radio" name="plan" value={k} defaultChecked={i === 0} style={{ accentColor: 'var(--gold)', marginTop: 4 }} />
             <span className="stack grow" style={{ gap: 4 }}>

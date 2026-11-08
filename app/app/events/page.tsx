@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { requireMember } from '@/lib/session';
 import { when, type EventRow } from '@/lib/events';
+import { getReserveVisible } from '@/lib/reserve';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,13 +11,14 @@ export default async function Events() {
     supabase.from('events').select('*').in('status', ['published', 'cancelled']).gte('starts_at', new Date(Date.now() - 6 * 3600000).toISOString()).order('starts_at'),
     supabase.from('event_rsvps').select('event_id, status').eq('user_id', me.id),
   ]);
+  const reserve = me.plan === 'black' || (await getReserveVisible(supabase));
   const rsvp = Object.fromEntries((mine || []).map((r) => [r.event_id, r.status]));
   const list = (events as EventRow[]) || [];
   return (
     <div className="phone">
       <span className="eyebrow">Members only</span>
       <h1 className="serif" style={{ fontSize: 40 }}>Events</h1>
-      <span className="muted small">Small, hosted nights in the city. Reserve members get first access. <Link href="/app/map">See where members are</Link>.</span>
+      <span className="muted small">Small, hosted nights in the city.{reserve ? ' Reserve members get first access.' : ''} <Link href="/app/map">See where members are</Link>.</span>
       {list.length === 0 && (
         <div className="card stack" style={{ textAlign: 'center', padding: 32 }}>
           <span className="serif" style={{ fontSize: 24 }}>Nothing on the calendar yet</span>
@@ -35,7 +37,7 @@ export default async function Events() {
                   : r === 'going' ? <span className="small" style={{ color: 'var(--rise)' }}>Going</span>
                   : r === 'waitlist' ? <span className="small muted">Waitlist</span>
                   : e.founders_only ? <span className="chip" style={{ fontSize: 11, padding: '2px 8px', color: 'var(--gold-light)', borderColor: 'var(--gold)' }}>Founding Members</span>
-                  : early ? <span className="chip" style={{ fontSize: 11, padding: '2px 8px' }}>Reserve first</span> : null}
+                  : early ? <span className="chip" style={{ fontSize: 11, padding: '2px 8px' }}>{reserve ? 'Reserve first' : 'Opening soon'}</span> : null}
               </span>
               <span className="serif" style={{ fontSize: 24 }}>{e.title}</span>
               <span className="small muted">{e.venue}{e.price_note ? ` · ${e.price_note}` : ''}</span>

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import FounderBadge from '@/components/FounderBadge';
 import { notFound } from 'next/navigation';
 import { requireMember } from '@/lib/session';
+import { getReserveVisible } from '@/lib/reserve';
 import { rsvp } from '../../features';
 import { when, type EventRow } from '@/lib/events';
 
@@ -25,6 +26,7 @@ export default async function EventPage({ params, searchParams }: { params: Prom
   const early = !e.founders_only && opensAt && opensAt.getTime() > Date.now();
   const foundersLocked = Boolean(e.founders_only) && !me.is_founder;
   const member = ['membership', 'premium', 'black'].includes(me.plan);
+  const reserve = me.plan === 'black' || (await getReserveVisible(supabase));
   const started = new Date(e.starts_at).getTime() < Date.now();
 
   return (
@@ -45,7 +47,7 @@ export default async function EventPage({ params, searchParams }: { params: Prom
       </div>
       {e.description && <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{e.description}</p>}
       {e.founders_only && <div className="notice" style={{ borderColor: 'var(--gold)' }}><FounderBadge /> <span style={{ marginLeft: 6 }}>A Founding Members event.{foundersLocked ? ' Only members with the Founding Member badge can RSVP.' : ' You’re in.'}</span></div>}
-      {early && <div className="notice test">Reserve members have first access until {opensAt!.toLocaleString('en-US', { weekday: 'long', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' })}.</div>}
+      {early && <div className="notice test">{reserve ? 'Reserve members have first access until ' : 'RSVPs open '}{opensAt!.toLocaleString('en-US', { weekday: 'long', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' })}.</div>}
 
       {e.status === 'published' && !started && (
         status === 'going' || status === 'waitlist' ? (

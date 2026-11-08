@@ -117,7 +117,7 @@ export default async function Search({ searchParams }: { searchParams: Promise<S
       {data?.limited && (
         <div className="card gold stack" style={{ gap: 8 }}>
           <span className="serif" style={{ fontSize: 24 }}>You&apos;ve used today&apos;s searches</span>
-          <span className="small muted">Searches reset at midnight. Premium and Reserve members search as much as they like.</span>
+          <span className="small muted">Searches reset at midnight. Premium members search as much as they like.</span>
           <Link href="/plans" className="btn sm" style={{ alignSelf: 'flex-start' }}>See plans</Link>
         </div>
       )}
