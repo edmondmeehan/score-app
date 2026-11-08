@@ -40,7 +40,9 @@ export default async function ReserveAdmin({ searchParams }: { searchParams: Pro
     supabase.rpc('staff_reserve_members'),
   ]);
   const owner = role === 'owner';
-  const notReady = [e1, e2].some((e) => e && /does not exist|schema cache|relation/i.test(e.message));
+  const missing = (e: { code?: string; message: string } | null) => Boolean(e && (e.code === '42P01' || e.code === 'PGRST202' || e.code === 'PGRST205' || /Could not find the (table|function)/i.test(e.message)));
+  const notReady = missing(e1) || missing(e2);
+  const otherError = [e1, e2].find((e) => e && !missing(e));
   const list = (mms as MM[]) || [];
   const active = list.filter((m) => m.active);
   const rows = (members as Member[]) || [];
@@ -52,7 +54,8 @@ export default async function ReserveAdmin({ searchParams }: { searchParams: Pro
       <h1 className="serif" style={{ fontSize: 44 }}>Reserve</h1>
       {sp.ok && <div className="notice">{sp.ok}</div>}
       {sp.error && <div className="notice error">{sp.error}</div>}
-      {notReady && <div className="notice error">Run migration 0022 in the Score SQL Editor to turn on matchmakers.</div>}
+      {notReady && <div className="notice error">Run migration 0022 in the Score SQL Editor to turn on matchmakers. ({(e1 || e2)?.message})</div>}
+      {otherError && <div className="notice error">Couldn’t load Reserve data: {otherError.message}{otherError.code ? ` (${otherError.code})` : ''}</div>}
 
       <section className="card stack" style={{ gap: 10 }}>
         <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
