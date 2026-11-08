@@ -54,6 +54,8 @@ export function reportBlocks(d: D, sections: string[]): { blocks: Block[]; headl
       ['Waitlist joins from ads, last 24 hours', num(ca.paid_joins_24h)],
       ['Waitlist joins from ads, month to date', num(ca.paid_joins_mtd)],
       ['Cost per sign-up, month to date', cps(Number(ca.spend_mtd), Number(ca.paid_joins_mtd))],
+      ['Paying members from ads, month to date', num(ca.paying_mtd)],
+      ['Cost per paying member (CAC), month to date', cps(Number(ca.spend_mtd), Number(ca.paying_mtd))],
       ['By channel today', top(ca.by_channel_24h)],
     ] });
     if (!Number(ca.spend_mtd)) out.push({ note: 'No ad spend entered this month. Add it in Admin → Campaigns to see cost per sign-up.' });

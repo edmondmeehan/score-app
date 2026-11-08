@@ -3,8 +3,8 @@ import { addSpend, removeSpend } from './actions';
 
 export const dynamic = 'force-dynamic';
 
-type Row = { channel: string; campaign: string; signups: number; qualified: number; referrals_brought: number; spend: number };
-type Report = { rows: Row[]; total_signups: number; total_qualified: number; total_spend: number; by_day: { day: string; signups: number; paid: number }[] };
+type Row = { channel: string; campaign: string; signups: number; qualified: number; referrals_brought: number; spend: number; members?: number; paying?: number; revenue?: number };
+type Report = { rows: Row[]; total_signups: number; total_qualified: number; total_spend: number; total_members?: number; total_paying?: number; total_revenue?: number; paid_paying?: number; paid_revenue?: number; by_day: { day: string; signups: number; paid: number }[] };
 type Spend = { id: string; day: string; channel: string; campaign: string | null; amount: number; note: string | null };
 
 const LABEL: Record<string, string> = { meta: 'Meta', google: 'Google', chatgpt: 'ChatGPT', youtube: 'YouTube / AdMob', creators: 'Creators', other: 'Other paid', referral: 'Referral', organic: 'Organic / direct' };
@@ -38,7 +38,7 @@ export default async function Campaigns({ searchParams }: { searchParams: Promis
   return (
     <>
       <h1 className="serif" style={{ fontSize: 44 }}>Campaigns</h1>
-      <span className="small muted">Waitlist signups by where they first came from, against what you spent. A signup is credited to the first campaign link that brought that browser to scoredate.app. Qualified = a zip code in an open area.</span>
+      <span className="small muted">Waitlist signups by where they first came from, against what you spent. A signup is credited to the first campaign link that brought that browser to scoredate.app. Qualified = a zip code in an open area. Members, Paying and Revenue follow those same sign-ups after they join, so CAC = spend ÷ paying members. Recent campaigns need time to convert.</span>
       {sp.ok && <div className="notice">{sp.ok}</div>}
       {sp.error && <div className="notice error">{sp.error}</div>}
       {notReady && <div className="notice error">Run migration 0029 in the ScoreDate SQL Editor first.</div>}
@@ -55,6 +55,8 @@ export default async function Campaigns({ searchParams }: { searchParams: Promis
           [usd(r.total_spend), 'Ad spend', 'Entered below'],
           [per(r.total_spend, paidSignups), 'Cost per paid signup', `${paidSignups.toLocaleString('en-US')} from paid channels`],
           [per(r.total_spend, r.total_signups), 'Blended cost per signup', 'Spend ÷ all signups'],
+          [per(r.total_spend, r.paid_paying || 0), 'Cost per paying member (CAC)', `${(r.paid_paying || 0).toLocaleString('en-US')} paying from paid channels`],
+          [r.total_spend ? `${((r.paid_revenue || 0) / r.total_spend).toFixed(2)}×` : '—', 'Return on ad spend', `${usd(r.paid_revenue || 0)} revenue from paid channels`],
         ].map(([n, l, s]) => (
           <div key={l} className="card stack" style={{ gap: 4, flex: '1 1 150px' }}>
             <span className="serif" style={{ fontSize: 30, lineHeight: 1 }}>{n}</span><span className="small">{l}</span><span className="small muted">{s}</span>
@@ -76,16 +78,17 @@ export default async function Campaigns({ searchParams }: { searchParams: Promis
 
       <section className="card scroll-x" style={{ overflowX: 'auto' }}>
         <table className="data" style={{ width: '100%' }}>
-          <thead><tr><th>Channel</th><th>Campaign</th><th>Spend</th><th>Signups</th><th>Qualified</th><th>Cost / signup</th><th>Cost / qualified</th><th>Friends they referred</th></tr></thead>
+          <thead><tr><th>Channel</th><th>Campaign</th><th>Spend</th><th>Signups</th><th>Qualified</th><th>Members</th><th>Paying</th><th>Revenue</th><th>Cost / signup</th><th>Cost / paying (CAC)</th><th>Return</th><th>Friends referred</th></tr></thead>
           <tbody>
             {r.rows.map((x) => (
               <tr key={`${x.channel}-${x.campaign}`}>
                 <td>{LABEL[x.channel] || x.channel}</td><td className="mono small">{x.campaign || '—'}</td><td>{x.spend ? usd(x.spend) : '—'}</td>
                 <td>{x.signups.toLocaleString('en-US')}</td><td>{x.qualified.toLocaleString('en-US')}</td>
-                <td>{per(x.spend, x.signups)}</td><td>{per(x.spend, x.qualified)}</td><td>{x.referrals_brought}</td>
+                <td>{(x.members || 0).toLocaleString('en-US')}</td><td>{(x.paying || 0).toLocaleString('en-US')}</td><td>{x.revenue ? usd(Number(x.revenue)) : '—'}</td>
+                <td>{per(x.spend, x.signups)}</td><td>{per(x.spend, x.paying || 0)}</td><td>{x.spend && x.revenue ? `${(Number(x.revenue) / x.spend).toFixed(2)}×` : '—'}</td><td>{x.referrals_brought}</td>
               </tr>
             ))}
-            {r.rows.length === 0 && <tr><td colSpan={8} className="small muted">No signups in this range yet.</td></tr>}
+            {r.rows.length === 0 && <tr><td colSpan={12} className="small muted">No signups in this range yet.</td></tr>}
           </tbody>
         </table>
       </section>
