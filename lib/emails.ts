@@ -409,6 +409,20 @@ export const templates = {
     ],
   }) satisfies Email,
 
+  staff_welcome: (d: { name?: string | null; added_by?: string | null; url: string; has_account: boolean }) => ({
+    subject: 'You’re now a ScoreDate admin',
+    preheader: 'You have full access to the ScoreDate admin.',
+    eyebrow: 'Team',
+    heading: 'Welcome to the ScoreDate team.',
+    kind: 'transactional',
+    blocks: [
+      { p: `${hi(d.name)} ${d.added_by ? `${d.added_by} added you` : 'You’ve been added'} as an admin on ScoreDate, with full access to the admin: members, verification, safety, content, billing and settings.` },
+      { p: d.has_account ? 'Sign in with this email address and you’ll go straight to the admin.' : 'Create your account with this email address (it has to match), and you’ll go straight to the admin.' },
+      { button: { label: d.has_account ? 'Open the admin' : 'Create my account', url: d.url } },
+      { p: 'Admin access includes members’ private information. Please keep it confidential and use it only to run ScoreDate. If you weren’t expecting this, reply and let us know.' },
+    ],
+  }) satisfies Email,
+
   admin_daily: (d: { date: string; headline: string; blocks: Block[] }) => ({
     subject: `ScoreDate daily report · ${d.date}`,
     preheader: d.headline,
@@ -477,6 +491,7 @@ export const SAMPLES: { [K in TemplateName]: Parameters<(typeof templates)[K]>[0
   deletion_confirm: { first_name: 'Nadia' },
   error_alert: { count: 4, rows: [['GET /api/cron', '4 errors · relation "x" does not exist']] },
   report_update: { first_name: 'Nadia', acted: true },
+  staff_welcome: { name: 'Jordan', added_by: 'Eddie', url: `${SITE_URL}/signin?mode=signup&next=/admin`, has_account: false },
   admin_daily: { date: 'Sun, Nov 8', headline: '$149.97 revenue · 12 sign-ups · 48 waitlist joins', blocks: [{ p: 'Finance' }, { facts: [['Revenue, last 24 hours', '$149.97'], ['New subscriptions', '3'], ['Estimated MRR', '$2,874.00']] }, { p: 'Waitlist' }, { facts: [['New joins', '48 (7-day avg 31.4)'], ['Total waitlist', '612']] }] },
   notification: { first_name: 'Nadia', title: 'Owen suggested a date', body: 'Via Carota · Sat Dec 6 at 7:30 pm', url: `${SITE_URL}/app/messages`, category: 'interaction' },
 };
@@ -506,6 +521,7 @@ export const TEMPLATE_INFO: Record<TemplateName, { label: string; when: string; 
   deletion_confirm: { label: 'Account deletion', when: 'A member deletes their account', live: true },
   error_alert: { label: 'Error alert (staff)', when: 'Server errors since the last alert, at most hourly, to owners', live: true },
   report_update: { label: 'Report follow-up', when: 'Staff resolves a report the member filed', live: true },
+  staff_welcome: { label: 'Admin welcome', when: 'An owner adds a new admin in Admin → Admins', live: true },
   admin_daily: { label: 'Admin daily report', when: 'Every morning to staff who turned it on in Admin → Daily report', live: true },
   notification: { label: 'Activity alert', when: 'Date plans, Notes, event and date reminders, weekly catch-up (automatic, respects settings)', live: true },
 };
