@@ -1,11 +1,14 @@
 'use client';
 import ShareInvite from './ShareInvite';
 import FounderBadge from './FounderBadge';
+import { useEffect } from 'react';
+import { trackLead } from './AdPixels';
 
 const SITE = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.scoredate.app').replace(/\/$/, '');
 
-export default function JoinedCard({ message, code, token, position, founder, founderReason }: { message: string; code: string; token: string; position: number | null; founder: boolean; founderReason: string | null }) {
+export default function JoinedCard({ eventId, message, code, token, position, founder, founderReason }: { eventId?: string; message: string; code: string; token: string; position: number | null; founder: boolean; founderReason: string | null }) {
   const url = `${SITE}/?ref=${code}`;
+  useEffect(() => { if (eventId) trackLead(eventId); }, [eventId]);
   return (
     <div className="card gold stack" style={{ gap: 14 }}>
       <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>

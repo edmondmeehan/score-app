@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation';
 import DocLayout from '@/components/DocLayout';
 import RichText from '@/components/RichText';
 import { DOCS } from '@/lib/docs';
+import AdsChoice from '@/components/AdsChoice';
 
 export function generateStaticParams() {
   return Object.keys(DOCS).map((doc) => ({ doc }));
@@ -25,6 +26,7 @@ export default async function Legal({ params }: { params: Promise<{ doc: string 
       {d.sections.map((s) => (
         <section key={s.id} id={s.id}>
           <h2>{s.h}</h2>
+          {doc === 'choices' && s.id === 'sell' && <AdsChoice />}
           {s.body.map((b, i) =>
             typeof b === 'string' ? <p key={i}><RichText text={b} /></p>
               : 'ul' in b ? <ul key={i}>{b.ul.map((li, j) => <li key={j}><RichText text={li} /></li>)}</ul>

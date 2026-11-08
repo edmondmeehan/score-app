@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextFetchEvent, type NextRequest } from 'next/server';
+import { ATTR_COOKIE, attrFromParams } from '@/lib/adsShared';
 import { SESSION_COOKIE, SESSION_MINUTES, VISITOR_COOKIE, isBot, parseUA, sendEvent, trafficSource } from '@/lib/analytics';
 
 export async function middleware(request: NextRequest, event: NextFetchEvent) {
@@ -47,6 +48,11 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
   const ref = request.nextUrl.searchParams.get('ref');
   if (ref && /^[A-Za-z0-9]{4,12}$/.test(ref)) {
     response.cookies.set('score_ref', ref.toUpperCase(), { httpOnly: true, sameSite: 'lax', secure: true, path: '/', maxAge: 60 * 60 * 24 * 30 });
+  }
+  // Ad campaigns: remember the first campaign that brought this browser here (utm_* or a click ID), 90 days.
+  if (request.method === 'GET' && !request.cookies.get(ATTR_COOKIE)) {
+    const attr = attrFromParams(request.nextUrl.searchParams, path);
+    if (attr) response.cookies.set(ATTR_COOKIE, encodeURIComponent(JSON.stringify(attr)), { httpOnly: true, sameSite: 'lax', secure: true, path: '/', maxAge: 60 * 60 * 24 * 90 });
   }
   // "Last active" powers gentle reminders (we never nudge someone who was just here). At most once an hour.
   if (user && path.startsWith('/app') && request.method === 'GET' && !request.cookies.get('score_seen')) {

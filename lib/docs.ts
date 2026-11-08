@@ -107,7 +107,7 @@ export const DOCS: Record<string, Doc> = {
         { ul: [
           'We store your **credit band and 12-month trend**, never your exact score or credit report.',
           'Your **ID images and ID selfie stay with our verification partner**, not on Score’s servers.',
-          'We **don’t sell** your personal information or share it for cross-context behavioral advertising.',
+          'We **don’t sell** your personal information. On our public website we use Meta and Google ad tags to measure whether our ads bring people to the waitlist, and you can opt out any time. They never run inside the Score app.',
           'Other members only ever see what’s on your profile. The member map shows **neighborhoods, never people**, and only for groups of 25 or more.',
           'You can delete your account any time in Settings.',
         ] },
@@ -133,6 +133,7 @@ export const DOCS: Record<string, Doc> = {
           'Device and usage: device type, browser, app version, pages visited, a random visitor ID and session ID, the referring site, and city-level location derived from your connection. We do not store your IP address in our analytics.',
           'Activity used to run the app, such as when you were last active (used for gentle reminders), notification preferences, when you’ve read a chat (shown to your match as “Read”), and whose profiles you’ve viewed (shown to Premium members as “Who viewed me”).',
           'Screenshot events, where your device lets us detect them: who took one, on which screen, and when.',
+          'Campaign details from the link that brought you to our website (such as utm tags, and whether you came from a Google, Meta or TikTok ad), saved with your waitlist signup.',
           'Error reports when something breaks on our servers: the page, the error message and the time. These don’t include your messages.',
           'If you allow notifications in the Score app, a push token from Apple or Google so we can deliver them.',
           'Purchase records from Apple, Google and RevenueCat: product, price, store and renewal status. We never see your card number.',
@@ -162,9 +163,10 @@ export const DOCS: Record<string, Doc> = {
           'Apple, Google and RevenueCat (subscriptions and purchases);',
           'CARTO and OpenStreetMap (map tiles; they see that a map was loaded, not who you are).',
         ] },
+        '**Advertising partners:** on our public website only (never in the app or your account), Meta (the Meta Pixel and Conversions API) and Google (the Google tag) receive your visit, your browser and device details, your IP address and, when you join the waitlist, a scrambled (hashed) copy of your email, so we can measure which ads work and show ads to people likely to be interested. Under some state laws this counts as “sharing” for targeted advertising. We never send them your credit band, verification results, profile or messages. Opt out at [Your Privacy Choices](/legal/choices); we also honor Global Privacy Control. Meta and Google use this data under their own privacy policies.',
         '**Legal and safety:** when required by law, or when we believe in good faith it’s necessary to prevent harm or fraud.',
         '**Business changes:** if Score is involved in a merger or sale, data may transfer under this policy.',
-        'We do not sell personal information.',
+        'We do not sell personal information for money.',
       ] },
       { id: 'retention', h: 'How long we keep it', body: [
         { ul: [
@@ -178,7 +180,7 @@ export const DOCS: Record<string, Doc> = {
         ] },
       ] },
       { id: 'rights', h: 'Your rights and choices', body: [
-        'Depending on where you live (including California, Colorado, Connecticut, Virginia and other states), you may have the right to access, correct, delete or get a copy of your personal information, and to opt out of sale, sharing or targeted advertising. Score doesn’t sell or share for targeted advertising, so there’s nothing to opt out of there, but you can still exercise the other rights. See [Your Privacy Choices](/legal/choices).',
+        'Depending on where you live (including California, Colorado, Connecticut, Virginia and other states), you may have the right to access, correct, delete or get a copy of your personal information, and to opt out of sale, sharing or targeted advertising. Score doesn’t sell personal information. To opt out of the ad measurement on our website (“sharing” under some state laws), use the switch on [Your Privacy Choices](/legal/choices). We honor Global Privacy Control signals.',
         'You can download a copy of your data any time in **Settings → Your data → Download my data**.',
         'We won’t treat you differently for exercising your rights.',
       ] },
@@ -201,8 +203,8 @@ export const DOCS: Record<string, Doc> = {
     title: 'Your Privacy Choices', eyebrow: 'Legal', updated: UPDATED, draft: DRAFT,
     summary: 'Every control you have over your data, and how to use it.',
     sections: [
-      { id: 'sell', h: 'We don’t sell or share your data for ads', body: [
-        'Score does not sell personal information and does not share it for cross-context behavioral advertising. We don’t use third-party advertising cookies or trackers. If that ever changes, we’ll update this page first and give you a way to opt out.',
+      { id: 'sell', h: 'Opt out of sale and sharing', body: [
+        'Score does not sell personal information. On our public website (never inside the app), we use the Meta Pixel, Meta’s Conversions API and the Google tag to measure whether our ads bring people to the waitlist. Some state laws call this “sharing” for targeted advertising. Use the switch above to opt out on this browser. We never share your credit band, verification results, profile or messages with advertisers.',
       ] },
       { id: 'in-app', h: 'Controls in the app', body: [
         { ul: [
@@ -225,7 +227,7 @@ export const DOCS: Record<string, Doc> = {
         'We’ll confirm we received it, may ask you to verify your identity, and respond within 30 days (45 where state law allows). An authorized agent can make a request for you with your signed permission. If we decline a request, you can appeal by replying to our decision.',
       ] },
       { id: 'gpc', h: 'Global Privacy Control', body: [
-        'If your browser sends a Global Privacy Control signal, we treat it as a request to opt out of sale and sharing. Since we don’t do either, nothing else changes, but we honor it anyway.',
+        'If your browser sends a Global Privacy Control signal, we treat it as a request to opt out of sale and sharing: ad tags don’t load and we don’t send your signup to Meta.',
       ] },
       { id: 'more', h: 'More', body: [
         'Read the full [Privacy Policy](/legal/privacy), the [Cookie Notice](/legal/cookies) and the [Biometric Data Policy](/legal/biometric).',
@@ -238,7 +240,7 @@ export const DOCS: Record<string, Doc> = {
     summary: 'A short list, because we only use the cookies Score actually needs.',
     sections: [
       { id: 'what', h: 'The cookies we use', body: [
-        'All of these are first-party cookies set by scoredate.app. We don’t use third-party advertising or cross-site tracking cookies.',
+        'These are first-party cookies set by scoredate.app. On our public website we also use advertising cookies from Meta and Google (listed below), unless you opt out at [Your Privacy Choices](/legal/choices). None of them run inside the Score app.',
         { ul: [
           '**Sign-in** (Supabase auth): keeps you signed in. Essential.',
           '**score_theme:** remembers light, dark or system theme. Up to 1 year.',
@@ -246,6 +248,9 @@ export const DOCS: Record<string, Doc> = {
           '**score_seen:** limits how often we update your “last active” time. 1 hour.',
           '**score_ref:** remembers a friend’s invite link so they get credit if you join. 30 days.',
           '**score_invite:** holds an invite code while you sign up. Until you finish.',
+          '**score_attr:** remembers which campaign link first brought you here, so we know which ads work. 90 days.',
+          '**score_ads:** remembers if you opted out of ad measurement. 2 years.',
+          '**Meta (_fbp, _fbc) and Google (_gcl_au and similar):** advertising cookies on our public website only, used to measure our ads. Up to 90 days. Not set if you opt out or send Global Privacy Control.',
         ] },
       ] },
       { id: 'storage', h: 'Other browser storage', body: [

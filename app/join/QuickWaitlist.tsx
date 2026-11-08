@@ -6,7 +6,7 @@ import JoinedCard from '@/components/JoinedCard';
 /** "No invite code?" — email + zip, confirms right on the screen. */
 export default function QuickWaitlist({ email }: { email?: string | null }) {
   const [state, action, pending] = useActionState<WaitlistState, FormData>(joinWaitlist, null);
-  if (state?.ok && state.joined) return <JoinedCard message={state.message} code={state.joined.code} token={state.joined.token} position={state.joined.position} founder={state.joined.founder} founderReason={state.joined.founderReason} />;
+  if (state?.ok && state.joined) return <JoinedCard eventId={state.joined.eventId} message={state.message} code={state.joined.code} token={state.joined.token} position={state.joined.position} founder={state.joined.founder} founderReason={state.joined.founderReason} />;
   if (state?.ok)
     return (
       <div className="card gold stack" style={{ gap: 10 }}>

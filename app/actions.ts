@@ -4,8 +4,9 @@ import { supabaseServer } from '@/lib/supabase/server';
 import { SITE_URL } from '@/lib/emails';
 import { sendEmail } from '@/lib/mailer';
 import { trackEvent } from '@/lib/track';
+import { newEventId, recordAttribution, sendMetaLead } from '@/lib/ads';
 
-export type Joined = { code: string; token: string; position: number | null; total: number | null; founder: boolean; founderReason: string | null; referred: boolean };
+export type Joined = { eventId: string; code: string; token: string; position: number | null; total: number | null; founder: boolean; founderReason: string | null; referred: boolean };
 export type WaitlistState =
   | null
   | { ok: true; message: string; joined?: Joined }
@@ -54,12 +55,15 @@ export async function joinWaitlist(_: WaitlistState, form: FormData): Promise<Wa
   }
   const shareUrl = `${SITE_URL}/w/${r.status_token}`;
   store.delete('score_ref');
+  const eventId = newEventId();
   await Promise.all([
+    recordAttribution(email),
+    sendMetaLead(email, eventId),
     sendEmail(email, 'waitlist_joined', { first_name: first || null, place, open, share_url: shareUrl, position: r.position ?? null, founder: Boolean(r.founder) }),
     trackEvent(quick ? 'waitlist_join_app' : 'waitlist_join'),
     r.referred ? trackEvent('waitlist_join_referred') : Promise.resolve(),
   ]);
-  const joined: Joined = { code: r.share_code!, token: r.status_token!, position: r.position ?? null, total: r.total ?? null, founder: Boolean(r.founder), founderReason: r.founder_reason ?? null, referred: Boolean(r.referred) };
+  const joined: Joined = { eventId, code: r.share_code!, token: r.status_token!, position: r.position ?? null, total: r.total ?? null, founder: Boolean(r.founder), founderReason: r.founder_reason ?? null, referred: Boolean(r.referred) };
   return {
     ok: true,
     joined,

@@ -5,6 +5,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import AdminBar from '@/components/AdminBar';
 import { cookies } from 'next/headers';
 import SeasonLayer from '@/components/SeasonLayer';
+import AdPixels from '@/components/AdPixels';
 import { getSeasonConfig } from '@/lib/seasonsServer';
 import { activeSeason, seasonsWith, type SeasonKey } from '@/lib/seasons';
 
@@ -36,7 +37,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
       </head>
-      <body><AdminBar />{children}{season && <SeasonLayer seasonKey={season.key} name={season.name} banner={season.banner} effect={season.effect} preview={Boolean(previewKey)} />}<Analytics /><SpeedInsights /></body>
+      <body><AdminBar />{children}{season && <SeasonLayer seasonKey={season.key} name={season.name} banner={season.banner} effect={season.effect} preview={Boolean(previewKey)} />}<Analytics /><SpeedInsights /><AdPixels /></body>
     </html>
   );
 }
