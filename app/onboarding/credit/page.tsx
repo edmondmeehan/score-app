@@ -36,7 +36,7 @@ export default async function Credit({ searchParams }: { searchParams: Promise<{
           <Steps at={3} />
           <h1 className="serif" style={{ fontSize: 38 }}>Enter your code</h1>
           <p className="muted" style={{ margin: 0, lineHeight: 1.55 }}>We texted a 6-digit code from our credit partner, Spinwheel. It expires in 5 minutes.</p>
-          {sandbox && <TestBanner>Sandbox demo. Use the code for Spinwheel&apos;s sandbox test number.</TestBanner>}
+          {sandbox && <TestBanner>Sandbox demo. Enter the code texted to your phone. No real credit data is used.</TestBanner>}
           <label className="field">Code<input className="input mono" name="code" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} required autoFocus /></label>
           {sp.error && <div className="notice error">{sp.error}</div>}
           <button className="btn block">Verify and see my band</button>
@@ -49,7 +49,7 @@ export default async function Credit({ searchParams }: { searchParams: Promise<{
         <Steps at={3} />
         <h1 className="serif" style={{ fontSize: 38 }}>Verify your credit</h1>
         <p className="muted" style={{ margin: 0, lineHeight: 1.55 }}>A soft pull confirms your band. It doesn&apos;t affect your score and lenders never see it. Members see your band and trend, never the number.</p>
-        {sandbox && <TestBanner>Sandbox demo with Spinwheel. Use one of Spinwheel&apos;s sandbox test identities, not your real details.</TestBanner>}
+        {sandbox && <TestBanner>Sandbox demo with Spinwheel. Use your own mobile number (for the code) and a sandbox test birth date: 1990-03-06 (score 800), 1990-03-05 (score 500) or 1967-06-08 (default).</TestBanner>}
         <label className="field">Mobile number<input className="input" name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="(212) 555-0123" required /></label>
         <label className="field">Date of birth<input className="input" name="dob" type="date" autoComplete="bday" required /></label>
         <label className="choice" style={{ alignItems: 'flex-start' }}>

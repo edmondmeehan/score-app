@@ -98,7 +98,7 @@ export async function verifyCode(userId: string, code: string) {
 export async function pullBand(userId: string): Promise<Band> {
   const id = encodeURIComponent(userId);
   let score: number | null = null;
-  const pull = await sw(`/v1/users/${id}/debtProfile`, { method: 'POST', body: { creditReport: {}, creditScore: {} } });
+  const pull = await sw(`/v1/users/${id}/debtProfile`, { method: 'POST', body: { creditScore: { model: process.env.SPINWHEEL_SCORE_MODEL || 'VANTAGE_SCORE_3_0' } } });
   if (pull.ok) score = findScore(pull.body);
   if (!score) {
     // One pull per user per day: fall back to the profile Spinwheel already has.
