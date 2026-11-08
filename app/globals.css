@@ -99,15 +99,18 @@ table.data td { padding: 12px 8px; border-top: 1px solid var(--line-soft); }
 .admin nav { flex: 1 1 220px; max-width: 264px; background: var(--admin-nav); border-right: 1px solid var(--line-soft); padding: 24px 14px; display: flex; flex-direction: column; gap: 4px; }
 .admin nav a { padding: 10px 12px; border-radius: 10px; color: var(--muted); text-decoration: none; font-size: 14px; }
 .admin nav a.on { background: var(--gold-wash); color: var(--gold-light); font-weight: 600; }
-.admin-nav-group { display: flex; flex-direction: column; gap: 2px; }
-.admin-nav-group + .admin-nav-group { margin-top: 4px; }
-.admin-nav-group.open + .admin-nav-group, .admin-nav-group + .admin-nav-group.open { margin-top: 10px; }
-.admin-nav-head { display: flex; align-items: center; justify-content: space-between; width: 100%; background: none; border: 0; cursor: pointer; font-family: var(--mono); font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--faint); padding: 8px 12px; border-radius: 8px; text-align: left; }
-.admin-nav-head:hover { color: var(--muted); background: var(--gold-wash); }
-.admin-nav-group.open .admin-nav-head { color: var(--muted); padding-bottom: 4px; }
+.admin-nav-group { display: flex; flex-direction: column; gap: 2px; border-radius: 12px; }
+.admin-nav-group + .admin-nav-group { margin-top: 6px; }
+.admin-nav-group.open { background: var(--graphite); border: 1px solid var(--line-soft); padding: 4px 4px 8px; }
+.admin-nav-head { display: flex; align-items: center; justify-content: space-between; width: 100%; background: none; border: 0; cursor: pointer; font-family: var(--sans); font-size: 15px; font-weight: 600; letter-spacing: 0; color: var(--ivory); padding: 10px 12px; border-radius: 10px; text-align: left; }
+.admin-nav-head:hover { background: var(--gold-wash); }
+.admin-nav-group.active .admin-nav-head { color: var(--gold-light); }
+.admin-nav-group.open .admin-nav-head { padding-bottom: 6px; }
+.admin-nav-items { display: flex; flex-direction: column; gap: 1px; margin-left: 12px; padding-left: 8px; border-left: 1px solid var(--line); }
+.admin nav .admin-nav-items a { padding: 8px 10px; font-size: 13.5px; }
 .admin-nav-meta { display: inline-flex; align-items: center; gap: 8px; }
-.admin-nav-chev { font-size: 14px; letter-spacing: 0; width: 10px; text-align: center; }
-.admin-nav-count { font-size: 10px; letter-spacing: 0; color: var(--gold); }
+.admin-nav-chev { font-size: 16px; font-weight: 400; color: var(--faint); width: 12px; text-align: center; }
+.admin-nav-count { font-size: 11px; font-weight: 600; color: var(--on-gold); background: var(--gold); border-radius: 999px; padding: 1px 7px; }
 .admin main { flex: 999 1 560px; min-width: 0; padding: 32px; display: flex; flex-direction: column; gap: 22px; }
 .scroll-x { overflow-x: auto; }
 .admin-bar, .admin-scrim { display: none; }
