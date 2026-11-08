@@ -133,6 +133,8 @@ export const DOCS: Record<string, Doc> = {
         { ul: [
           'Device and usage: device type, browser, app version, pages visited, a random visitor ID and session ID, the referring site, and city-level location derived from your connection. We do not store your IP address in our analytics.',
           'Activity used to run the app, such as when you were last active (used for gentle reminders), notification preferences, when you’ve read a chat (shown to your match as “Read”), and whose profiles you’ve viewed (shown to Premium members as “Who viewed me”).',
+          'If you turn on active status (off by default), when you were last active in the app, shown to your matches as “Active now” or “Active in the last hour”. Turning it off clears it.',
+          'Reservation details you choose to share on a date plan (time, party size, name and confirmation number), visible only to you and your match.',
           'Screenshot events, where your device lets us detect them: who took one, on which screen, and when.',
           'Campaign details from the link that brought you to our website (such as utm tags, and whether you came from a Google, Meta or TikTok ad), saved with your waitlist signup.',
           'Error reports when something breaks on our servers: the page, the error message and the time. These don’t include your messages.',
@@ -160,7 +162,7 @@ export const DOCS: Record<string, Doc> = {
           'Amazon Web Services (photo matching);',
           'Supabase and Vercel (hosting and databases, in the United States);',
           'Resend (email delivery), Google Firebase Cloud Messaging and Apple Push Notification service (app notifications), and web push services operated by your browser or phone maker;',
-          'Google Maps Platform (address search and maps when you enter a location);',
+          'Google Maps Platform (address search, maps, and place photos, hours and links for date spots, loaded from Google when you view them);',
           'Apple, Google and RevenueCat (subscriptions and purchases);',
           'CARTO and OpenStreetMap (map tiles; they see that a map was loaded, not who you are).',
         ] },

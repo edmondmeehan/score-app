@@ -58,7 +58,13 @@ export default async function Search({ searchParams }: { searchParams: Promise<S
         <Link href="/app" className="small">← Daily Drop</Link>
         {!unlimited && remaining !== null && <span className="small muted">{remaining} {remaining === 1 ? 'search' : 'searches'} left today</span>}
       </div>
-      <h1 className="serif" style={{ fontSize: 38 }}>Search</h1>
+      <h1 className="serif" style={{ fontSize: 38 }}>Search &amp; directory</h1>
+      <div className="row" style={{ gap: 8, flexWrap: 'wrap' }}>
+        <Link href="/app/discover" className="chip">Discover</Link>
+        <Link href="/app/events" className="chip">Events</Link>
+        <Link href="/app/map" className="chip">Member map</Link>
+        <Link href="/app/likes" className="chip">Likes</Link>
+      </div>
 
       <form action="/app/search" method="get" className="stack" style={{ gap: 12 }}>
         <div className="row" style={{ gap: 8 }}>

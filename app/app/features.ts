@@ -112,6 +112,9 @@ export async function proposeDate(form: FormData) {
     const n = (k: string) => { const v = Number(form.get(k)); return form.get(k) && Number.isFinite(v) ? v : null; };
     await supabase.rpc('set_date_place', { p_date: dateId, p_place_id: String(form.get('place_id')), p_lat: n('lat'), p_lng: n('lng') });
   }
+  // Drop a line in the chat so the suggestion shows up in the conversation too.
+  const nyWhen = new Date(utc).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' });
+  await supabase.from('messages').insert({ conversation_id: conv, sender_id: user.id, body: `Suggested a date: ${String(form.get('place') || '').slice(0, 120)}, ${nyWhen}.` });
   after(() => flushNotifications(user.id));
   redirect(`/app/messages/${conv}`);
 }
@@ -121,8 +124,35 @@ export async function respondDate(form: FormData) {
   const conv = String(form.get('conversation_id'));
   const { error } = await supabase.rpc('respond_date', { p_plan: String(form.get('plan_id')), p_status: String(form.get('status')) });
   if (error) back(`/app/messages/${conv}`, 'error', error.message);
+  const st = String(form.get('status'));
+  const line = st === 'accepted' ? 'Confirmed our date. See you there.' : st === 'declined' ? 'Can’t make that one. Maybe another time?' : st === 'cancelled' ? 'Cancelled our date plan.' : '';
+  if (line) await supabase.from('messages').insert({ conversation_id: conv, sender_id: user.id, body: line });
   after(() => flushNotifications(user.id));
   redirect(`/app/messages/${conv}`);
+}
+
+/** Share a booking on an accepted date (either person). Posts a short note in the chat. */
+export async function setReservation(form: FormData) {
+  const { supabase } = await ctx();
+  const conv = String(form.get('conversation_id'));
+  const clear = form.get('clear') === '1';
+  const when = String(form.get('reservation_at') || '');
+  const tz = Number(form.get('tz_offset') || 0);
+  const at = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(when) ? new Date(Date.parse(when + ':00Z') + tz * 60000).toISOString() : null;
+  const party = Number(form.get('party'));
+  const { error } = await supabase.rpc('set_date_reservation', {
+    p_plan: String(form.get('plan_id')), p_at: at, p_name: String(form.get('name') || ''), p_party: Number.isFinite(party) && party > 0 ? party : 2,
+    p_conf: String(form.get('conf') || ''), p_note: String(form.get('note') || ''), p_clear: clear,
+  });
+  if (error) back(`/app/messages/${conv}`, 'error', error.message);
+  redirect(`/app/messages/${conv}?ok=` + encodeURIComponent(clear ? 'Reservation removed.' : 'Reservation shared.'));
+}
+
+export async function setShowOnline(form: FormData) {
+  const { supabase } = await ctx();
+  await supabase.rpc('set_show_online', { p_on: form.get('show_online') === 'on' });
+  revalidatePath('/app/settings');
+  redirect('/app/settings?saved=1');
 }
 
 export async function shareDate(form: FormData) {

@@ -31,14 +31,17 @@ export default async function Conversation({ params, searchParams }: { params: P
   const shared = (o?.money_values || []).filter((v) => me.money_values?.includes(v));
   const paid = ['membership', 'premium', 'black', 'paused'].includes(me.plan);
   const canSend = !conv.ended_at && (paid || (Boolean(conv.note_from) && conv.note_from !== me.id));
-  const { data: readAt } = await supabase.rpc('other_read_at', { p_conversation: id });
+  const [{ data: readAt }, { data: presence }] = await Promise.all([
+    supabase.rpc('other_read_at', { p_conversation: id }),
+    supabase.rpc('presence_of', { p_user: otherId }),
+  ]);
   const fromNote = conv.note_from && conv.note_from !== me.id;
   return (
     <div className="phone" style={{ paddingBottom: 'calc(110px + env(safe-area-inset-bottom))' }}>
       <ScreenshotContext context="chat" target={otherId} />
       <div className="row appbar">
         <Link href="/app/messages" aria-label="Back" className="btn ghost sm" style={{ width: 44, padding: 0 }}>‹</Link>
-        <Link href={`/app/u/${otherId}`} className="stack grow" style={{ gap: 4, textDecoration: 'none', color: 'inherit' }}><strong>{o?.first_name || 'Member'}</strong>{o && <BandPill band={o.band} trend={o.trend} verified={Boolean(o.credit_verified_at)} />}</Link>
+        <Link href={`/app/u/${otherId}`} className="stack grow" style={{ gap: 4, textDecoration: 'none', color: 'inherit' }}><strong>{o?.first_name || 'Member'}</strong>{presence === 'now' ? <span className="small" style={{ color: 'var(--rise)' }}><span className="presence-dot" />Active now</span> : presence === 'hour' ? <span className="small muted"><span className="presence-dot hour" />Active in the last hour</span> : null}{o && <BandPill band={o.band} trend={o.trend} verified={Boolean(o.credit_verified_at)} />}</Link>
         <details className="chat-menu">
           <summary className="small muted" aria-label="More">More</summary>
           <div className="chat-menu-list">

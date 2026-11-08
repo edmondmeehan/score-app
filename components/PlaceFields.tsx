@@ -7,7 +7,7 @@ declare global { interface Window { google?: any; __scoreMaps?: Promise<any> } }
 const KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
 
 /** Loads Google Maps + Places only when someone starts typing in a place field. */
-function loadPlaces(): Promise<any> {
+export function loadPlaces(): Promise<any> {
   if (!KEY) return Promise.reject(new Error('no key'));
   if (window.__scoreMaps) return window.__scoreMaps;
   window.__scoreMaps = new Promise((resolve, reject) => {
@@ -31,10 +31,12 @@ export type PlaceValue = { name?: string | null; address?: string | null; place_
  */
 export default function PlaceFields({
   nameField = 'venue', nameLabel = 'Venue', namePlaceholder, addressField = 'address', addressLabel = 'Address', addressPlaceholder,
-  defaults = {}, required = true, nameMax = 120, addressMax = 200, compact = false,
+  defaults = {}, required = true, nameMax = 120, addressMax = 200, compact = false, onPick,
 }: {
   nameField?: string; nameLabel?: string; namePlaceholder?: string; addressField?: string; addressLabel?: string; addressPlaceholder?: string;
   defaults?: PlaceValue; required?: boolean; nameMax?: number; addressMax?: number; compact?: boolean;
+  /** Called with the Google place ID when someone picks a suggestion (null when they type over it). */
+  onPick?: (placeId: string | null) => void;
 }) {
   const [name, setName] = useState(defaults.name || '');
   const [address, setAddress] = useState(defaults.address || '');
@@ -92,6 +94,7 @@ export default function PlaceFields({
     setName(s.main.slice(0, nameMax));
     setAddress(s.secondary.slice(0, addressMax));
     setPlaceId(s.id);
+    onPick?.(s.id);
     try {
       const place = s.prediction.toPlace();
       await place.fetchFields({ fields: ['displayName', 'formattedAddress', 'location'] });
@@ -118,7 +121,7 @@ export default function PlaceFields({
           <input className="input" name={nameField} value={name} required={required} maxLength={nameMax} placeholder={namePlaceholder}
             autoComplete="off" role="combobox" aria-expanded={open} aria-autocomplete="list"
             onFocus={() => { if (KEY) ensure().catch(() => null); }}
-            onChange={(e) => { setName(e.target.value); setPlaceId(''); setLat(''); setLng(''); search(e.target.value); }}
+            onChange={(e) => { setName(e.target.value); setPlaceId(''); setLat(''); setLng(''); onPick?.(null); search(e.target.value); }}
             onKeyDown={onKey} />
         </label>
         {open && (
