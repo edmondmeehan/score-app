@@ -61,8 +61,8 @@ export default function PhotoUploader({ doneHref = '/onboarding', max = 6 }: { d
   if (state?.ok) {
     return (
       <div className="stack">
-        {state.results?.map((r) => (
-          <div key={r.name} className="card row">
+        {state.results?.map((r, i) => (
+          <div key={i} className="card row">
             <span className="grow small">{r.name}</span>
             <span className="small" style={{ color: r.status === 'approved' ? 'var(--rise)' : r.status === 'error' ? 'var(--alert)' : 'var(--gold)' }}>
               {r.status === 'approved' ? `Matched${r.similarity ? ` · ${r.similarity}%` : ''}` : r.status === 'error' ? 'Upload failed' : 'In review'}

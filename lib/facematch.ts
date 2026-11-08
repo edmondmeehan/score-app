@@ -26,7 +26,13 @@ export async function compareFaces(selfie: Uint8Array, photo: Uint8Array): Promi
     const best = Math.max(0, ...(out.FaceMatches || []).map((m) => m.Similarity || 0));
     if (best >= threshold) return { status: 'approved', similarity: Math.round(best * 10) / 10, reason: 'Strong match' };
     return { status: 'review', similarity: best ? Math.round(best * 10) / 10 : null, reason: best ? 'Weak match' : 'No matching face found' };
-  } catch {
-    return { status: 'review', similarity: null, reason: 'Could not read a face in one of the images' };
+  } catch (e) {
+    const err = e as { name?: string; message?: string };
+    // Image problems are normal (no face, unsupported file); anything else means AWS itself failed.
+    if (err.name === 'InvalidParameterException' || err.name === 'InvalidImageFormatException' || err.name === 'ImageTooLargeException') {
+      return { status: 'review', similarity: null, reason: 'Could not read a face in one of the images' };
+    }
+    console.error('[facematch] AWS error:', err.name, err.message);
+    return { status: 'review', similarity: null, reason: `AWS error: ${err.name || 'unknown'}${err.message ? ` (${err.message.slice(0, 120)})` : ''}` };
   }
 }

@@ -132,6 +132,7 @@ export const DOCS: Record<string, Doc> = {
         { h3: 'Automatically' },
         { ul: [
           'Device and usage: device type, browser, app version, pages visited, a random visitor ID and session ID, the referring site, and city-level location derived from your connection. We do not store your IP address in our analytics.',
+          'Verification security signals: when you complete your profile basics, start your ID check or upload photos, we record your IP address, the approximate location it maps to (city level), and your device and browser. Only our verification team can see these, we use them to prevent fake and duplicate accounts, and we delete them after 180 days.',
           'Activity used to run the app, such as when you were last active (used for gentle reminders), notification preferences, when you’ve read a chat (shown to your match as “Read”), and whose profiles you’ve viewed (shown to Premium members as “Who viewed me”).',
           'If you turn on active status (off by default), when you were last active in the app, shown to your matches as “Active now” or “Active in the last hour”. Turning it off clears it.',
           'Reservation details you choose to share on a date plan (time, party size, name and confirmation number), visible only to you and your match.',
@@ -177,6 +178,7 @@ export const DOCS: Record<string, Doc> = {
           'Biometric data held by our partners: deleted within 30 days of verification, or sooner when you delete your account.',
           'Notifications: removed after 90 days.',
           'Server error reports: deleted after 30 days.',
+          'Verification security signals (IP address, approximate location, device): deleted after 180 days.',
           'Profile views and screenshot events: kept while your account is open, and erased with it.',
           'Chat photos: kept with the conversation, and erased when your account is deleted.',
           'Waitlist entries: until you join, ask us to remove you, or we close the waitlist.',

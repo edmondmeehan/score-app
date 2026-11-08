@@ -6,6 +6,7 @@ import { compareFaces } from '@/lib/facematch';
 import { BIOMETRIC_POLICY_VERSION } from '@/lib/policy';
 import { sendEmail } from '@/lib/mailer';
 import { trackEvent } from '@/lib/track';
+import { recordSignal } from '@/lib/signals';
 import { cookies } from 'next/headers';
 import { supabaseAnon } from '@/lib/supabase/server';
 import { findUser, pullBand, spinwheelConfigured, startConnect, toE164, verifyCode } from '@/lib/spinwheel';
@@ -35,6 +36,7 @@ export async function saveBasics(form: FormData) {
   }).eq('id', user.id);
   if (error) redirect('/onboarding/basics?error=' + encodeURIComponent(error.message));
   await trackEvent('onboarding_basics', user.id);
+  await recordSignal(user.id, 'signup');
   redirect('/onboarding');
 }
 
@@ -42,6 +44,7 @@ export async function startIdentity(form: FormData) {
   const { supabase, user } = await ctx();
   if (form.get('consent') !== 'yes') redirect('/onboarding/identity?error=' + encodeURIComponent('Please agree to the biometric notice to continue.'));
   await supabase.rpc('give_biometric_consent', { p_version: BIOMETRIC_POLICY_VERSION });
+  await recordSignal(user.id, 'id_start');
   if (!(await personaConfigured())) {
     // Test mode: no real ID check happens.
     const { error } = await supabase.rpc('test_approve_id');
@@ -86,6 +89,17 @@ export async function uploadPhotos(_: PhotoState, form: FormData): Promise<Photo
   const { data: consented } = await supabase.from('biometric_consents').select('user_id').eq('user_id', user.id).limit(1);
   if (!consented?.length) return { ok: false, message: 'Biometric consent is required first.' };
 
+  await recordSignal(user.id, 'photos');
+  try {
+    return await checkPhotos(supabase, user.id, selfie, photos);
+  } catch (e) {
+    console.error('[photos] upload failed:', (e as Error).message);
+    return { ok: false, message: 'Something went wrong checking your photos. Please try again.' };
+  }
+}
+
+async function checkPhotos(supabase: Awaited<ReturnType<typeof supabaseServer>>, userId: string, selfie: File, photos: File[]): Promise<PhotoState> {
+  const user = { id: userId };
   const selfieBytes = new Uint8Array(await selfie.arrayBuffer()); // memory only, never saved
   const { count } = await supabase.from('photos').select('id', { count: 'exact', head: true }).eq('user_id', user.id);
   const room = Math.max(0, 6 - (count || 0));
@@ -99,9 +113,10 @@ export async function uploadPhotos(_: PhotoState, form: FormData): Promise<Photo
     const path = `${user.id}/${crypto.randomUUID()}.${file.type.split('/')[1] || 'jpg'}`;
     const up = await supabase.storage.from('photos').upload(path, bytes, { contentType: file.type });
     if (up.error) { results.push({ name: file.name, status: 'error', similarity: null, reason: up.error.message }); continue; }
-    const { data: row } = await supabase.from('photos').insert({ user_id: user.id, path, position: pos++ }).select('id').single();
+    const { data: row, error: insErr } = await supabase.from('photos').insert({ user_id: user.id, path, position: pos++ }).select('id').single();
+    if (insErr || !row) { results.push({ name: file.name, status: 'error', similarity: null, reason: insErr?.message || 'Could not save' }); continue; }
     const match = await compareFaces(selfieBytes, bytes);
-    await supabase.rpc('record_photo_match', { p_secret: process.env.SCORE_SERVER_SECRET, p_photo: row!.id, p_status: match.status, p_similarity: match.similarity });
+    await supabase.rpc('record_photo_match', { p_secret: process.env.SCORE_SERVER_SECRET, p_photo: row.id, p_status: match.status, p_similarity: match.similarity, p_reason: match.reason });
     results.push({ name: file.name, status: match.status, similarity: match.similarity, reason: match.reason });
   }
   return { ok: true, message: 'Photos checked.', results };

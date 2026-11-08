@@ -1,25 +1,35 @@
 import Link from 'next/link';
 import { supabaseServer } from '@/lib/supabase/server';
-import { photoUrls } from '@/lib/photos';
 import type { Profile } from '@/lib/types';
-import { staffAct } from '../actions';
 import { setCreditMode } from './actions';
 import { getCreditMode } from '@/lib/creditMode';
 import { spinwheelConfigured } from '@/lib/spinwheel';
+
+export const dynamic = 'force-dynamic';
 
 export default async function Verification({ searchParams }: { searchParams: Promise<{ ok?: string; error?: string }> }) {
   const sp = await searchParams;
   const supabase = await supabaseServer();
   const mode = await getCreditMode();
   const { count: selfCount } = await supabase.from('profiles').select('id', { count: 'exact', head: true }).not('band', 'is', null).is('credit_verified_at', null);
-  const [{ data: idq }, { data: phq }] = await Promise.all([
+  const [{ data: idq }, { data: phq }, { data: recentRows }] = await Promise.all([
     supabase.from('profiles').select('*').in('id_status', ['review', 'pending']).order('created_at').limit(50),
     supabase.from('profiles').select('*').eq('photo_status', 'review').order('created_at').limit(50),
+    supabase.from('verifications').select('user_id, kind, provider, created_at').eq('status', 'approved').in('kind', ['id', 'photo']).order('created_at', { ascending: false }).limit(15),
   ]);
-  const photoMap = await photoUrls(supabase, (phq || []).map((p) => p.id), false);
-  const btn = (action: string, user: string, label: string, cls = 'btn ghost sm') => (
-    <form action={staffAct}><input type="hidden" name="action" value={action} /><input type="hidden" name="user" value={user} /><input type="hidden" name="back" value="/admin/verification" /><input type="hidden" name="reason" value={label} /><button className={cls}>{label}</button></form>
-  );
+  const queue = [...new Map([...((idq || []) as Profile[]), ...((phq || []) as Profile[])].map((p) => [p.id, p])).values()];
+  const recent = (recentRows || []) as { user_id: string; kind: string; provider: string; created_at: string }[];
+  const ids = [...new Set([...queue.map((p) => p.id), ...recent.map((r) => r.user_id)])];
+  const [{ data: sigRows }, { data: photoRows }, { data: nameRows }] = ids.length ? await Promise.all([
+    supabase.from('verification_signals').select('user_id, city, country, created_at').in('user_id', ids).order('created_at', { ascending: false }),
+    supabase.from('photos').select('user_id, match_similarity').in('user_id', queue.map((p) => p.id)).eq('match_status', 'review'),
+    supabase.from('profiles').select('id, first_name, email').in('id', recent.map((r) => r.user_id)),
+  ]) : [{ data: [] }, { data: [] }, { data: [] }];
+  const sigBy = new Map<string, { city: string | null; country: string | null }>();
+  (sigRows || []).forEach((r) => { if (!sigBy.has(r.user_id)) sigBy.set(r.user_id, r); });
+  const lowBy = new Map<string, number>();
+  (photoRows || []).forEach((r) => { if (r.match_similarity != null) lowBy.set(r.user_id, Math.min(lowBy.get(r.user_id) ?? 100, Number(r.match_similarity))); });
+  const names = new Map((nameRows || []).map((r) => [r.id, r.first_name || r.email]));
   return (
     <>
       <h1 className="serif" style={{ fontSize: 44 }}>Verification</h1>
@@ -40,22 +50,32 @@ export default async function Verification({ searchParams }: { searchParams: Pro
           {mode === 'self' && !spinwheelConfigured() && <span className="small" style={{ color: 'var(--alert)' }}>The credit partner isn’t connected yet, so new members would see the test screen.</span>}
         </form>
       </section>
-      <section className="card stack">
-        <h2 style={{ fontSize: 16, fontWeight: 600 }}>ID checks waiting</h2>
-        <span className="small muted">ID images stay in the verification partner&apos;s dashboard. Review the case there, then record the decision here.</span>
-        {(idq as Profile[] | null)?.length ? (idq as Profile[]).map((p) => (
-          <div key={p.id} className="list-row"><Link href={`/admin/members/${p.id}`} className="grow" style={{ color: 'var(--ivory)' }}>{p.first_name || p.email}</Link><span className="small muted">{p.id_status}</span>{btn('approve_id', p.id, 'Approve')}{btn('decline_id', p.id, 'Decline', 'btn danger sm')}</div>
-        )) : <span className="small muted">Nothing waiting.</span>}
+      <section className="card stack" style={{ gap: 8 }}>
+        <h2 style={{ fontSize: 16, fontWeight: 600 }}>Needs review ({queue.length})</h2>
+        <span className="small muted">ID checks Persona flagged or hasn’t finished, and photos that didn’t clearly match the live selfie. Open a case to see the Persona results, IP and location, photo scores and to send feedback.</span>
+        {queue.length ? queue.map((p) => {
+          const sig = sigBy.get(p.id);
+          const low = lowBy.get(p.id);
+          return (
+            <Link key={p.id} href={`/admin/verification/${p.id}`} className="list-row" style={{ color: 'var(--ivory)', textDecoration: 'none', gap: 10, flexWrap: 'wrap' }}>
+              <span className="grow" style={{ minWidth: 140 }}><strong>{p.first_name || p.email}</strong>{p.birth_year ? <span className="muted">, {new Date().getFullYear() - p.birth_year}</span> : null}<span className="small muted"> · {p.zip || 'no zip'}</span></span>
+              {['review', 'pending'].includes(p.id_status) && <span className="chip small" style={{ color: 'var(--gold)' }}>ID {p.id_status}</span>}
+              {p.photo_status === 'review' && <span className="chip small" style={{ color: 'var(--gold)' }}>Photos{low != null ? ` · ${low}%` : ''}</span>}
+              {sig && <span className="small muted">{[sig.city, sig.country].filter(Boolean).join(', ')}{sig.country && sig.country !== 'US' ? ' ⚠' : ''}</span>}
+              <span className="small muted">{new Date(p.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} ›</span>
+            </Link>
+          );
+        }) : <span className="small muted">Nothing waiting.</span>}
       </section>
-      <section className="card stack">
-        <h2 style={{ fontSize: 16, fontWeight: 600 }}>Photos needing a person</h2>
-        <span className="small muted">These didn&apos;t clearly match the member&apos;s live selfie. Approve only if they&apos;re clearly the same person and follow the photo rules.</span>
-        {(phq as Profile[] | null)?.length ? (phq as Profile[]).map((p) => (
-          <div key={p.id} className="stack" style={{ borderTop: '1px solid var(--line-soft)', paddingTop: 12 }}>
-            <div className="row"><Link href={`/admin/members/${p.id}`} className="grow" style={{ color: 'var(--ivory)' }}>{p.first_name || p.email}</Link>{btn('approve_photos', p.id, 'Approve photos')}{btn('reject_photos', p.id, 'Reject', 'btn danger sm')}</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))', gap: 8 }}>{(photoMap[p.id] || []).map((u) => <div key={u} className="photo"><img src={u} alt="" /></div>)}</div>
-          </div>
-        )) : <span className="small muted">Nothing waiting.</span>}
+      <section className="card stack" style={{ gap: 8 }}>
+        <h2 style={{ fontSize: 16, fontWeight: 600 }}>Recently verified</h2>
+        <span className="small muted">Spot-check automatic approvals. Open any case for full details.</span>
+        {recent.length ? recent.map((r) => (
+          <Link key={r.user_id + r.created_at} href={`/admin/verification/${r.user_id}`} className="list-row" style={{ color: 'var(--ivory)', textDecoration: 'none' }}>
+            <span className="grow">{names.get(r.user_id) || 'Member'}</span>
+            <span className="small muted">{r.kind === 'id' ? `ID · ${r.provider}` : 'Photo match'} · {new Date(r.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' })} ›</span>
+          </Link>
+        )) : <span className="small muted">None yet.</span>}
       </section>
     </>
   );

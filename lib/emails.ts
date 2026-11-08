@@ -266,6 +266,19 @@ export const templates = {
     ],
   }) satisfies Email,
 
+  verification_feedback: (d: { first_name?: string | null; kind: 'id' | 'photos'; message: string }) => ({
+    subject: d.kind === 'id' ? 'One more step on your ID check' : 'A quick note about your photos',
+    preheader: d.kind === 'id' ? 'A note from our verification team.' : 'A note from our photo review team.',
+    eyebrow: 'Verification',
+    heading: d.kind === 'id' ? "Let's finish verifying you." : 'One quick fix on your photos.',
+    kind: 'transactional',
+    blocks: [
+      { p: `${hi(d.first_name)} a person on our team reviewed your ${d.kind === 'id' ? 'ID check' : 'photos'}.` },
+      { p: d.message },
+      { button: d.kind === 'id' ? { label: 'Retry verification', url: `${SITE_URL}/onboarding/identity` } : { label: 'Update photos', url: `${SITE_URL}/onboarding/photos` } },
+      { note: 'Questions? Reply to this email and a real person will help.' },
+    ],
+  }) satisfies Email,
   photos_review: (d: { first_name?: string | null; approved: boolean }) => ({
     subject: d.approved ? 'Your photos are approved' : 'A quick note about your photos',
     preheader: d.approved ? 'Your profile photos are live.' : 'One photo needs a swap before it goes live.',
@@ -480,6 +493,7 @@ export const SAMPLES: { [K in TemplateName]: Parameters<(typeof templates)[K]>[0
   id_approved: { first_name: 'Nadia' },
   id_needs_attention: { first_name: 'Nadia' },
   photos_review: { first_name: 'Nadia', approved: false },
+  verification_feedback: { first_name: 'Nadia', kind: 'photos', message: 'Your second photo is a group shot, so we can’t tell which person is you. Swap it for a photo of just you and you’re all set.' },
   daily_drop: { first_name: 'Nadia', count: 5, top_match: 'Owen, 33' },
   new_message: { first_name: 'Nadia', from_name: 'Owen', conversation_id: 'example', count: 1 },
   event_announce: { first_name: 'Nadia', title: 'Rooftop supper club', when: 'Thursday, Dec 4 at 7:30 pm', venue: 'Westlight, Williamsburg', event_id: 'example', black_only: false },
@@ -510,6 +524,7 @@ export const TEMPLATE_INFO: Record<TemplateName, { label: string; when: string; 
   id_approved: { label: 'ID approved', when: 'Persona approves the ID and selfie check', live: true },
   id_needs_attention: { label: 'ID retry', when: 'Persona declines the ID check', live: true },
   photos_review: { label: 'Photo review result', when: 'Staff approves or rejects photos in review', live: true },
+  verification_feedback: { label: 'Verification feedback', when: 'Staff asks a member to redo their ID or photos, with a written note', live: true },
   daily_drop: { label: 'Daily Drop', when: 'Daily around noon (automatic)', live: true },
   new_message: { label: 'New message', when: 'Unread for 10+ min, at most every 3 hours (automatic)', live: true },
   event_announce: { label: 'Event announcement', when: 'Staff announces an event (Reserve first during priority window)', live: true },
