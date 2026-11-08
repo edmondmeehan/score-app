@@ -256,3 +256,17 @@ table.data td { padding: 12px 8px; border-top: 1px solid var(--line-soft); }
 .season-banner { position: fixed; z-index: 75; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom)); width: min(560px, calc(100vw - 32px)); display: flex; align-items: center; gap: 12px; justify-content: space-between; padding: 10px 12px 10px 16px; border-radius: 999px; background: var(--glass-strong); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid var(--gold); color: var(--ivory); font: 500 13px/1.35 var(--sans); box-shadow: 0 10px 30px var(--shadow); }
 .season-banner button { flex: none; width: 28px; height: 28px; border-radius: 50%; border: 0; background: var(--track); color: var(--muted); cursor: pointer; font-size: 16px; line-height: 1; }
 .tabbar ~ .season-banner, body:has(.tabbar) .season-banner { bottom: calc(86px + env(safe-area-inset-bottom)); }
+
+/* Chat menu, photos and safety notes */
+.chat-menu { position: relative; }
+.chat-menu > summary { list-style: none; cursor: pointer; padding: 6px 8px; }
+.chat-menu > summary::-webkit-details-marker { display: none; }
+.chat-menu-list { position: absolute; right: 0; top: calc(100% + 6px); z-index: 30; min-width: 220px; background: var(--graphite); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 12px 30px var(--shadow); padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+.chat-menu-list a, .chat-menu-list button { display: block; text-align: left; width: 100%; background: none; border: 0; padding: 9px 10px; border-radius: 10px; color: var(--ivory); font: 500 14px var(--sans); text-decoration: none; cursor: pointer; }
+.chat-menu-list a:hover, .chat-menu-list button:hover { background: var(--gold-wash); }
+.chat-menu-list form span { display: block; padding: 0 10px 4px; }
+.chat-photo { display: block; border: 0; padding: 0; border-radius: 16px; overflow: hidden; background: var(--bubble); cursor: pointer; width: 220px; height: 220px; position: relative; }
+.chat-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.chat-photo.hidden img { filter: blur(22px) brightness(.7); transform: scale(1.1); }
+.chat-photo .chat-photo-label { position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font: 600 13px var(--sans); text-shadow: 0 1px 3px rgba(0,0,0,.6); }
+.msg-warning { align-self: flex-start; max-width: 85%; font-size: 12px; line-height: 1.45; color: var(--alert); border: 1px solid var(--danger-line); border-radius: 12px; padding: 8px 10px; margin-top: -4px; }

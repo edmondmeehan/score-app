@@ -62,6 +62,15 @@ export async function GET(request: NextRequest) {
         to: r.email!, data: { first_name: r.first_name, days_left: Number(r.days_left) || 1 }, unsubUrl: unsubUrl(r.user_id, 'reminders'),
       })));
 
+      // Server error alert to owners (at most hourly).
+      const alert = await sb.rpc('cron_error_alert', { p_secret: secret });
+      const a = alert.data as { errors: { path: string; message: string; n: number }[]; to?: string[] } | null;
+      if (a?.errors?.length && a.to?.length) {
+        const count = a.errors.reduce((s2, e) => s2 + Number(e.n || 0), 0);
+        const rows = a.errors.map((e) => [e.path || 'unknown', `${e.n} error${e.n === 1 ? '' : 's'} · ${(e.message || '').slice(0, 90)}`] as [string, string]);
+        out.error_alert = await sendBatch('error_alert', a.to.map((to) => ({ to, data: { count, rows } })));
+      }
+
       const reverify = await claim('reverify');
       out.reverify = await sendBatch('reverify_reminder', reverify.map((r) => ({
         to: r.email!, data: { first_name: r.first_name, due: String(r.due || 'soon') }, unsubUrl: unsubUrl(r.user_id, 'reminders'),
@@ -73,6 +82,7 @@ export async function GET(request: NextRequest) {
     out.notifications = await flushNotifications(null, 500);
   } catch (e) {
     out.error = e instanceof Error ? e.message : 'failed';
+    await sb.rpc('log_app_error', { p_secret: secret, p_path: `cron ${job}`, p_message: String(out.error), p_digest: '', p_kind: 'cron' }).then(() => null, () => null);
     return NextResponse.json(out, { status: 500 });
   }
   return NextResponse.json(out);

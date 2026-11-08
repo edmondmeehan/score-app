@@ -5,7 +5,7 @@ export type Doc = { title: string; eyebrow: string; summary: string; updated: st
 
 const COMPANY = 'Please & Thank You, Inc.';
 const ADDRESS = '1133 Broadway, Suite 1301, New York, NY 10010';
-const UPDATED = 'November 7, 2026';
+const UPDATED = 'November 8, 2026';
 const DRAFT = true; // flip to false once counsel has reviewed
 
 export const DOCS: Record<string, Doc> = {
@@ -48,14 +48,17 @@ export const DOCS: Record<string, Doc> = {
           'harass, threaten, stalk, bully, or intimidate anyone, on or off Score;',
           'ask any member for money, gifts, crypto, investments, loans or financial account details;',
           'post nudity, sexual content, hate speech, or anything violent or illegal;',
-          'share another member’s band, messages, photos or personal information outside Score;',
+          'share another member’s band, messages, photos or personal information outside Score, including by screenshot or screen recording;',
+          'send photos in chat that are sexual, violent, or of someone who hasn’t agreed to be shared;',
           'promote a business, sell anything, recruit, or solicit;',
           'use bots, scrape the Service, reverse-engineer it, or try to get around our security or limits;',
           'use Score if you’re under 25 or for anyone else.',
         ] },
+        'Where your device lets us detect it, we record when someone takes a screenshot of a profile or chat. Our team reviews repeated screenshots, which can lead to a warning or suspension.',
       ] },
       { id: 'content', h: 'Your content', body: [
         'You own what you post (photos, prompts, messages). You give us a worldwide, non-exclusive, royalty-free license to host, store, display and process it only to run, improve and promote the Service to you and other members, and to keep Score safe. This license ends when you delete the content or your account, except where we must keep something for safety, legal or backup reasons for a limited time.',
+        'We will only feature your story (for example, from the $50 Date Challenge) in Score marketing if you give us permission at the time, and you can withdraw it later.',
         'We may remove any content or account that we believe breaks these Terms or puts anyone at risk.',
       ] },
       { id: 'billing', h: 'Memberships, purchases and billing', body: [
@@ -70,7 +73,8 @@ export const DOCS: Record<string, Doc> = {
       ] },
       { id: 'safety', h: 'Safety and your interactions', body: [
         'You’re responsible for your interactions with other members. Score does not run criminal background checks, and we can’t guarantee anyone’s identity, intentions or behavior, even with verification. Meet in public, tell a friend, and use the tools in our [Safety Center](/safety). If you’re in danger, call 911.',
-        'Report anyone who makes you uncomfortable. We review every report and may warn, suspend or remove members, and we cooperate with law enforcement when required.',
+        'Report anyone who makes you uncomfortable. A person on our team reviews every report and may warn, suspend or remove members. We’ll let you know when we’ve acted on your report, and we cooperate with law enforcement when required.',
+        'Chat messages are scanned automatically for signs of scams (like requests for money or crypto) and harassment so we can show you a safety warning. Our team may review flagged messages. You can unmatch anyone at any time, which ends the chat for both of you.',
       ] },
       { id: 'termination', h: 'Leaving, pausing and removal', body: [
         'You can pause or delete your account at any time in Settings. We may suspend or remove an account, with or without notice, if we believe it breaks these Terms, creates risk, or is required by law. If we remove you for breaking these Terms, you won’t be entitled to a refund of unused time, except where the law or the store requires.',
@@ -113,7 +117,9 @@ export const DOCS: Record<string, Doc> = {
         { ul: [
           'Waitlist details: name, email, zip code, what you do, and an invite or referral code if you have one.',
           'Account and profile: name, birth year, gender, who you’d like to meet, photos, job, neighborhood, prompts, money values, optional song and Instagram handle.',
-          'Messages, Notes, date plans and event RSVPs you send through Score.',
+          'Messages, photos you send in chat, Notes, likes, date plans and event RSVPs you send through Score.',
+          'Answers you give in Hot or Financially Compatible rounds, and any $50 Date Challenge story you choose to submit.',
+          'Event and date locations you enter, which are completed using Google Places.',
           'Support requests and reports you file.',
         ] },
         { h3: 'From verification' },
@@ -125,14 +131,19 @@ export const DOCS: Record<string, Doc> = {
         { h3: 'Automatically' },
         { ul: [
           'Device and usage: device type, browser, app version, pages visited, a random visitor ID and session ID, the referring site, and city-level location derived from your connection. We do not store your IP address in our analytics.',
-          'Activity used to run the app, such as when you were last active (used for gentle reminders) and notification preferences.',
+          'Activity used to run the app, such as when you were last active (used for gentle reminders), notification preferences, when you’ve read a chat (shown to your match as “Read”), and whose profiles you’ve viewed (shown to Premium members as “Who viewed me”).',
+          'Screenshot events, where your device lets us detect them: who took one, on which screen, and when.',
+          'Error reports when something breaks on our servers: the page, the error message and the time. These don’t include your messages.',
+          'If you allow notifications in the Score app, a push token from Apple or Google so we can deliver them.',
           'Purchase records from Apple, Google and RevenueCat: product, price, store and renewal status. We never see your card number.',
         ] },
       ] },
       { id: 'use', h: 'How we use it', body: [
         { ul: [
           'To run Score: create your account, verify you, build your Daily Drop, deliver messages, and process memberships.',
-          'To keep members safe: detect fake accounts and scams, review reports, enforce our Guidelines, and respond to legal requests.',
+          'To keep members safe: detect fake accounts and scams, automatically flag chat messages that look like scams or harassment and show a warning, review reports and screenshot activity, enforce our Guidelines, and respond to legal requests. These automated flags never suspend anyone on their own; a person on our team decides.',
+          'To show compatibility: compare your blind-round answers with a match’s to show a for-fun percentage to the two of you.',
+          'To fix problems: use error reports to find and repair bugs.',
           'To communicate: account emails, notifications you’ve turned on, and occasional updates you can unsubscribe from.',
           'To improve Score: understand which features help people meet, in aggregate.',
           'To comply with law and protect our rights.',
@@ -146,7 +157,8 @@ export const DOCS: Record<string, Doc> = {
           'credit data (soft-inquiry band and trend);',
           'Amazon Web Services (photo matching);',
           'Supabase and Vercel (hosting and databases, in the United States);',
-          'Resend (email delivery) and web push services operated by your browser or phone maker (notifications);',
+          'Resend (email delivery), Google Firebase Cloud Messaging and Apple Push Notification service (app notifications), and web push services operated by your browser or phone maker;',
+          'Google Maps Platform (address search and maps when you enter a location);',
           'Apple, Google and RevenueCat (subscriptions and purchases);',
           'CARTO and OpenStreetMap (map tiles; they see that a map was loaded, not who you are).',
         ] },
@@ -159,11 +171,15 @@ export const DOCS: Record<string, Doc> = {
           'Account data: while your account is open. When you delete your account, your profile disappears immediately and the rest is erased within 30 days, except what we must keep for safety, fraud prevention, legal or tax reasons.',
           'Biometric data held by our partners: deleted within 30 days of verification, or sooner when you delete your account.',
           'Notifications: removed after 90 days.',
+          'Server error reports: deleted after 30 days.',
+          'Profile views and screenshot events: kept while your account is open, and erased with it.',
+          'Chat photos: kept with the conversation, and erased when your account is deleted.',
           'Waitlist entries: until you join, ask us to remove you, or we close the waitlist.',
         ] },
       ] },
       { id: 'rights', h: 'Your rights and choices', body: [
         'Depending on where you live (including California, Colorado, Connecticut, Virginia and other states), you may have the right to access, correct, delete or get a copy of your personal information, and to opt out of sale, sharing or targeted advertising. Score doesn’t sell or share for targeted advertising, so there’s nothing to opt out of there, but you can still exercise the other rights. See [Your Privacy Choices](/legal/choices).',
+        'You can download a copy of your data any time in **Settings → Your data → Download my data**.',
         'We won’t treat you differently for exercising your rights.',
       ] },
       { id: 'security', h: 'Security', body: [

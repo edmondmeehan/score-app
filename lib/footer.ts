@@ -20,7 +20,7 @@ export const FOOTER_DEFAULT: FooterConfig = {
   address: '1133 Broadway, Suite 1301\nNew York, NY 10010',
   email: 'support@scoredate.app',
   columns: [
-    { title: 'Score', links: [{ label: 'How it works', href: '/#how' }, { label: 'Where we’re live', href: '/#where' }, { label: 'Request an invite', href: '/#invite' }, { label: 'I have a code', href: '/join' }, { label: 'Sign in', href: '/signin' }] },
+    { title: 'Score', links: [{ label: 'How it works', href: '/#how' }, { label: 'Where we’re live', href: '/#where' }, { label: 'Request an invite', href: '/#invite' }, { label: 'I have a code', href: '/join' }, { label: 'Sign in', href: '/signin' }, { label: 'Help center', href: '/help' }] },
     { title: 'Trust & safety', links: [{ label: 'Safety center', href: '/safety' }, { label: 'Community guidelines', href: '/legal/community' }, { label: 'Biometric data policy', href: '/legal/biometric' }, { label: 'Report a concern', href: '/safety#report' }] },
     { title: 'Company', links: [{ label: 'Partners', href: '/partners' }, { label: 'Press', href: '/press' }, { label: 'Brand & marketing', href: '/brand' }, { label: 'Contact', href: '/contact' }] },
     { title: 'Legal', links: [{ label: 'Terms of Service', href: '/legal/terms' }, { label: 'Privacy Policy', href: '/legal/privacy' }, { label: 'Your privacy choices', href: '/legal/choices' }, { label: 'Cookie notice', href: '/legal/cookies' }] },

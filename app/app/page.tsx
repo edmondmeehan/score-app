@@ -45,6 +45,9 @@ export default async function Drop({ searchParams }: { searchParams: Promise<{ o
         <span className="eyebrow">{preview ? 'Preview' : 'Today'}</span>
         <span className="row" style={{ gap: 12 }}>
           {preview && daysLeft !== null && <span className="mono small muted">{daysLeft} days left</span>}
+          <Link href="/app/likes" aria-label="Likes" style={{ color: 'inherit', display: 'inline-flex' }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" /></svg>
+          </Link>
           <Link href="/app/search" aria-label="Search members" style={{ color: 'inherit', display: 'inline-flex' }}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
           </Link>

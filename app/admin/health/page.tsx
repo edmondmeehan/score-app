@@ -53,10 +53,14 @@ function Spark({ h, period }: { h: Health; period: PeriodKey }) {
 }
 
 export default async function HealthPage({ searchParams }: { searchParams: Promise<{ p?: string }> }) {
-  await requireStaff();
+  const { supabase } = await requireStaff();
   const sp = await searchParams;
   const period = (sp.p && sp.p in PERIODS ? sp.p : '24h') as PeriodKey;
-  const h = await getHealth(period);
+  const [h, { data: errs }] = await Promise.all([
+    getHealth(period),
+    supabase.from('app_errors').select('path, message, kind, created_at').gte('created_at', new Date(Date.now() - 86400000).toISOString()).order('created_at', { ascending: false }).limit(30),
+  ]);
+  const appErrors = (errs as { path: string; message: string; kind: string; created_at: string }[]) || [];
   const errRate = h.total ? h.classes['5xx'] / h.total : 0;
   const statusColor = (c: string) => (c.startsWith('5') ? 'var(--alert)' : c.startsWith('4') ? 'var(--gold-light)' : c.startsWith('3') ? 'var(--stone)' : 'var(--rise)');
 
@@ -72,6 +76,16 @@ export default async function HealthPage({ searchParams }: { searchParams: Promi
       </div>
       <span className="small muted">Live traffic and performance from Vercel for scoredate.app. Refresh the page for the latest numbers. <a href={`https://vercel.com/pleaseco/score-app/observability?period=${period}`} target="_blank" rel="noopener noreferrer">Open in Vercel ↗</a></span>
 
+      <section className="card stack" style={{ gap: 8 }}>
+        <div className="row" style={{ justifyContent: 'space-between' }}><strong>Server errors recorded by Score (24 hours)</strong><span className="small" style={{ color: appErrors.length ? 'var(--alert)' : 'var(--rise)' }}>{appErrors.length ? `${appErrors.length} recent` : 'None'}</span></div>
+        {appErrors.slice(0, 10).map((e, i) => (
+          <div key={i} className="row small" style={{ justifyContent: 'space-between', gap: 12, borderBottom: '1px solid var(--line-soft)', paddingBottom: 6 }}>
+            <span className="mono" style={{ overflowWrap: 'anywhere' }}>{e.path}</span>
+            <span className="muted" style={{ textAlign: 'right', overflowWrap: 'anywhere', maxWidth: '55%' }}>{e.message.slice(0, 120)} · {new Date(e.created_at).toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' })}</span>
+          </div>
+        ))}
+        <span className="small muted">Owners get an email when new errors happen, at most once an hour.</span>
+      </section>
       {!h.configured && <div className="notice error">This page uses the same VERCEL_API_TOKEN as the Security page. It’s set for Production only, so it works on scoredate.app but not on preview links.</div>}
       {h.error && (
         <div className="notice error stack" style={{ gap: 6 }}>

@@ -4,6 +4,7 @@ import { supabaseAnon } from '@/lib/supabase/server';
 import { sendBatch } from '@/lib/mailer';
 import { unsubUrl, type UnsubKind } from '@/lib/unsub';
 import { SITE_URL } from '@/lib/emails';
+import { fcmReady, sendNativePush } from '@/lib/fcm';
 
 type Sub = { endpoint: string; p256dh: string; auth: string };
 type Claimed = {
@@ -52,6 +53,18 @@ export async function flushNotifications(actorId: string | null = null, limit = 
           .then(() => undefined, () => undefined));
       }
       await Promise.all(jobs);
+    }
+
+    // Native app push (iPhone / Android) for members who installed the app.
+    if (fcmReady()) {
+      const { data: toks } = await sb.rpc('native_tokens_for', { p_secret: secret, p_users: [...new Set(rows.map((r) => r.user_id))] });
+      const byUser = new Map<string, string[]>();
+      for (const t of (toks as { user_id: string; token: string }[]) || []) byUser.set(t.user_id, [...(byUser.get(t.user_id) || []), t.token]);
+      await Promise.all(rows.flatMap((n) => (byUser.get(n.user_id) || []).map((tk) =>
+        sendNativePush(tk, { title: n.title, body: n.body, url: n.url, tag: n.kind, high: n.category === 'interaction' }).then((r) => {
+          if (r === 'ok') out.pushed++;
+          if (r === 'dead') { out.dead++; return sb.rpc('native_token_dead', { p_secret: secret, p_token: tk }).then(() => undefined, () => undefined); }
+        }))));
     }
 
     const mail = rows.filter((n) => n.email);

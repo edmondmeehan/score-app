@@ -382,6 +382,33 @@ export const templates = {
     ],
   }) satisfies Email,
 
+  error_alert: (d: { count: number; rows: [string, string][] }) => ({
+    subject: `Score: ${d.count} server error${d.count === 1 ? '' : 's'} in the last hour`,
+    preheader: d.rows.map(([k]) => k).slice(0, 2).join(' · '),
+    eyebrow: 'Admin · Site health',
+    heading: 'Something is failing.',
+    kind: 'transactional',
+    blocks: [
+      { p: 'These pages returned server errors since the last alert. Members may be seeing an error screen.' },
+      { facts: d.rows },
+      { button: { label: 'Open Site health', url: `${SITE_URL}/admin/health` } },
+      { note: 'You get at most one of these an hour. Sent to Score owners.' },
+    ],
+  }) satisfies Email,
+
+  report_update: (d: { first_name?: string | null; acted: boolean }) => ({
+    subject: 'We reviewed your report',
+    preheader: d.acted ? 'We took action under our community guidelines.' : 'Thanks for helping keep Score safe.',
+    eyebrow: 'Safety',
+    heading: 'Thanks for telling us.',
+    kind: 'transactional',
+    blocks: [
+      { p: d.acted ? `${hi(d.first_name)} we reviewed your report and took action under our community guidelines. For everyone’s privacy, we can’t share the details.` : `${hi(d.first_name)} we reviewed your report carefully. We didn’t find a rules violation this time, but we’ll keep an eye out.` },
+      { p: 'If you ever feel unsafe, you can block or unmatch at any time. In an emergency, call 911.' },
+      { button: { label: 'Open Score', url: `${SITE_URL}/app` } },
+    ],
+  }) satisfies Email,
+
   admin_daily: (d: { date: string; headline: string; blocks: Block[] }) => ({
     subject: `Score daily report · ${d.date}`,
     preheader: d.headline,
@@ -448,6 +475,8 @@ export const SAMPLES: { [K in TemplateName]: Parameters<(typeof templates)[K]>[0
   reverify_reminder: { first_name: 'Nadia', due: 'December 1' },
   report_received: { first_name: 'Nadia' },
   deletion_confirm: { first_name: 'Nadia' },
+  error_alert: { count: 4, rows: [['GET /api/cron', '4 errors · relation "x" does not exist']] },
+  report_update: { first_name: 'Nadia', acted: true },
   admin_daily: { date: 'Sun, Nov 8', headline: '$149.97 revenue · 12 sign-ups · 48 waitlist joins', blocks: [{ p: 'Finance' }, { facts: [['Revenue, last 24 hours', '$149.97'], ['New subscriptions', '3'], ['Estimated MRR', '$2,874.00']] }, { p: 'Waitlist' }, { facts: [['New joins', '48 (7-day avg 31.4)'], ['Total waitlist', '612']] }] },
   notification: { first_name: 'Nadia', title: 'Owen suggested a date', body: 'Via Carota · Sat Dec 6 at 7:30 pm', url: `${SITE_URL}/app/messages`, category: 'interaction' },
 };
@@ -475,6 +504,8 @@ export const TEMPLATE_INFO: Record<TemplateName, { label: string; when: string; 
   reverify_reminder: { label: 'Re-verify band', when: '2 weeks before the 6-month re-check (automatic)', live: true },
   report_received: { label: 'Report received', when: 'A member reports someone', live: true },
   deletion_confirm: { label: 'Account deletion', when: 'A member deletes their account', live: true },
+  error_alert: { label: 'Error alert (staff)', when: 'Server errors since the last alert, at most hourly, to owners', live: true },
+  report_update: { label: 'Report follow-up', when: 'Staff resolves a report the member filed', live: true },
   admin_daily: { label: 'Admin daily report', when: 'Every morning to staff who turned it on in Admin → Daily report', live: true },
   notification: { label: 'Activity alert', when: 'Date plans, Notes, event and date reminders, weekly catch-up (automatic, respects settings)', live: true },
 };

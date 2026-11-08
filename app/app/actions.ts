@@ -32,6 +32,29 @@ export async function sendMessage(conversationId: string, body: string) {
   return { ok: !error, error: error?.message };
 }
 
+export async function sendPhoto(conversationId: string, path: string) {
+  const { supabase, user } = await ctx();
+  if (!path.startsWith(`${conversationId}/${user.id}/`)) return { ok: false, error: 'Upload failed' };
+  const { error } = await supabase.from('messages').insert({ conversation_id: conversationId, sender_id: user.id, body: 'Photo', image_path: path });
+  if (!error) after(() => flushNotifications(user.id, 20));
+  return { ok: !error, error: error?.message };
+}
+
+export async function unmatchConversation(form: FormData) {
+  const { supabase } = await ctx();
+  const id = String(form.get('id'));
+  const { error } = await supabase.rpc('unmatch', { p_conversation: id });
+  if (error) redirect(`/app/messages/${id}?error=` + encodeURIComponent(error.message));
+  revalidatePath('/app/messages');
+  redirect('/app/messages?ok=' + encodeURIComponent('Unmatched. You won’t see each other in Messages anymore.'));
+}
+
+export async function otherReadAt(conversationId: string) {
+  const { supabase } = await ctx();
+  const { data } = await supabase.rpc('other_read_at', { p_conversation: conversationId });
+  return (data as string | null) || null;
+}
+
 export async function makeInvite(form: FormData) {
   const { supabase } = await ctx();
   const { error } = await supabase.rpc('create_invite', { p_kind: String(form.get('kind') || 'date') });

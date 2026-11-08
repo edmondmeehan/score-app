@@ -6,12 +6,13 @@ import { Gauge, age } from '@/components/ui';
 import { BANDS, type Profile } from '@/lib/types';
 import { photoUrls } from '@/lib/photos';
 import { sayHello } from '../../actions';
+import { likeMember, unlikeMember } from '../../likes/actions';
 import { sendNote } from '../../features';
 import { detailChips } from '@/lib/profileDetails';
 import VerifiedBadge, { isVerified } from '@/components/VerifiedBadge';
 import ScreenshotContext from '@/components/ScreenshotContext';
 
-export default async function Member({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string }> }) {
+export default async function Member({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string; liked?: string }> }) {
   const { id } = await params;
   const sp = await searchParams;
   const { supabase, me } = await requireMember();
@@ -28,6 +29,10 @@ export default async function Member({ params, searchParams }: { params: Promise
     supabase.rpc('my_addons'),
   ]);
   const notes: number = mine?.included ? Infinity : (mine?.note ?? 0);
+  const [{ data: liked }] = await Promise.all([
+    supabase.from('likes').select('liker').eq('liker', me.id).eq('liked', p.id).maybeSingle(),
+    p.id !== me.id ? supabase.rpc('log_profile_view', { p_viewed: p.id }) : Promise.resolve(null),
+  ]);
   return (
     <div className="phone" style={{ paddingTop: 0 }}>
       <ScreenshotContext context="profile" target={p.id === me.id ? null : p.id} />
@@ -72,6 +77,7 @@ export default async function Member({ params, searchParams }: { params: Promise
         </a>
       )}
       {sp.error && <div className="notice error">{sp.error}</div>}
+      {sp.liked && <div className="notice">Liked. If {p.first_name} likes you back, you’ll match.</div>}
       {p.id === me.id ? (
         <Link href="/app/profile" className="btn block">Edit profile</Link>
       ) : existing ? (
@@ -80,6 +86,10 @@ export default async function Member({ params, searchParams }: { params: Promise
         <div className="stack">
           <div className="row">
             <Link href={`/app/report/${p.id}`} className="btn ghost sm">Report</Link>
+            <form action={liked ? unlikeMember : likeMember}>
+              <input type="hidden" name="id" value={p.id} />
+              <button className={liked ? 'btn sm' : 'btn ghost sm'} data-haptic={liked ? 'light' : 'success'} aria-pressed={Boolean(liked)} aria-label={liked ? `Unlike ${p.first_name}` : `Like ${p.first_name}`} style={{ minWidth: 48 }}>{liked ? '♥' : '♡'}</button>
+            </form>
             {me.plan === 'preview' ? (
               <Link href="/plans" className="btn ghost grow">Become a member to say hello</Link>
             ) : (

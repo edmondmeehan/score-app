@@ -4,10 +4,10 @@ import { photoUrls } from '@/lib/photos';
 
 export const dynamic = 'force-dynamic';
 
-export default async function Messages({ searchParams }: { searchParams: Promise<{ reported?: string }> }) {
+export default async function Messages({ searchParams }: { searchParams: Promise<{ reported?: string; ok?: string }> }) {
   const { supabase, me } = await requireMember();
   const sp = await searchParams;
-  const { data: convs } = await supabase.from('conversations').select('id, user_a, user_b, created_at, note_from').or(`user_a.eq.${me.id},user_b.eq.${me.id}`);
+  const { data: convs } = await supabase.from('conversations').select('id, user_a, user_b, created_at, note_from').or(`user_a.eq.${me.id},user_b.eq.${me.id}`).is('ended_at', null);
   const others = (convs || []).map((c) => (c.user_a === me.id ? c.user_b : c.user_a));
   const { data: reads } = await supabase.from('conversation_reads').select('conversation_id, last_read_at').eq('user_id', me.id);
   const readAt = Object.fromEntries((reads || []).map((r) => [r.conversation_id, r.last_read_at]));
@@ -24,6 +24,7 @@ export default async function Messages({ searchParams }: { searchParams: Promise
   return (
     <div className="phone">
       <h1 className="serif" style={{ fontSize: 38 }}>Messages</h1>
+      {sp.ok && <div className="notice">{sp.ok}</div>}
       {sp.reported && <div className="notice">Thanks. A person on our team will review your report, usually within 24 hours.</div>}
       {me.plan === 'preview' && <div className="notice test">Preview members can reply to Notes, but can&apos;t start chats. <Link href="/plans">Become a member</Link> to say hello.</div>}
       {rows.length === 0 && <p className="muted">No conversations yet. Open someone from your Daily Drop and send a note.</p>}

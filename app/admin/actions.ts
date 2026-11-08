@@ -1,4 +1,6 @@
 'use server';
+import { after } from 'next/server';
+import { flushNotifications } from '@/lib/notify';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { supabaseServer } from '@/lib/supabase/server';
@@ -15,6 +17,11 @@ export async function staffAct(form: FormData) {
   });
   if (error) redirect(back + (back.includes('?') ? '&' : '?') + 'error=' + encodeURIComponent(error.message));
   const action = String(form.get('action'));
+  // Close the loop with whoever filed the report (no details shared).
+  if (form.get('report') && ['warn', 'suspend', 'remove', 'dismiss'].includes(action)) {
+    await supabase.rpc('report_followup', { p_report: String(form.get('report')) }).then(() => null, () => null);
+    after(() => flushNotifications(null, 20));
+  }
   if (['approve_photos', 'reject_photos', 'approve_id', 'decline_id'].includes(action)) {
     const c = await contactFor(String(form.get('user')));
     if (action.endsWith('photos')) await sendEmail(c.email, 'photos_review', { first_name: c.first_name, approved: action === 'approve_photos' });

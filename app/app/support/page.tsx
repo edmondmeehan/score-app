@@ -13,7 +13,7 @@ export default async function Support({ searchParams }: { searchParams: Promise<
   return (
     <div className="phone">
       <h1 className="serif" style={{ fontSize: 36 }}>Help &amp; support</h1>
-      <span className="muted small">We usually reply by email within one business day.</span>
+      <span className="muted small">We usually reply by email within one business day. Quick answers are in the <Link href="/help">Help center</Link>.</span>
       {sp.ok && <div className="notice">Got it. We&apos;ll email you soon.</div>}
       {sp.error && <div className="notice error">{sp.error}</div>}
       <div className="notice small">In danger right now? Call 911. To report a member, open their profile and tap Report so we can act on it right away.</div>
