@@ -29,6 +29,14 @@ export type Profile = {
   plan: 'none' | 'preview' | 'membership' | 'premium' | 'black' | 'paused';
   preview_ends_at: string | null;
   is_founder: boolean;
+  height_cm?: number | null;
+  has_kids?: string | null;
+  wants_kids?: string | null;
+  education?: string | null;
+  drinking?: string | null;
+  smoking?: string | null;
+  exercise?: string | null;
+  last_active_at?: string | null;
   invited_by: string | null;
   created_at: string;
 };

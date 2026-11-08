@@ -6,7 +6,8 @@ import { TestBanner } from '@/components/ui';
 import PhotoUploader from '../../onboarding/photos/PhotoUploader';
 import SongPicker from './SongPicker';
 import { PROMPTS } from '@/lib/prompts';
-import { clearSong, movePhoto, removePhoto, saveAbout, saveInstagram } from './actions';
+import { clearSong, movePhoto, removePhoto, saveAbout, saveDetails, saveInstagram } from './actions';
+import { DRINKING, EDUCATION, EXERCISE, HAS_KIDS, HEIGHTS, SMOKING, WANTS_KIDS } from '@/lib/profileDetails';
 
 export const dynamic = 'force-dynamic';
 
@@ -69,6 +70,25 @@ export default async function EditProfile({ searchParams }: { searchParams: Prom
           </div>
         )}
       </section>
+
+      {/* Details (optional, searchable) */}
+      <form id="details" action={saveDetails} className="card stack">
+        <span style={{ fontWeight: 600 }}>Details</span>
+        <span className="small muted">Optional. Members can filter search by these, so filling them in helps the right people find you.</span>
+        <label className="field">Height<select className="input" name="height_cm" defaultValue={me.height_cm ? String(me.height_cm) : ''}><option value="">Prefer not to say</option>{HEIGHTS.map((h) => <option key={h.cm} value={h.cm}>{h.label}</option>)}</select></label>
+        <label className="field">Education<select className="input" name="education" defaultValue={me.education || ''}><option value="">Prefer not to say</option>{EDUCATION.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
+        <div className="row" style={{ gap: 10 }}>
+          <label className="field grow">Kids<select className="input" name="has_kids" defaultValue={me.has_kids || ''}><option value="">Prefer not to say</option>{HAS_KIDS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
+          <label className="field grow">Future kids<select className="input" name="wants_kids" defaultValue={me.wants_kids || ''}><option value="">Prefer not to say</option>{WANTS_KIDS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
+        </div>
+        <div className="row" style={{ gap: 10 }}>
+          <label className="field grow">Drinking<select className="input" name="drinking" defaultValue={me.drinking || ''}><option value="">—</option>{DRINKING.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
+          <label className="field grow">Smoking<select className="input" name="smoking" defaultValue={me.smoking || ''}><option value="">—</option>{SMOKING.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
+          <label className="field grow">Exercise<select className="input" name="exercise" defaultValue={me.exercise || ''}><option value="">—</option>{EXERCISE.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
+        </div>
+        {sp.saved === 'details' && <div className="notice">Saved.</div>}
+        <button className="btn ghost sm" style={{ alignSelf: 'flex-start' }}>Save details</button>
+      </form>
 
       {/* About */}
       <form action={saveAbout} className="card stack">

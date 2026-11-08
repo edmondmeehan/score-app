@@ -7,6 +7,7 @@ import { BANDS, type Profile } from '@/lib/types';
 import { photoUrls } from '@/lib/photos';
 import { sayHello } from '../../actions';
 import { sendNote } from '../../features';
+import { detailChips } from '@/lib/profileDetails';
 
 export default async function Member({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string }> }) {
   const { id } = await params;
@@ -39,6 +40,9 @@ export default async function Member({ params, searchParams }: { params: Promise
           </div>
           {p.trend === 'up' && <span className="small" style={{ color: 'var(--rise)', fontWeight: 600 }}>↑ Up</span>}
         </div>
+      )}
+      {detailChips(p).length > 0 && (
+        <div className="row" style={{ flexWrap: 'wrap', gap: 8 }}>{detailChips(p).map((c) => <span key={c} className="chip">{c}</span>)}</div>
       )}
       {p.money_values?.length > 0 && (
         <div className="stack" style={{ gap: 8 }}><span className="label">Money values</span><div className="row" style={{ flexWrap: 'wrap', gap: 8 }}>{p.money_values.map((v) => <span key={v} className="chip">{v}</span>)}</div></div>

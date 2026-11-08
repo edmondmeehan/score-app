@@ -8,6 +8,7 @@ const usd = (n: number | null | undefined, cents = false) =>
   (Number(n) || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: cents ? 2 : 0, minimumFractionDigits: cents ? 2 : 0 });
 const num = (n: number | null | undefined) => (Number(n) || 0).toLocaleString('en-US');
 const pct = (a: number, b: number) => (b ? Math.round((a / b) * 100) : 0);
+const GENDERS: [string, string, string][] = [['woman', 'Female', 'var(--gold)'], ['man', 'Male', 'var(--rise)'], ['nonbinary', 'Other', 'var(--gold-light)'], ['unset', 'Not set', 'var(--line-soft)']];
 const STORE: Record<string, string> = { APP_STORE: 'Apple', PLAY_STORE: 'Google Play', STRIPE: 'Web (Stripe)', PROMOTIONAL: 'Promotional', unknown: 'Unknown' };
 const PLAN_NAME = (p: string) => (PLANS as Record<string, { name: string }>)[p]?.name || p.charAt(0).toUpperCase() + p.slice(1);
 
@@ -194,8 +195,16 @@ export default async function Overview({ searchParams }: { searchParams: Promise
               <div style={{ height: 8, borderRadius: 4, background: 'var(--track)' }}><div style={{ height: 8, borderRadius: 4, width: `${share(b)}%`, background: BANDS[b].color }} /></div>
             </div>
           ))}
-          {gTotal > 0 && <span className="small muted">Active: {Object.entries(gender).map(([k, v]) => `${pct(v, gTotal)}% ${k === 'unset' ? 'not set' : k}`).join(' · ')}</span>}
           <span className="small muted">Bands only. Exact scores are never stored.</span>
+        </Panel>
+        <Panel title="Members by gender">
+          {gTotal === 0 ? <span className="small muted">No active members yet.</span> : GENDERS.filter(([k]) => k !== 'unset' || gender.unset).map(([k, label, color]) => (
+            <div key={k} className="stack" style={{ gap: 6 }}>
+              <div className="row small" style={{ justifyContent: 'space-between' }}><span>{label}</span><span className="muted">{pct(gender[k] || 0, gTotal)}% · {num(gender[k])}</span></div>
+              <div style={{ height: 8, borderRadius: 4, background: 'var(--track)' }}><div style={{ height: 8, borderRadius: 4, width: `${pct(gender[k] || 0, gTotal)}%`, background: color }} /></div>
+            </div>
+          ))}
+          <span className="small muted">Active and preview members{test ? ', including test accounts' : ''}. {num(gTotal)} total.</span>
         </Panel>
       </div>
 

@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { supabaseServer } from '@/lib/supabase/server';
 import { getTrack, parseTrackId } from '@/lib/spotify';
 import { PROMPTS } from '@/lib/prompts';
+import { DRINKING, EDUCATION, EXERCISE, HAS_KIDS, HEIGHTS, SMOKING, WANTS_KIDS, valid } from '@/lib/profileDetails';
 
 
 async function ctx() {
@@ -82,4 +83,21 @@ export async function movePhoto(form: FormData) {
   [order[i], order[j]] = [order[j], order[i]];
   await Promise.all(order.map((pid, k) => supabase.from('photos').update({ position: k }).eq('id', pid).eq('user_id', user.id)));
   back('saved=photos');
+}
+
+export async function saveDetails(form: FormData) {
+  const { supabase, user } = await ctx();
+  const h = Number(form.get('height_cm'));
+  const { error } = await supabase.from('profiles').update({
+    height_cm: HEIGHTS.some((x) => x.cm === h) ? h : null,
+    has_kids: valid(HAS_KIDS, form.get('has_kids')),
+    wants_kids: valid(WANTS_KIDS, form.get('wants_kids')),
+    education: valid(EDUCATION, form.get('education')),
+    drinking: valid(DRINKING, form.get('drinking')),
+    smoking: valid(SMOKING, form.get('smoking')),
+    exercise: valid(EXERCISE, form.get('exercise')),
+  }).eq('id', user.id);
+  if (error) back('error=' + encodeURIComponent(/column|schema/.test(error.message) ? 'Profile details are almost ready. Please try again later.' : error.message));
+  revalidatePath('/app/profile');
+  back('saved=details#details');
 }
