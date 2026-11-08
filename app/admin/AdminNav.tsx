@@ -23,6 +23,15 @@ export default function AdminNav({ counts, email }: { counts: { rep: number; ver
     { title: 'Business', items: [['/admin/billing', 'Billing', 0], ['/admin/integrations', 'Integrations', 0]] },
   ];
   const items = groups.flatMap((g) => g.items);
+  const [openGroups, setOpenGroups] = useState<string[]>([]);
+  useEffect(() => {
+    try { const v = JSON.parse(localStorage.getItem('score_admin_nav') || '[]'); if (Array.isArray(v)) setOpenGroups(v); } catch { /* ignore */ }
+  }, []);
+  const toggleGroup = (t: string) => setOpenGroups((cur) => {
+    const next = cur.includes(t) ? cur.filter((x) => x !== t) : [...cur, t];
+    try { localStorage.setItem('score_admin_nav', JSON.stringify(next)); } catch { /* ignore */ }
+    return next;
+  });
   const isOn = (href: string) => (href === '/admin' ? path === '/admin' : path.startsWith(href));
   const current = items.find(([href]) => isOn(href))?.[1] ?? 'Admin';
   const pending = counts.rep + counts.ver + counts.del + counts.sup;
@@ -41,16 +50,24 @@ export default function AdminNav({ counts, email }: { counts: { rep: number; ver
       {open && <div className="admin-scrim" onClick={() => setOpen(false)} aria-hidden />}
       <nav id="admin-nav" aria-label="Admin" className={open ? 'open' : ''}>
         <div className="admin-nav-logo" style={{ padding: '0 10px 18px' }}><Logo size={14} /></div>
-        {groups.map((g) => (
-          <div key={g.title} className="admin-nav-group" role="group" aria-label={g.title}>
-            <span className="admin-nav-head">{g.title}</span>
-            {g.items.map(([href, label, n]) => (
-              <Link key={href} href={href} className={isOn(href) ? 'on' : ''} aria-current={isOn(href) ? 'page' : undefined}>
-                {label}{n ? <span style={{ color: href === '/admin/moderation' ? 'var(--alert)' : 'var(--gold)' }}> · {n}</span> : null}
-              </Link>
-            ))}
-          </div>
-        ))}
+        {groups.map((g) => {
+          const active = g.items.some(([href]) => isOn(href));
+          const isOpen = active || openGroups.includes(g.title);
+          const waiting = g.items.reduce((s2, [, , n]) => s2 + (Number(n) || 0), 0);
+          return (
+            <div key={g.title} className={`admin-nav-group${isOpen ? ' open' : ''}`} role="group" aria-label={g.title}>
+              <button type="button" className="admin-nav-head" aria-expanded={isOpen} onClick={() => !active && toggleGroup(g.title)}>
+                <span>{g.title}</span>
+                <span className="admin-nav-meta">{!isOpen && waiting > 0 && <span className="admin-nav-count">{waiting}</span>}<span className="admin-nav-chev" aria-hidden>{active ? '' : isOpen ? '−' : '+'}</span></span>
+              </button>
+              {isOpen && g.items.map(([href, label, n]) => (
+                <Link key={href} href={href} className={isOn(href) ? 'on' : ''} aria-current={isOn(href) ? 'page' : undefined}>
+                  {label}{n ? <span style={{ color: href === '/admin/moderation' ? 'var(--alert)' : 'var(--gold)' }}> · {n}</span> : null}
+                </Link>
+              ))}
+            </div>
+          );
+        })}
         <span className="small muted" style={{ padding: '18px 12px 0', overflowWrap: 'anywhere' }}>{email}</span>
         <Link href="/app" className="small" style={{ padding: '6px 12px' }}>Back to app</Link>
         <div style={{ padding: '10px 8px' }}><ThemeSwitch /></div>
