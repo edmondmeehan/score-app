@@ -1,6 +1,6 @@
 import { requireStaff } from '@/lib/session';
 import { getSecurityStatus } from '@/lib/vercelSecurity';
-import { attackMode, botProtection, aiBots } from './actions';
+import { attackMode, botProtection, aiBots, setMaintenance } from './actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +11,9 @@ function State({ on, label }: { on: boolean; label: string }) {
 }
 
 export default async function Security({ searchParams }: { searchParams: Promise<{ ok?: string; error?: string }> }) {
-  await requireStaff();
+  const { supabase } = await requireStaff();
+  const { data: mRow } = await supabase.from('app_config').select('value').eq('key', 'maintenance').maybeSingle();
+  const maint = (mRow?.value || {}) as { on?: boolean; message?: string; since?: string };
   const sp = await searchParams;
   const s = await getSecurityStatus();
   const left = s.attackMode.until ? Math.max(0, Math.round((s.attackMode.until - Date.now()) / 60000)) : null;
@@ -26,6 +28,22 @@ export default async function Security({ searchParams }: { searchParams: Promise
           To use these switches, create a Vercel access token (Vercel → Account Settings → Tokens, scoped to this team) and add it as a <strong>sensitive</strong> environment variable named <span className="mono">VERCEL_API_TOKEN</span> for Production, then redeploy. Don’t paste the token anywhere else.
         </div>
       )}
+      <section id="maintenance" className="card stack" style={{ gap: 12, borderColor: maint.on ? 'var(--alert)' : undefined }}>
+        <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+          <strong>Maintenance mode</strong>
+          <State on={Boolean(maint.on)} label={maint.on ? `On${maint.since ? ` since ${fmt(new Date(maint.since).getTime())}` : ''}` : 'Off'} />
+        </div>
+        <span className="small muted">Turns Score off for members and visitors. They see a page with the Score logo, your message, the build number and a contact form (messages go to Support). Staff stay signed in and can use everything, and sign-in, legal pages, billing webhooks and scheduled jobs keep running.</span>
+        <form action={setMaintenance} className="stack" style={{ gap: 10 }}>
+          <input type="hidden" name="on" value={maint.on ? 'false' : 'true'} />
+          <label className="field">Message visitors see<textarea className="input" name="message" rows={2} maxLength={400} defaultValue={maint.message || 'Score is down for scheduled maintenance. We’ll be back shortly.'} /></label>
+          <div className="row" style={{ gap: 10, flexWrap: 'wrap' }}>
+            <button className={maint.on ? 'btn sm' : 'btn ghost sm'}>{maint.on ? 'Turn off maintenance' : 'Turn on maintenance'}</button>
+            <a className="small" href="/maintenance" target="_blank" rel="noopener noreferrer">Preview the page ↗</a>
+          </div>
+        </form>
+      </section>
+
       <span className="small muted">Vercel’s automatic DDoS mitigation is always on. These add extra checks when you need them. Every change is recorded in the audit log.</span>
 
       <section className="card stack" style={{ gap: 12 }}>

@@ -20,6 +20,21 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
   );
   const { data: { user } } = await supabase.auth.getUser();
   const path = request.nextUrl.pathname;
+
+  // Maintenance mode (Admin → Maintenance). Staff, sign-in, legal pages and webhooks keep working.
+  if (!MAINT_OPEN.some((p) => path === p || path.startsWith(p + '/')) && (await maintenanceOn(supabase))) {
+    const staff = user ? (await supabase.rpc('is_staff')).data === true : false;
+    if (!staff) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/maintenance';
+      url.search = '';
+      const res = NextResponse.rewrite(url, { status: 503 });
+      res.headers.set('Retry-After', '1800');
+      res.headers.set('X-Robots-Tag', 'noindex');
+      return res;
+    }
+  }
+
   const needsAuth = path.startsWith('/app') || path.startsWith('/onboarding') || path.startsWith('/admin') || path.startsWith('/plans');
   if (needsAuth && !user) {
     const url = request.nextUrl.clone();
@@ -43,6 +58,20 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
     response.headers.set('X-Robots-Tag', 'noindex, nofollow');
   }
   return response;
+}
+
+const MAINT_OPEN = ['/maintenance', '/admin', '/signin', '/auth', '/legal', '/manifest.webmanifest', '/icon.svg', '/apple-icon.png'];
+let maint: { on: boolean; at: number } = { on: false, at: 0 };
+/** Checked at most every 20 seconds per server instance, so it adds no real delay. */
+async function maintenanceOn(supabase: { from: (t: string) => any }): Promise<boolean> {
+  if (Date.now() - maint.at < 20_000) return maint.on;
+  try {
+    const { data } = await supabase.from('app_config').select('value').eq('key', 'maintenance').maybeSingle();
+    maint = { on: Boolean(data?.value?.on), at: Date.now() };
+  } catch {
+    maint = { on: maint.on, at: Date.now() };
+  }
+  return maint.on;
 }
 
 /** Record a page view (skips bots, prefetches, server-action posts, files and the admin area). */

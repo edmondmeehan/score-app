@@ -39,3 +39,12 @@ export async function aiBots(form: FormData) {
   await log(on ? 'ai_bots_block_on' : 'ai_bots_block_off', '');
   done(on ? 'AI crawlers are blocked.' : 'AI crawlers are allowed.');
 }
+
+export async function setMaintenance(form: FormData) {
+  const { supabase } = await requireStaff();
+  const on = form.get('on') === 'true';
+  const { error } = await supabase.rpc('staff_set_maintenance', { p_on: on, p_message: String(form.get('message') || '') });
+  if (error) redirect('/admin/security?error=' + encodeURIComponent(/Could not find the function/i.test(error.message) ? 'Run migration 0023 in the Score SQL Editor first.' : error.message) + '#maintenance');
+  revalidatePath('/', 'layout');
+  redirect('/admin/security?ok=' + encodeURIComponent(on ? 'Maintenance mode is on. Visitors see the maintenance page within about 20 seconds. Staff can still use everything.' : 'Maintenance mode is off. Score is back for everyone.') + '#maintenance');
+}
