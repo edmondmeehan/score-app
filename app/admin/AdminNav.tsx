@@ -19,7 +19,7 @@ export default function AdminNav({ counts, email }: { counts: { rep: number; ver
     { title: 'Growth', items: [['/admin/waitlist', 'Waitlist & invites', 0], ['/admin/investors', 'Investors', 0]] },
     { title: 'Members', items: [['/admin/members', 'Members', 0], ['/admin/reserve', 'Reserve', 0], ['/admin/verification', 'Verification', counts.ver], ['/admin/support', 'Support', counts.sup], ['/admin/deletions', 'Deletions', counts.del]] },
     { title: 'Trust & safety', items: [['/admin/moderation', 'Moderation', counts.rep], ['/admin/screenshots', 'Screenshots', 0], ['/admin/security', 'Security', 0], ['/admin/audit', 'Audit log', 0]] },
-    { title: 'Content', items: [['/admin/content', 'Content', 0], ['/admin/events', 'Events', 0], ['/admin/date-challenge', '$50 Date Challenge', 0], ['/admin/emails', 'Emails', 0], ['/admin/footer', 'Footer', 0]] },
+    { title: 'Content', items: [['/admin/content', 'Content', 0], ['/admin/events', 'Events', 0], ['/admin/date-challenge', '$50 Date Challenge', 0], ['/admin/emails', 'Emails', 0], ['/admin/footer', 'Footer', 0], ['/admin/themes', 'Seasonal themes', 0]] },
     { title: 'Business', items: [['/admin/billing', 'Billing', 0], ['/admin/integrations', 'Integrations', 0]] },
   ];
   const items = groups.flatMap((g) => g.items);

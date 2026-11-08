@@ -21,5 +21,6 @@ export async function GET(req: Request) {
     ]);
     if (p) target = { ...p, open_reports: count || 0 };
   }
-  return NextResponse.json({ staff: true, email, target }, { headers: { 'Cache-Control': 'no-store' } });
+  const { data: m } = await supabase.from('app_config').select('value').eq('key', 'maintenance').maybeSingle();
+  return NextResponse.json({ staff: true, email, target, maintenance: Boolean(m?.value?.on) }, { headers: { 'Cache-Control': 'no-store' } });
 }

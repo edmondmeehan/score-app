@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { staffAct } from '@/app/admin/actions';
 
 type Target = { id: string; first_name: string | null; status: string; id_status: string; photo_status: string; open_reports: number };
-type Me = { staff: boolean; email?: string; target?: Target | null };
+type Me = { staff: boolean; email?: string; target?: Target | null; maintenance?: boolean };
 
 /** Thin bar shown only to signed-in Score staff, on the site and in the app. Moderation tools appear on member profiles. */
 export default function AdminBar() {
@@ -34,7 +34,8 @@ export default function AdminBar() {
     <div className="staff-bar" role="region" aria-label="Staff tools">
       <div className="staff-bar-row">
         <span className="staff-pill">Admin</span>
-        <span className="staff-text">Signed in as staff{me.email ? ` · ${me.email}` : ''}</span>
+        {me.maintenance && <Link href="/admin/security#maintenance" className="staff-pill" style={{ background: 'var(--alert)', color: '#111', textDecoration: 'none' }} title="Visitors and members see the maintenance page. Staff can still use everything.">Maintenance ON</Link>}
+        <span className="staff-text">{me.maintenance ? 'Only staff can see the site right now' : `Signed in as staff${me.email ? ` · ${me.email}` : ''}`}</span>
         {t && (
           <button type="button" className="staff-btn" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
             Moderate {t.first_name || 'member'}{t.open_reports ? ` · ${t.open_reports} report${t.open_reports > 1 ? 's' : ''}` : ''}

@@ -251,3 +251,8 @@ table.data td { padding: 12px 8px; border-top: 1px solid var(--line-soft); }
 
 /* Member photos: no dragging, selecting or long-press saving */
 .photo img { -webkit-user-drag: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; pointer-events: none; }
+
+/* ---------- Seasonal themes ---------- */
+.season-banner { position: fixed; z-index: 75; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom)); width: min(560px, calc(100vw - 32px)); display: flex; align-items: center; gap: 12px; justify-content: space-between; padding: 10px 12px 10px 16px; border-radius: 999px; background: var(--glass-strong); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid var(--gold); color: var(--ivory); font: 500 13px/1.35 var(--sans); box-shadow: 0 10px 30px var(--shadow); }
+.season-banner button { flex: none; width: 28px; height: 28px; border-radius: 50%; border: 0; background: var(--track); color: var(--muted); cursor: pointer; font-size: 16px; line-height: 1; }
+.tabbar ~ .season-banner, body:has(.tabbar) .season-banner { bottom: calc(86px + env(safe-area-inset-bottom)); }

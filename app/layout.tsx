@@ -3,6 +3,10 @@ import './globals.css';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import AdminBar from '@/components/AdminBar';
+import { cookies } from 'next/headers';
+import SeasonLayer from '@/components/SeasonLayer';
+import { getSeasonConfig } from '@/lib/seasonsServer';
+import { activeSeason, seasonsWith, type SeasonKey } from '@/lib/seasons';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.scoredate.app'),
@@ -19,15 +23,20 @@ export const viewport: Viewport = { themeColor: '#0B0B0C', width: 'device-width'
 // Runs before first paint so there's no flash of the wrong theme.
 const THEME_SCRIPT = `(function(){try{var m=document.cookie.match(/(?:^|; )score_theme=(dark|light|system)/);var t=m?m[1]:'dark';var d=document.documentElement;d.dataset.theme=t;var l=t==='light'||(t==='system'&&matchMedia('(prefers-color-scheme: light)').matches);if(l){var e=document.querySelector('meta[name="theme-color"]');if(e)e.setAttribute('content','#F6F3EC');}}catch(e){}})();`;
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Seasonal theme: scheduled automatically, or previewed by staff via a short-lived cookie.
+  const cfg = await getSeasonConfig();
+  const previewKey = (await cookies()).get('score_season_preview')?.value as SeasonKey | undefined;
+  const season = (previewKey && seasonsWith(cfg).find((s) => s.key === previewKey)) || activeSeason(cfg);
+  const seasonVars = season ? ({ '--gold': season.accent, '--gold-light': season.accentLight, '--hero-glow': season.glow } as React.CSSProperties) : undefined;
   return (
-    <html lang="en" data-theme="dark" suppressHydrationWarning>
+    <html lang="en" data-theme="dark" data-season={season?.key} style={seasonVars} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
       </head>
-      <body><AdminBar />{children}<Analytics /><SpeedInsights /></body>
+      <body><AdminBar />{children}{season && <SeasonLayer seasonKey={season.key} name={season.name} banner={season.banner} effect={season.effect} preview={Boolean(previewKey)} />}<Analytics /><SpeedInsights /></body>
     </html>
   );
 }

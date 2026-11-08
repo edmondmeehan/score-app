@@ -41,9 +41,11 @@ export default async function SupportQueue({ searchParams }: { searchParams: Pro
             <div className="notice" style={{ color: 'var(--ivory)', whiteSpace: 'pre-wrap' }}>{t.body}</div>
             <form action={updateTicket} className="stack" style={{ gap: 8 }}>
               <input type="hidden" name="id" value={t.id} />
+              <input type="hidden" name="current" value={t.status} />
               <input className="input" name="note" placeholder="Internal note (logged, not sent to the member)" defaultValue={t.staff_note || ''} />
               <div className="row" style={{ flexWrap: 'wrap' }}>
                 {t.email && <a className="btn ghost sm" href={`mailto:${t.email}?subject=${subject}`}>Reply by email</a>}
+                <button className="btn ghost sm" name="status" value="">Save note</button>
                 <button className="btn ghost sm" name="status" value="pending">Mark in progress</button>
                 <button className="btn sm" name="status" value="resolved">Resolve</button>
                 {t.status === 'resolved' && <button className="btn ghost sm" name="status" value="open">Reopen</button>}
