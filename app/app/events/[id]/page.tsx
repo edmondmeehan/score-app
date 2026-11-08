@@ -6,7 +6,7 @@ import { getReserveVisible } from '@/lib/reserve';
 import { getBasemap } from '@/lib/basemap';
 import { rsvp } from '../../features';
 import { approx, countdown, dayParts, eventImage, timeOnly, when, type EventRow } from '@/lib/events';
-import EventMap from '@/components/EventMap';
+import EventMapAuto from '@/components/EventMapAuto';
 import { BANDS, type Band } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
@@ -103,7 +103,7 @@ export default async function EventPage({ params, searchParams }: { params: Prom
           <strong>{e.venue}</strong>
           {!isGoing && <span className="small muted">Exact spot after you RSVP</span>}
         </div>
-        {mapLat != null && mapLng != null && <EventMap lat={mapLat} lng={mapLng} exact={isGoing} label={e.venue} tiles={tiles} />}
+        <EventMapAuto lat={mapLat ?? null} lng={mapLng ?? null} query={[e.venue, isGoing ? e.address : null, 'New York, NY'].filter(Boolean).join(', ')} exact={isGoing} label={e.venue} tiles={tiles} />
         {isGoing && e.address && (
           <div className="stack" style={{ gap: 4 }}>
             <span className="small">{e.address}</span>
