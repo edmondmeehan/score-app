@@ -2,6 +2,7 @@
 import { useActionState } from 'react';
 import { joinWaitlist, notifyMe, type WaitlistState } from './actions';
 import JoinedCard from '@/components/JoinedCard';
+import ZipInput from '@/components/ZipInput';
 
 export function NotifyMe({ first_name, email, zip, message }: { first_name: string; email: string; zip: string; message: string }) {
   const [state, action, pending] = useActionState(notifyMe, null);
@@ -29,7 +30,7 @@ export default function WaitlistForm({ note = 'You’ll share your credit band, 
       <label className="field">First name<input className="input" name="first_name" required autoComplete="given-name" /></label>
       <label className="field">Last name<input className="input" name="last_name" autoComplete="family-name" /></label>
       <label className="field" style={{ gridColumn: '1 / -1' }}>Email<input className="input" name="email" type="email" required autoComplete="email" /></label>
-      <label className="field">Home zip code<input className="input" name="zip" required inputMode="numeric" pattern="[0-9]{5}" maxLength={5} autoComplete="postal-code" placeholder="10011" /></label>
+      <ZipInput />
       <label className="field">What you do<input className="input" name="job" /></label>
       {state && !state.ok && <div className="notice error" style={{ gridColumn: '1 / -1' }}>{state.message}</div>}
       <button className="btn" style={{ gridColumn: '1 / -1' }} disabled={pending}>{pending ? 'Adding you…' : 'Join the waitlist'}</button>

@@ -2,6 +2,7 @@
 import { useActionState } from 'react';
 import { joinWaitlist, type WaitlistState } from '../actions';
 import JoinedCard from '@/components/JoinedCard';
+import ZipInput from '@/components/ZipInput';
 
 /** "No invite code?" — email + zip, confirms right on the screen. */
 export default function QuickWaitlist({ email }: { email?: string | null }) {
@@ -21,7 +22,7 @@ export default function QuickWaitlist({ email }: { email?: string | null }) {
       <span className="small muted">Join the waitlist. We open area by area and send invites by zip code.</span>
       <input type="hidden" name="quick" value="1" />
       <label className="field">Email<input className="input" name="email" type="email" required autoComplete="email" inputMode="email" defaultValue={email || ''} /></label>
-      <label className="field">Home zip code<input className="input" name="zip" required inputMode="numeric" pattern="[0-9]{5}" maxLength={5} autoComplete="postal-code" placeholder="10011" /></label>
+      <ZipInput />
       {state && !state.ok && <div className="notice error">{state.message}</div>}
       <button className="btn ghost block" disabled={pending}>{pending ? 'Adding you…' : 'Join the waitlist'}</button>
     </form>

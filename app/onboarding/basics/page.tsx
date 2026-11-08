@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { getMe } from '@/lib/session';
 import { Steps } from '@/components/ui';
 import { saveBasics } from '../actions';
+import ZipFields from './ZipFields';
 
 export default async function Basics({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { me } = await getMe();
@@ -22,8 +23,7 @@ export default async function Basics({ searchParams }: { searchParams: Promise<{
         ))}
       </fieldset>
       <label className="field">What you do<input className="input" name="job" defaultValue={me.job || ''} /></label>
-      <label className="field">Home zip code<input className="input" name="zip" required inputMode="numeric" pattern="[0-9]{5}" maxLength={5} autoComplete="postal-code" defaultValue={me.zip || ''} /><span className="small muted">Used to match you with people nearby.</span></label>
-      <label className="field">Neighborhood<input className="input" name="neighborhood" defaultValue={me.neighborhood || ''} /></label>
+      <ZipFields zip={me.zip || ''} neighborhood={me.neighborhood || ''} />
       <button className="btn block">Continue</button>
     </form>
   );

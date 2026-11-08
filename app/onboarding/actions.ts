@@ -32,7 +32,7 @@ export async function saveBasics(form: FormData) {
     gender: String(form.get('gender')),
     seeking: form.getAll('seeking').map(String),
     job: String(form.get('job') || '').trim() || null,
-    neighborhood: String(form.get('neighborhood') || '').trim() || null,
+    neighborhood: String(form.get('neighborhood') || '').trim() || (await lookupZip(zip))?.neighborhood || null,
   }).eq('id', user.id);
   if (error) redirect('/onboarding/basics?error=' + encodeURIComponent(error.message));
   await trackEvent('onboarding_basics', user.id);
@@ -197,4 +197,14 @@ export async function creditVerify(form: FormData) {
   if (!swUserId || (mine && mine !== swUserId)) back('error=' + encodeURIComponent('That session expired. Start again.'));
   try { await verifyCode(swUserId!, code); } catch (e) { back('step=code&error=' + encodeURIComponent((e as Error).message)); return; }
   await finishCredit(user.id, swUserId!);
+}
+
+export type ZipInfo = { nyc: boolean; borough: string | null; neighborhood: string | null } | null;
+
+/** ZIP → neighborhood and borough for the signup form. Public information only. */
+export async function lookupZip(zip: string): Promise<ZipInfo> {
+  if (!/^[0-9]{5}$/.test(zip)) return null;
+  const { data } = await supabaseAnon().rpc('zip_lookup', { p_zip: zip });
+  if (!data) return null;
+  return { nyc: Boolean(data.nyc), borough: data.borough ?? null, neighborhood: data.neighborhood ?? null };
 }
