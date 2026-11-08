@@ -96,7 +96,7 @@ table.data { width: 100%; border-collapse: collapse; font-size: 14px; }
 table.data th { text-align: left; color: var(--faint); font-size: 12px; font-weight: 500; padding: 10px 8px; }
 table.data td { padding: 12px 8px; border-top: 1px solid var(--line-soft); }
 .admin { display: flex; flex-wrap: wrap; min-height: 100vh; }
-.admin nav { flex: 1 1 220px; max-width: 250px; background: var(--admin-nav); border-right: 1px solid var(--line-soft); padding: 24px 14px; display: flex; flex-direction: column; gap: 4px; }
+.admin nav { flex: 1 1 220px; max-width: 264px; background: var(--admin-nav); border-right: 1px solid var(--line-soft); padding: 24px 14px; display: flex; flex-direction: column; gap: 4px; }
 .admin nav a { padding: 10px 12px; border-radius: 10px; color: var(--muted); text-decoration: none; font-size: 14px; }
 .admin nav a.on { background: var(--gold-wash); color: var(--gold-light); font-weight: 600; }
 .admin-nav-group { display: flex; flex-direction: column; gap: 2px; }
@@ -146,6 +146,10 @@ table.data td { padding: 12px 8px; border-top: 1px solid var(--line-soft); }
 .theme-switch { display: inline-flex; padding: 4px; gap: 4px; border-radius: 999px; background: var(--track); }
 .theme-switch button { border: 0; background: transparent; color: var(--stone); font: 500 13px var(--sans); padding: 8px 14px; border-radius: 999px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
 .theme-switch button[aria-pressed="true"] { background: var(--graphite); color: var(--ivory); box-shadow: 0 1px 3px var(--shadow); }
+.admin-account { margin: 18px 0 0; display: flex; max-width: 100%; }
+.admin-account .admin-account-email { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: var(--graphite); color: var(--ivory); box-shadow: 0 1px 3px var(--shadow); font: 500 12px var(--sans); padding: 8px 10px; border-radius: 999px; }
+.admin nav .admin-account a { flex: none; padding: 8px 10px; border-radius: 999px; color: var(--stone); font: 500 12px var(--sans); text-decoration: none; white-space: nowrap; }
+.admin nav .admin-account a:hover { color: var(--ivory); }
 .leaflet-container { background: var(--onyx) !important; }
 
 .hero-glow { position: relative; }

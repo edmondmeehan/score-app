@@ -68,10 +68,12 @@ export default function AdminNav({ counts, email }: { counts: { rep: number; ver
             </div>
           );
         })}
-        <span className="small muted" style={{ padding: '18px 12px 0', overflowWrap: 'anywhere' }}>{email}</span>
-        <Link href="/app" className="small" style={{ padding: '6px 12px' }}>Back to app</Link>
-        <div style={{ padding: '10px 8px' }}><ThemeSwitch /></div>
-        <span className="mono" style={{ padding: '4px 12px', fontSize: 10, color: 'var(--faint)' }}>{BUILD_LABEL}</span>
+        <div className="theme-switch admin-account" role="group" aria-label="Account">
+          <span className="admin-account-email" title={email}>{email}</span>
+          <Link href="/app">Back to app</Link>
+        </div>
+        <div style={{ padding: '8px 0 0' }}><ThemeSwitch /></div>
+        <span className="mono" style={{ padding: '6px 6px', fontSize: 10, color: 'var(--faint)' }}>{BUILD_LABEL}</span>
       </nav>
     </>
   );
