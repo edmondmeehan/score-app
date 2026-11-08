@@ -1,3 +1,4 @@
+import { EVENT_HEADERS } from '@/lib/eventHeaders';
 import Link from 'next/link';
 import PlaceFields from '@/components/PlaceFields';
 import { notFound } from 'next/navigation';
@@ -45,6 +46,15 @@ export default async function EditEvent({ params, searchParams }: { params: Prom
           <div className="stack" style={{ gap: 6 }}>
             <span className="small" style={{ fontWeight: 600 }}>Header image</span>
             {eventImage(e?.image_path) && <img src={eventImage(e?.image_path)!} alt="" style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: 12 }} />}
+            <select className="input" name="image_preset" defaultValue="">
+              <option value="">Choose from the image library…</option>
+              {(['Scheduled', 'Night types'] as const).map((g) => (
+                <optgroup key={g} label={g === 'Scheduled' ? 'Scheduled events' : 'Night types'}>
+                  {EVENT_HEADERS.filter((h) => h.group === g).map((h) => <option key={h.path} value={h.path}>{h.label}</option>)}
+                </optgroup>
+              ))}
+            </select>
+            <span className="small muted">Or upload your own (an upload wins over the library pick):</span>
             <input type="file" name="image" accept="image/jpeg,image/png,image/webp" style={{ fontSize: 14 }} />
             <span className="small muted">Wide photo of the venue or the vibe, about 1600×900, JPG under 4 MB. Members see it full-width at the top of the event. No member photos without their OK.</span>
             {e?.image_path && <label className="choice small"><input type="checkbox" name="clear_image" style={{ accentColor: 'var(--gold)' }} /> Remove the current image</label>}

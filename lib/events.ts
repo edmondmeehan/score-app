@@ -36,7 +36,7 @@ export function countdown(startIso: string, endIso?: string | null) {
 
 /** Public URL for a header image in the 'events' storage bucket. */
 export const eventImage = (path?: string | null) =>
-  path ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/events/${path.split('/').map(encodeURIComponent).join('/')}` : null;
+  !path ? null : path.startsWith('/events/headers/') ? path : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/events/${path.split('/').map(encodeURIComponent).join('/')}`;
 
 /** Rough location (about 1 km) for people who haven't RSVP'd: the exact spot stays private until you're going. */
 export const approx = (n?: number | null) => (n == null ? null : Math.round(n * 100) / 100);

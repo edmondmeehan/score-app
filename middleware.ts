@@ -110,5 +110,5 @@ function track(request: NextRequest, response: NextResponse, event: NextFetchEve
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|email/|api/).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|email/|events/headers/|api/).*)'],
 };

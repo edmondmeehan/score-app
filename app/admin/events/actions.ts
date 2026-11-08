@@ -1,4 +1,5 @@
 'use server';
+import { isEventHeader } from '@/lib/eventHeaders';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { supabaseServer, supabaseAnon } from '@/lib/supabase/server';
@@ -35,6 +36,8 @@ export async function saveEvent(form: FormData) {
   await supabase.rpc('staff_set_event_place', { p_id: data, p_place_id: String(form.get('place_id') || ''), p_lat: num('lat'), p_lng: num('lng') });
   // Header image (optional): upload to the public 'events' bucket.
   let imagePath = '';
+  const preset = String(form.get('image_preset') || '');
+  if (preset && isEventHeader(preset)) imagePath = preset;
   const file = form.get('image');
   if (file instanceof File && file.size > 0) {
     if (!/^image\/(jpeg|png|webp)$/.test(file.type)) redirect(`/admin/events/${data}?error=` + encodeURIComponent('Header image must be a JPG, PNG or WebP.'));
