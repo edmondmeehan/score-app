@@ -191,3 +191,30 @@ table.data td { padding: 12px 8px; border-top: 1px solid var(--line-soft); }
   .doc-toc-mobile a { color: var(--muted); text-decoration: none; font-size: 15px; }
   .doc-hero { padding-top: 32px; }
 }
+
+/* Member search filters */
+.filters summary { cursor: pointer; list-style: none; display: flex; align-items: center; }
+.filters summary::-webkit-details-marker { display: none; }
+.filters summary::after { content: '▾'; margin-left: auto; color: var(--muted); }
+.filters[open] summary::after { content: '▴'; }
+.filter-group { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.filter-group legend { font-size: 13px; color: var(--muted); margin-bottom: 8px; padding: 0; }
+.filter-row { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
+.filter-chip { position: relative; display: inline-flex; }
+.filter-chip input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.filter-chip span { display: inline-block; padding: 8px 12px; border-radius: 999px; border: 1px solid var(--line-soft); font-size: 13px; color: var(--stone); background: transparent; }
+.filter-chip input:checked + span { border-color: var(--gold); color: var(--gold-light); background: var(--gold-wash); }
+.filter-chip input:focus-visible + span { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* Staff toolbar (only rendered for signed-in staff) */
+.staff-bar { position: sticky; top: 0; z-index: 70; background: #1B1406; color: #F3E2B8; border-bottom: 1px solid #5A4417; font: 500 13px var(--sans); padding-top: env(safe-area-inset-top); }
+.staff-bar-row { display: flex; align-items: center; gap: 10px; padding: 7px 14px; flex-wrap: wrap; }
+.staff-pill { background: var(--gold); color: #111; font-weight: 700; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; }
+.staff-text { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: .85; }
+.staff-btn { border: 1px solid #5A4417; background: transparent; color: #F3E2B8; font: 600 12px var(--sans); padding: 6px 10px; border-radius: 999px; text-decoration: none; cursor: pointer; white-space: nowrap; }
+.staff-btn.gold { background: var(--gold); color: #111; border-color: var(--gold); }
+.staff-panel { display: flex; flex-direction: column; gap: 10px; padding: 4px 14px 14px; max-width: 720px; }
+.staff-panel .input { font-size: 16px; }
+.staff-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.staff-panel .btn.danger { color: var(--alert); border-color: var(--danger-line); }
+@media (max-width: 520px) { .staff-text { display: none; } }

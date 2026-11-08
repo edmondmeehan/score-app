@@ -6,15 +6,18 @@ type Row = { name: string; kind: Spot['kind']; lat: number; lng: number; live: b
 
 /** Real demand only: waitlist counts by neighborhood (rounded, hidden when small), "Live" once members pass the minimum. */
 export default async function DemandMap() {
-  const [{ data }, tiles] = await Promise.all([supabaseAnon().rpc('public_demand_map'), getBasemap()]);
+  const [{ data }, { data: heat }, tiles] = await Promise.all([supabaseAnon().rpc('public_demand_map'), supabaseAnon().rpc('public_area_heat'), getBasemap()]);
   // Real people only. If the database still includes sample data (before migration 0018), show nothing from it.
   const demo = Boolean((data as { demo?: boolean } | null)?.demo);
   const rows = demo ? [] : ((data as { spots?: Row[] } | null)?.spots) || [];
   const total = demo ? null : (data as { total_waiting?: number | null } | null)?.total_waiting ?? null;
-  const spots: Spot[] = rows.map((r) => ({
+  const real: Spot[] = rows.map((r) => ({
     name: r.name, kind: r.kind, lat: Number(r.lat), lng: Number(r.lng), level: r.level,
     detail: r.live ? 'Live now' + (r.waiting ? ` · ${r.waiting}+ waiting` : '') : r.waiting ? `${r.waiting}+ on the waitlist` : 'Growing',
   }));
+  // Before real counts pass the public minimum, show the borough-level preview (glow levels only, no numbers or claims).
+  const preview = real.length === 0;
+  const spots: Spot[] = preview ? (((heat as Spot[]) || []).map((h) => ({ ...h, lat: Number(h.lat), lng: Number(h.lng), detail: h.open === false ? 'Opening soon' : 'Opening neighborhood by neighborhood' }))) : real;
   const top = rows.filter((r) => r.waiting || r.live).slice(0, 6);
 
   return (
@@ -31,7 +34,7 @@ export default async function DemandMap() {
       <HeatMap tiles={tiles} spots={spots} height={380} center={[40.74, -73.97]} zoom={11} />
       <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginTop: 14 }}>
         <Legend />
-        <span className="small muted">Counts are real requests, rounded down. Never individuals.</span>
+        <span className="small muted">{preview ? 'Preview of the live map. Score opens in New York once 500 people join the waitlist.' : 'Counts are real requests, rounded down. Never individuals.'}</span>
       </div>
       {top.length > 0 ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10, marginTop: 20 }}>
