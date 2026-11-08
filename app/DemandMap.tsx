@@ -34,7 +34,7 @@ export default async function DemandMap() {
       <HeatMap tiles={tiles} spots={spots} height={380} center={[40.74, -73.97]} zoom={11} />
       <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginTop: 14 }}>
         <Legend />
-        <span className="small muted">{preview ? 'Preview of the live map. Score opens in New York once 500 people join the waitlist.' : 'Counts are real requests, rounded down. Never individuals.'}</span>
+        <span className="small muted">{preview ? 'Preview of the live map. It fills in as New York joins the waitlist.' : 'Counts are real requests, rounded down. Never individuals.'}</span>
       </div>
       {top.length > 0 ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10, marginTop: 20 }}>
