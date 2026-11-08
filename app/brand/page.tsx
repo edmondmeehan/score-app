@@ -20,6 +20,7 @@ const TOC = [
   { id: 'claims', h: 'Claims & compliance' },
   { id: 'imagery', h: 'Imagery' },
   { id: 'assets', h: 'Approved assets' },
+  { id: 'campaign', h: 'Campaign: 60 days free' },
   { id: 'partners', h: 'Partners & press' },
 ];
 
@@ -41,6 +42,12 @@ const ASSETS: [string, string, string, string][] = [
   ['score-post-every-band.png', 'Social post · “Every band is welcome.”', 'PNG, 1080×1350 (Instagram feed)', 'dark'],
   ['score-post-soft-check.png', 'Social post · “A soft check.”', 'PNG, 1080×1350 (Instagram feed)', 'light'],
   ['score-story-request-invite.png', 'Story · “Request an invite”', 'PNG, 1080×1920 (Stories, Reels cover)', 'dark'],
+];
+
+const CAMPAIGN: [string, string, string, string][] = [
+  ['score-story-60-days-free.png', 'Story · 60 days free', '1080×1920', 'dark'],
+  ['score-post-60-days-free.png', 'Feed post · 60 days on us', '1080×1350', 'light'],
+  ['score-post-get-on-the-list.png', 'Square post · Get on the list', '1080×1080', 'dark'],
 ];
 
 function Swatch({ name, hex, use, light }: { name: string; hex: string; use: string; light?: boolean }) {
@@ -73,7 +80,7 @@ export default function Brand() {
       <section>
         <div className="card row" style={{ justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 8 }}>
           <span className="stack" style={{ gap: 2 }}><strong>Brand kit</strong><span className="small muted">Every approved logo and asset on this page, in one download.</span></span>
-          <a className="btn sm" href="/brand/score-brand-kit.zip" download>Download kit (ZIP, 2 MB)</a>
+          <a className="btn sm" href="/brand/score-brand-kit.zip" download>Download kit (ZIP, 4 MB)</a>
         </div>
       </section>
 
@@ -224,6 +231,39 @@ export default function Brand() {
             </a>
           ))}
         </div>
+      </section>
+
+      <section id="campaign">
+        <h2>Campaign: First 60 days free</h2>
+        <p>Waitlist-growth assets for Instagram and TikTok. The offer: <strong>new members who join from the waitlist get their first 60 days of Membership free</strong>, then the regular price.</p>
+        <div className="doc-draft">Every placement must keep the fine print: “New members from the waitlist. Then $24.99/mo, auto-renews, cancel anytime. Terms apply.” In captions, add it after the call to action.</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 260px) minmax(0, 1fr)', gap: 18, alignItems: 'start', marginBottom: 16 }} className="campaign-grid">
+          <div className="stack" style={{ gap: 8 }}>
+            <video src="/brand/score-reel-60-days-free.mp4" poster="/brand/score-reel-poster.jpg" controls playsInline muted loop preload="none" style={{ width: '100%', borderRadius: 16, border: '1px solid var(--line-soft)', background: '#0B0B0C' }} />
+            <a className="small" href="/brand/score-reel-60-days-free.mp4" download>Download Reel (MP4, 1080×1920, 10s) ↓</a>
+            <span className="small muted">Silent, so add a trending or licensed track in Instagram or TikTok.</span>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12 }}>
+            {CAMPAIGN.map(([file, label, spec, bg]) => (
+              <a key={file} href={`/brand/${file}`} download className="tool-card" style={{ padding: 0, overflow: 'hidden', gap: 0, textDecoration: 'none', color: 'inherit' }}>
+                <div style={{ height: 170, display: 'grid', placeItems: 'center', background: bg === 'light' ? '#F6F3EC' : '#0B0B0C', borderBottom: '1px solid var(--line-soft)' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={`/brand/thumbs/${file}`} alt={label} loading="lazy" style={{ maxWidth: '86%', maxHeight: 150, objectFit: 'contain' }} />
+                </div>
+                <div className="stack" style={{ gap: 2, padding: '10px 12px 12px' }}>
+                  <strong style={{ fontSize: 13 }}>{label}</strong>
+                  <span className="small muted">{spec}</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+        <h3>Suggested captions</h3>
+        <ul>
+          <li>Date someone who has their act together. Score opens in New York first, and new members get their first 60 days free. Get on the list at scoredate.app.</li>
+          <li>Every member verified. Every band welcome. Your first two months are on us when your invite arrives. Link in bio.</li>
+          <li>Invite only. New York first. 60 days free for new members. scoredate.app</li>
+        </ul>
       </section>
 
       <section id="partners">
