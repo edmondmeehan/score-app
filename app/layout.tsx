@@ -5,6 +5,9 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import AdminBar from '@/components/AdminBar';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.scoredate.app'),
+  openGraph: { type: 'website', siteName: 'Score', images: [{ url: '/brand/score-share-card-dark.png', width: 1200, height: 630, alt: 'Score: Date someone who has their act together.' }] },
+  twitter: { card: 'summary_large_image', images: ['/brand/score-share-card-dark.png'] },
   title: 'Score — Date someone who has their act together',
   description: 'Invite-only dating where every member has verified their credit band.',
   applicationName: 'Score',

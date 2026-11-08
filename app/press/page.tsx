@@ -39,7 +39,7 @@ export default function Press() {
       </section>
       <section>
         <h2>Brand assets</h2>
-        <p>Logos, product screenshots and founder photos are available on request. Please don’t alter the Score logo or describe Score as a credit product: we aren’t a credit bureau, lender or credit repair service.</p>
+        <p>Logos, social templates, colors and our full style guide are on the <Link href="/brand">Brand &amp; marketing</Link> page. Product screenshots and founder photos are available on request. Please don’t alter the Score logo or describe Score as a credit product: we aren’t a credit bureau, lender or credit repair service.</p>
       </section>
     </DocLayout>
   );
