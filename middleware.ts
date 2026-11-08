@@ -38,6 +38,10 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
     event.waitUntil(Promise.resolve(supabase.rpc('touch_active')).then(() => undefined, () => undefined));
     response.cookies.set('score_seen', '1', { httpOnly: true, sameSite: 'lax', secure: true, path: '/', maxAge: 60 * 60 });
   }
+  // Staging (and any non-production host): keep it out of search results.
+  if (request.headers.get('host')?.startsWith('staging.') || process.env.VERCEL_ENV === 'preview') {
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+  }
   return response;
 }
 

@@ -111,7 +111,7 @@ begin
   if coalesce(staff_role(), '') <> 'owner' then raise exception 'Only owners can manage the investor room'; end if;
   if p_hash is null or p_salt is null or length(p_hash) < 32 then raise exception 'Invalid password hash'; end if;
   update investor_settings set pw_hash = p_hash, pw_salt = p_salt, pw_set_at = now(), updated_at = now() where id;
-  delete from investor_sessions;
+  delete from investor_sessions where true;
   insert into audit_log(staff_email, action, reason) values (staff_email(), 'investor_password_set', 'All investor sessions signed out');
 end $$;
 
@@ -119,7 +119,7 @@ create or replace function public.staff_signout_investors() returns void
 language plpgsql security definer set search_path = public as $$
 begin
   if coalesce(staff_role(), '') <> 'owner' then raise exception 'Only owners can manage the investor room'; end if;
-  delete from investor_sessions;
+  delete from investor_sessions where true;
   insert into audit_log(staff_email, action, reason) values (staff_email(), 'investor_signout_all', null);
 end $$;
 
