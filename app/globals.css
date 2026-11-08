@@ -99,6 +99,9 @@ table.data td { padding: 12px 8px; border-top: 1px solid var(--line-soft); }
 .admin nav { flex: 1 1 220px; max-width: 250px; background: var(--admin-nav); border-right: 1px solid var(--line-soft); padding: 24px 14px; display: flex; flex-direction: column; gap: 4px; }
 .admin nav a { padding: 10px 12px; border-radius: 10px; color: var(--muted); text-decoration: none; font-size: 14px; }
 .admin nav a.on { background: var(--gold-wash); color: var(--gold-light); font-weight: 600; }
+.admin-nav-group { display: flex; flex-direction: column; gap: 2px; }
+.admin-nav-group + .admin-nav-group { margin-top: 14px; }
+.admin-nav-head { font-family: var(--mono); font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--faint); padding: 0 12px 6px; }
 .admin main { flex: 999 1 560px; min-width: 0; padding: 32px; display: flex; flex-direction: column; gap: 22px; }
 .scroll-x { overflow-x: auto; }
 .admin-bar, .admin-scrim { display: none; }
@@ -218,3 +221,12 @@ table.data td { padding: 12px 8px; border-top: 1px solid var(--line-soft); }
 .staff-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .staff-panel .btn.danger { color: var(--alert); border-color: var(--danger-line); }
 @media (max-width: 520px) { .staff-text { display: none; } }
+
+/* ---------- Investor room ---------- */
+.inv-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 560px; }
+.inv-table th, .inv-table td { padding: 8px 10px; border-bottom: 1px solid var(--line-soft); text-align: left; vertical-align: top; }
+.inv-table th { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); font-weight: 400; }
+.inv-table .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.inv-table .inv-strong td { font-weight: 600; color: var(--ivory); }
+.inv-table .inv-head td { padding-top: 16px; font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); border-bottom: none; }
+.inv-table td:first-child { position: sticky; left: 0; background: var(--onyx); }
