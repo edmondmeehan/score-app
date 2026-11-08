@@ -135,6 +135,15 @@ export async function notifyArea(form: FormData) {
   redirect('/onboarding/not-yet?done=1&zip=' + zip);
 }
 
+// ---------- Self-reported band (credit mode = 'self') ----------
+export async function selfReportBand(form: FormData) {
+  const supabase = await supabaseServer();
+  if (form.get('confirm') !== 'yes') redirect('/onboarding/credit?error=' + encodeURIComponent('Please confirm your band matches your current credit score.'));
+  const { error } = await supabase.rpc('self_report_band', { p_band: String(form.get('band') || ''), p_trend: String(form.get('trend') || 'steady') });
+  if (error) redirect('/onboarding/credit?error=' + encodeURIComponent(error.message));
+  redirect('/onboarding/credit?revealed=1');
+}
+
 // ---------- Credit band via Spinwheel ----------
 const SW_COOKIE = 'score_sw';
 const back = (q: string) => redirect('/onboarding/credit?' + q);

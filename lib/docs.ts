@@ -40,7 +40,7 @@ export const DOCS: Record<string, Doc> = {
       ] },
       { id: 'account', h: 'Your account', body: [
         'Keep your sign-in details private and tell us right away at support@scoredate.app if you think someone else has accessed your account. You’re responsible for what happens on your account. One person, one account.',
-        'Your profile must be accurate and current. Don’t impersonate anyone, use someone else’s photos, or misstate your age, relationship status or anything else that matters to the people you meet.',
+        'Your profile must be accurate and current. Don’t impersonate anyone, use someone else’s photos, or misstate your age, relationship status or anything else that matters to the people you meet. If you self-report your credit band, it must match your current credit score, and you must update it if your score moves into a different band.',
       ] },
       { id: 'conduct', h: 'How you agree to behave', body: [
         'You agree to follow the [Community Guidelines](/legal/community). In short, you won’t:',
@@ -126,6 +126,7 @@ export const DOCS: Record<string, Doc> = {
         { ul: [
           '**Identity:** our verification partner tells us whether your ID and selfie check passed, failed or needs review. We don’t receive or store your ID images.',
           '**Credit:** our credit data partner returns your band and trend from a soft inquiry. We don’t receive your score, report, accounts or balances.',
+          '**Self-reported band:** while credit verification isn’t available, you choose your band yourself from a credit score you look up (for example on Credit Karma, Credit Sesame or your bank’s app). We store only the band and trend you choose, labeled self-reported, and never pull your credit.',
           '**Photos:** we compare each profile photo with a live selfie to confirm it’s you and store only the result and a similarity score. See the [Biometric Data Policy](/legal/biometric).',
         ] },
         { h3: 'Automatically' },

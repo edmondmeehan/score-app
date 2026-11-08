@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { requireMember } from '@/lib/session';
+import { verifiedMap } from '@/lib/bandVerified';
 import { BandPill } from '@/components/ui';
 import FounderBadge from '@/components/FounderBadge';
 import { photoUrls } from '@/lib/photos';
@@ -36,7 +37,7 @@ export default async function Search({ searchParams }: { searchParams: Promise<S
   const areas = (areasData as Area[]) || [];
   const data = search.data as { results: Result[]; total: number; remaining: number | null; limited: boolean; per_page: number } | null;
   const results = data?.results || [];
-  const photos = await photoUrls(supabase, results.map((r) => r.id));
+  const [photos, vmap] = await Promise.all([photoUrls(supabase, results.map((r) => r.id)), verifiedMap(supabase, results.map((r) => r.id))]);
   const remaining = data ? data.remaining : (remainingData as number | null);
   const unlimited = ['premium', 'black'].includes(me.plan);
   const filterCount = [f.q, f.age_min, f.age_max, f.area, f.height_min, f.height_max, f.has_kids, f.active_days].filter(Boolean).length
@@ -132,7 +133,7 @@ export default async function Search({ searchParams }: { searchParams: Promise<S
                 <div className="stack grow" style={{ gap: 6, minWidth: 0 }}>
                   <span><strong style={{ fontSize: 17 }}>{p.first_name}</strong> <span className="muted">{p.age}</span>{p.is_founder && <span style={{ marginLeft: 8 }}><FounderBadge /></span>}{p.active && <span className="small" style={{ marginLeft: 8, color: 'var(--rise)' }}>● Active</span>}</span>
                   <span className="small muted" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{[p.job, p.neighborhood, heightLabel(p.height_cm)].filter(Boolean).join(' · ')}</span>
-                  <BandPill band={p.band} trend={p.trend} />
+                  <BandPill band={p.band} trend={p.trend} verified={vmap[p.id]} />
                 </div>
                 <div className="stack" style={{ alignItems: 'flex-end', gap: 0 }}><span className="serif" style={{ fontSize: 26, color: 'var(--gold-light)' }}>{p.compat}%</span><span className="small muted">match</span></div>
               </Link>

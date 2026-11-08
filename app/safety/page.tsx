@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import DocLayout from '@/components/DocLayout';
+import { getCreditMode, type CreditMode } from '@/lib/creditMode';
 
 export const metadata: Metadata = {
   title: 'Safety Center · ScoreDate',
@@ -25,11 +26,15 @@ const Icon = ({ d }: { d: string }) => (
   <span className="tool-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d={d} /></svg></span>
 );
 
-const TOOLS: [keyof typeof I, string, string][] = [
+const BAND_TOOL: Record<CreditMode, [keyof typeof I, string, string]> = {
+  verified: ['band', 'Verified credit band', 'A soft credit check (it never affects your score) confirms each member’s band. Members see the band, never the number, and bands are re-checked every six months.'],
+  self: ['band', 'Self-reported credit band', 'Members choose their band from a free credit score and it’s labeled self-reported until band verification opens. Members see the band, never the number. A false band breaks our Community Guidelines.'],
+};
+const BASE_TOOLS: [keyof typeof I, string, string][] = [
   ['invite', 'Invite-only', 'Every member is invited by another member or let in from the waitlist by our team. No open sign-ups, no bulk accounts.'],
   ['id', 'ID + live selfie check', 'Members verify a government ID and a live selfie with our identity verification partner before they can match or message. ID images stay with the partner, not on ScoreDate.'],
   ['photo', 'Photo matching', 'Every profile photo is compared with a live selfie, so the face you see is the person you meet. Photos that don’t match go to human review.'],
-  ['band', 'Verified credit band', 'A soft credit check (it never affects your score) confirms each member’s band. Members see the band, never the number, and bands are re-checked every six months.'],
+
   ['money', 'Zero tolerance for money requests', 'Asking any member for money, gifts, crypto or investments means immediate removal. It’s the most common romance-scam tactic, so we don’t give it a second chance.'],
   ['flag', 'Report and block anywhere', 'Report or block from any profile or chat. They can’t see or message you afterward, and they never learn it was you.'],
   ['share', 'Share your date with a friend', 'On any confirmed date, send a friend a private link with the where and when. It shows nothing else and expires after the date.'],
@@ -48,7 +53,9 @@ const TOC = [
   { id: 'help', h: 'Get help now' },
 ];
 
-export default function Safety() {
+export default async function Safety() {
+  const mode = await getCreditMode();
+  const TOOLS = [...BASE_TOOLS.slice(0, 3), BAND_TOOL[mode], ...BASE_TOOLS.slice(3)];
   return (
     <DocLayout eyebrow="Trust & safety" title="Safety Center" toc={TOC}
       summary="Verified isn’t a slogan at ScoreDate. Every member’s identity, photos and credit band are checked before they can say hello. Here’s everything we do to keep you safe, and what you can do too.">
@@ -104,7 +111,7 @@ export default function Safety() {
           <li>professes strong feelings fast but always has a reason not to meet or video chat;</li>
           <li>asks for your account logins, codes or personal financial details.</li>
         </ul>
-        <p><strong>A verified credit band is never a reason to trust a request for money.</strong> Report it in the app. If you’ve sent money, also contact your bank and file reports with the FTC at <a href="https://reportfraud.ftc.gov" target="_blank" rel="noopener noreferrer">ReportFraud.ftc.gov</a> and the FBI at <a href="https://www.ic3.gov" target="_blank" rel="noopener noreferrer">ic3.gov</a>.</p>
+        <p><strong>A credit band, verified or not, is never a reason to trust a request for money.</strong> Report it in the app. If you’ve sent money, also contact your bank and file reports with the FTC at <a href="https://reportfraud.ftc.gov" target="_blank" rel="noopener noreferrer">ReportFraud.ftc.gov</a> and the FBI at <a href="https://www.ic3.gov" target="_blank" rel="noopener noreferrer">ic3.gov</a>.</p>
       </section>
 
       <section id="report">

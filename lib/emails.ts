@@ -144,7 +144,7 @@ export const templates = {
       { p: d.inviter ? `${hi(d.first_name)} ${d.inviter} thinks you belong on ScoreDate, the invite-only dating app where every member has verified their identity and their credit band.` : `${hi(d.first_name)} your spot in this New York drop is ready. Here is your personal invite code.` },
       { code: d.code, caption: `Good for ${d.days} days · one use` },
       { button: { label: 'Accept your invite', url: `${SITE_URL}/join?code=${encodeURIComponent(d.code)}` } },
-      { p: 'Joining takes about ten minutes: the basics, a quick ID and selfie check, your credit band (soft pull, never affects your score), a short money-values quiz and your photos.' },
+      { p: 'Joining takes about ten minutes: the basics, a quick ID and selfie check, your credit band, a short money-values quiz and your photos.' },
     ],
   }) satisfies Email,
 

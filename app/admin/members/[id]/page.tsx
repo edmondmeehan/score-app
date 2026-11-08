@@ -24,7 +24,7 @@ export default async function MemberDetail({ params, searchParams }: { params: P
   );
   return (
     <>
-      <div className="row" style={{ flexWrap: 'wrap' }}><h1 className="serif" style={{ fontSize: 40 }}>{p.first_name || p.email}</h1><BandPill band={p.band} trend={p.trend} /><span className="chip">{p.status}</span></div>
+      <div className="row" style={{ flexWrap: 'wrap' }}><h1 className="serif" style={{ fontSize: 40 }}>{p.first_name || p.email}</h1><BandPill band={p.band} trend={p.trend} verified={Boolean(p.credit_verified_at)} /><span className="chip">{p.status}</span></div>
       {sp.error && <div className="notice error">{sp.error}</div>}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20 }}>
         <section className="card stack" style={{ flex: '1 1 300px' }}>

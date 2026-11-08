@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { requireMember } from '@/lib/session';
 import { photoUrls } from '@/lib/photos';
+import { verifiedMap } from '@/lib/bandVerified';
 import { BandPill, age } from '@/components/ui';
 import type { Band } from '@/lib/types';
 import { likeMember } from './actions';
@@ -15,7 +16,7 @@ export default async function Likes({ searchParams }: { searchParams: Promise<{ 
   const { data } = await supabase.rpc('likes_me');
   const r = (data as { locked: boolean; count: number; people?: Person[] }) || { locked: true, count: 0 };
   const people = r.people || [];
-  const photos = await photoUrls(supabase, people.map((p) => p.id));
+  const [photos, vmap] = await Promise.all([photoUrls(supabase, people.map((p) => p.id)), verifiedMap(supabase, people.map((p) => p.id))]);
   return (
     <div className="phone">
       <div className="row" style={{ justifyContent: 'space-between' }}>
@@ -39,7 +40,7 @@ export default async function Likes({ searchParams }: { searchParams: Promise<{ 
           <Link href={`/app/u/${p.id}`} className="stack grow" style={{ gap: 4, textDecoration: 'none', color: 'inherit', minWidth: 0 }}>
             <span><strong>{p.first_name}</strong> <span className="muted">{age(p.birth_year)}</span></span>
             <span className="small muted">{p.neighborhood || ''}</span>
-            <BandPill band={p.band} />
+            <BandPill band={p.band} verified={vmap[p.id]} />
           </Link>
           <form action={likeMember}><input type="hidden" name="id" value={p.id} /><input type="hidden" name="back" value="/app/likes" /><button className="btn sm" data-haptic="success" aria-label={`Like ${p.first_name} back`}>♥ Like back</button></form>
         </div>

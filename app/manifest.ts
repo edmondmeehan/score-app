@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'ScoreDate',
     short_name: 'ScoreDate',
-    description: 'Invite-only dating where every member has verified their credit band.',
+    description: 'Invite-only dating built on honesty about money. Every member verifies their identity.',
     start_url: '/app',
     scope: '/',
     display: 'standalone',

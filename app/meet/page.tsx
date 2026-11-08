@@ -3,6 +3,7 @@ import Link from 'next/link';
 import WaitlistForm from '../WaitlistForm';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
+import { getCreditMode, CREDIT_COPY } from '@/lib/creditMode';
 
 // Ad landing page: dating first, verification explained further down. The homepage (/) stays as it is.
 export const metadata: Metadata = {
@@ -17,7 +18,8 @@ const FEATURES: [string, string][] = [
   ['Everyone is verified', 'Every member verifies a government ID and a live selfie. Members are 25+ and live in New York.'],
 ];
 
-export default function Meet() {
+export default async function Meet() {
+  const copy = CREDIT_COPY[await getCreditMode()];
   return (
     <div>
       <SiteHeader />
@@ -32,7 +34,7 @@ export default function Meet() {
         <div id="invite" style={{ flex: '1 1 400px' }}>
           <div className="card stack" style={{ gap: 12 }}>
             <strong className="serif" style={{ fontSize: 30 }}>Request an invite</strong>
-            <WaitlistForm />
+            <WaitlistForm note={copy.formNote} />
           </div>
         </div>
       </section>
@@ -51,7 +53,7 @@ export default function Meet() {
       <section style={{ background: 'var(--graphite)', borderTop: '1px solid var(--line-soft)' }}>
         <div className="page stack" style={{ padding: '64px 24px', gap: 14, maxWidth: 760 }}>
           <h2 className="serif" style={{ fontSize: 40, lineHeight: 1.05 }}>How verification works</h2>
-          <p className="muted" style={{ lineHeight: 1.6, margin: 0 }}>When you’re invited, you verify your ID and a live selfie. You also confirm a band (Elite, Strong, Solid or Building) through a soft check that doesn’t affect your credit. Other members see only your band, never a number, and every band is welcome.</p>
+          <p className="muted" style={{ lineHeight: 1.6, margin: 0 }}>When you’re invited, you verify your ID and a live selfie. {copy.meetLine} Every band is welcome.</p>
           <p className="small muted" style={{ margin: 0 }}>ScoreDate is a dating app. It is not a credit bureau, lender or credit repair service, and it never sees or stores your exact score or credit report.</p>
           <a href="#invite" className="btn" style={{ alignSelf: 'flex-start' }}>Request an invite</a>
         </div>

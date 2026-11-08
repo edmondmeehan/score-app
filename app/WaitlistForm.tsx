@@ -20,7 +20,7 @@ export function NotifyMe({ first_name, email, zip, message }: { first_name: stri
   );
 }
 
-export default function WaitlistForm() {
+export default function WaitlistForm({ note = 'You’ll share your credit band, never your score.' }: { note?: string }) {
   const [state, action, pending] = useActionState<WaitlistState, FormData>(joinWaitlist, null);
   if (state?.ok && state.joined) return <JoinedCard eventId={state.joined.eventId} message={state.message} code={state.joined.code} token={state.joined.token} position={state.joined.position} founder={state.joined.founder} founderReason={state.joined.founderReason} />;
   if (state?.ok) return <div className="card gold"><p className="serif" style={{ fontSize: 28, margin: 0 }}>{state.message}</p></div>;
@@ -33,7 +33,7 @@ export default function WaitlistForm() {
       <label className="field">What you do<input className="input" name="job" /></label>
       {state && !state.ok && <div className="notice error" style={{ gridColumn: '1 / -1' }}>{state.message}</div>}
       <button className="btn" style={{ gridColumn: '1 / -1' }} disabled={pending}>{pending ? 'Adding you…' : 'Join the waitlist'}</button>
-      <p className="small muted" style={{ gridColumn: '1 / -1', margin: 0 }}>New York City opens first, then more areas. Members must be 25 or older. Verification uses a soft pull and never affects your score.</p>
+      <p className="small muted" style={{ gridColumn: '1 / -1', margin: 0 }}>New York City opens first, then more areas. Members must be 25 or older. {note}</p>
     </form>
   );
 }

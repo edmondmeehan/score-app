@@ -37,14 +37,14 @@ export default async function Member({ params, searchParams }: { params: Promise
     <div className="phone" style={{ paddingTop: 0 }}>
       <ScreenshotContext context="profile" target={p.id === me.id ? null : p.id} />
       <div className="photo" style={{ margin: '0 -20px', borderRadius: 0, aspectRatio: '4/5' }}>{photos[0] ? <img src={photos[0]} alt={`${p.first_name}`} /> : <span className="serif" style={{ fontSize: 64 }}>{p.first_name?.[0]}</span>}</div>
-      <div><span className="serif" style={{ fontSize: 40 }}>{p.first_name}</span> <span className="muted" style={{ fontSize: 20 }}>{age(p.birth_year)}</span>{p.is_founder && <span style={{ marginLeft: 10, verticalAlign: 'middle' }}><FounderBadge /></span>}{isVerified(p) && <span style={{ marginLeft: 8 }}><VerifiedBadge /></span>}<div className="muted small">{[p.job, p.neighborhood].filter(Boolean).join(' · ')}</div></div>
+      <div><span className="serif" style={{ fontSize: 40 }}>{p.first_name}</span> <span className="muted" style={{ fontSize: 20 }}>{age(p.birth_year)}</span>{p.is_founder && <span style={{ marginLeft: 10, verticalAlign: 'middle' }}><FounderBadge /></span>}{isVerified(p) && <span style={{ marginLeft: 8 }}><VerifiedBadge credit={Boolean(p.credit_verified_at)} /></span>}<div className="muted small">{[p.job, p.neighborhood].filter(Boolean).join(' · ')}</div></div>
       {b && (
         <div className="card gold row">
           <Gauge fill={b.fill} color={b.color} size={56} />
           <div className="stack grow" style={{ gap: 2 }}>
             <span className="label">ScoreDate band</span>
             <span className="serif" style={{ fontSize: 32, color: b.color }}>{b.label}</span>
-            <span className="small muted">Verified{p.credit_verified_at ? ` ${new Date(p.credit_verified_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}` : ''}{inviter?.first_name ? ` · Invited by ${inviter.first_name}` : ''}</span>
+            <span className="small muted">{p.credit_verified_at ? `Verified ${new Date(p.credit_verified_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}` : 'Self-reported'}{inviter?.first_name ? ` · Invited by ${inviter.first_name}` : ''}</span>
           </div>
           {p.trend === 'up' && <span className="small" style={{ color: 'var(--rise)', fontWeight: 600 }}>↑ Up</span>}
         </div>

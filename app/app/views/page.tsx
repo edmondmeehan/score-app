@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { requireMember } from '@/lib/session';
 import { photoUrls } from '@/lib/photos';
+import { verifiedMap } from '@/lib/bandVerified';
 import { BandPill, age } from '@/components/ui';
 import type { Band } from '@/lib/types';
 
@@ -14,7 +15,7 @@ export default async function Views() {
   const { data } = await supabase.rpc('views_me');
   const r = (data as { locked: boolean; count: number; people?: Person[] }) || { locked: true, count: 0 };
   const people = r.people || [];
-  const photos = await photoUrls(supabase, people.map((p) => p.id));
+  const [photos, vmap] = await Promise.all([photoUrls(supabase, people.map((p) => p.id)), verifiedMap(supabase, people.map((p) => p.id))]);
   return (
     <div className="phone">
       <div className="row"><Link href="/app/likes" aria-label="Back" className="btn ghost sm" style={{ width: 44, padding: 0 }}>‹</Link><span className="eyebrow">Profile views</span></div>
@@ -29,7 +30,7 @@ export default async function Views() {
       ) : people.map((p) => (
         <Link key={p.id} href={`/app/u/${p.id}`} className="card row" style={{ padding: 12, gap: 12, textDecoration: 'none', color: 'inherit' }}>
           <div className="photo" style={{ width: 64, flex: 'none' }}>{photos[p.id]?.[0] ? <img src={photos[p.id][0]} alt="" /> : <span className="serif">{p.first_name?.[0]}</span>}</div>
-          <div className="stack grow" style={{ gap: 4 }}><span><strong>{p.first_name}</strong> <span className="muted">{age(p.birth_year)}</span></span><BandPill band={p.band} /></div>
+          <div className="stack grow" style={{ gap: 4 }}><span><strong>{p.first_name}</strong> <span className="muted">{age(p.birth_year)}</span></span><BandPill band={p.band} verified={vmap[p.id]} /></div>
           <span className="small muted">{ago(p.at)}</span>
         </Link>
       ))}

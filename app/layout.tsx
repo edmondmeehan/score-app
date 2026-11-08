@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   openGraph: { type: 'website', siteName: 'ScoreDate', images: [{ url: '/brand/score-share-card-dark.png', width: 1200, height: 630, alt: 'ScoreDate: Date someone who has their act together.' }] },
   twitter: { card: 'summary_large_image', images: ['/brand/score-share-card-dark.png'] },
   title: 'ScoreDate — Date someone who has their act together',
-  description: 'Invite-only dating where every member has verified their credit band.',
+  description: 'Invite-only dating built on honesty about money. Every member verifies their identity.',
   applicationName: 'ScoreDate',
   appleWebApp: { capable: true, title: 'ScoreDate', statusBarStyle: 'black-translucent' },
   formatDetection: { telephone: false },

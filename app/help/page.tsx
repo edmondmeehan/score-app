@@ -2,22 +2,24 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import DocLayout from '@/components/DocLayout';
 import { PLANS } from '@/lib/types';
+import { getCreditMode, CREDIT_COPY, type CreditMode } from '@/lib/creditMode';
 
-export const metadata: Metadata = { title: 'Help center · ScoreDate', description: 'Answers about credit bands, the soft check, billing, cancelling, safety and your account on ScoreDate.' };
+export const metadata: Metadata = { title: 'Help center · ScoreDate', description: 'Answers about credit bands, billing, cancelling, safety and your account on ScoreDate.' };
 
 type QA = [string, React.ReactNode];
-const SECTIONS: { id: string; h: string; items: QA[] }[] = [
+const sections = (mode: CreditMode): { id: string; h: string; items: QA[] }[] => [
   { id: 'start', h: 'Getting started', items: [
     ['How do I join?', <>ScoreDate is invite-only. <Link href="/#invite">Join the waitlist</Link> or use an invite code from a member. Invites go out in drops as each area opens, starting with New York City.</>],
     ['Who can join?', 'Adults 25 and older who live in an area we’ve opened. Everyone verifies a government ID, a live selfie and a credit band.'],
     ['How do I move up the waitlist?', 'Share your invite link. Each friend who joins moves you up 5 spots, and 3 friends makes you a Founding Member.'],
   ] },
   { id: 'bands', h: 'Credit bands', items: [
-    ['Will checking my band hurt my credit score?', 'No. It’s a soft inquiry, which doesn’t affect your credit score and isn’t visible to lenders.'],
+    ['Will checking my band hurt my credit score?', CREDIT_COPY[mode].bandsAnswer],
+    ...(mode === 'self' ? [['What does “self-reported” mean?', 'You chose your band yourself from a free credit score. ScoreDate hasn’t verified it, so it’s labeled self-reported on your profile. Giving a false band breaks our Community Guidelines.'] as QA] : []),
     ['What do other members see?', 'Only your band (Elite, Strong, Solid or Building) and whether it’s trending up over 12 months. Never your score or your credit report.'],
     ['Does ScoreDate store my credit score?', 'No. ScoreDate never sees or stores your exact score or report, only the band and trend.'],
     ['Can I get in with a lower band?', 'Yes. Every band is welcome. ScoreDate is about honesty around money, not having a perfect number.'],
-    ['How often is my band updated?', 'We ask you to re-verify every 6 months so bands stay current. If yours goes up, re-verify any time.'],
+    ['How often is my band updated?', mode === 'self' ? 'You can update a self-reported band once every 30 days, so keep it current. When band verification opens, we’ll ask you to verify it.' : 'We ask you to re-verify every 6 months so bands stay current. If yours goes up, re-verify any time.'],
   ] },
   { id: 'billing', h: 'Plans & billing', items: [
     ['What do plans cost?', <>Preview is $9.99 once. {PLANS.membership.name} is {PLANS.membership.monthly}, {PLANS.premium.name} is {PLANS.premium.monthly}. Prices are always shown before you buy.</>],
@@ -41,7 +43,8 @@ const SECTIONS: { id: string; h: string; items: QA[] }[] = [
   ] },
 ];
 
-export default function Help() {
+export default async function Help() {
+  const SECTIONS = sections(await getCreditMode());
   return (
     <DocLayout eyebrow="Support" title="Help center" toc={[...SECTIONS.map((s) => ({ id: s.id, h: s.h })), { id: 'contact', h: 'Still need help?' }]}
       summary="Quick answers about bands, billing, matching and safety. Can’t find yours? We’re here.">

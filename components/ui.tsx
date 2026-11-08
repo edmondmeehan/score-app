@@ -25,14 +25,15 @@ export function Logo({ size = 18 }: { size?: number }) {
   );
 }
 
-export function BandPill({ band, trend }: { band: Band | null; trend?: string | null }) {
+/** verified=false adds "self-reported" (credit mode 'self'); leave it undefined where the source is unknown. */
+export function BandPill({ band, trend, verified }: { band: Band | null; trend?: string | null; verified?: boolean }) {
   if (!band) return <span className="chip small muted">Unverified</span>;
   const b = BANDS[band];
   const p = arcPoint(b.fill);
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '.06em', padding: '3px 9px 3px 7px', borderRadius: 999, border: `1px solid ${b.color}`, color: b.color }}>
       <svg width="12" height="12" viewBox="0 0 100 100" aria-hidden="true"><path d={`M24.5 75.5 A36 36 0 ${p.large} 1 ${p.x.toFixed(1)} ${p.y.toFixed(1)}`} fill="none" stroke="currentColor" strokeWidth={16} strokeLinecap="round" /></svg>
-      {b.label}{trend === 'up' && <span style={{ color: 'var(--rise)' }}> ↑</span>}
+      {b.label}{trend === 'up' && <span style={{ color: 'var(--rise)' }}> ↑</span>}{verified === false && <span style={{ opacity: 0.7, letterSpacing: '.02em' }} title="The member chose this band from their own credit score. Not verified by ScoreDate."> · self-reported</span>}
     </span>
   );
 }

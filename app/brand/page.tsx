@@ -4,6 +4,7 @@ import DocLayout from '@/components/DocLayout';
 import { Gauge, Logo, BandPill } from '@/components/ui';
 import { BANDS, type Band } from '@/lib/types';
 import { supabaseServer } from '@/lib/supabase/server';
+import { getCreditMode } from '@/lib/creditMode';
 
 export const dynamic = 'force-dynamic';
 
@@ -76,6 +77,7 @@ function DoDont({ dos, donts }: { dos: string[]; donts: string[] }) {
 }
 
 export default async function Brand() {
+  const creditMode = await getCreditMode();
   let staff = false;
   try {
     const sb = await supabaseServer();
@@ -205,6 +207,7 @@ export default async function Brand() {
       <section id="claims">
         <h2>Claims & compliance</h2>
         <p>ScoreDate touches credit, so a few rules are non-negotiable in every ad, post, email and partner placement.</p>
+        {creditMode === 'self' && <div className="notice" style={{ margin: '4px 0 12px' }}><strong>Bands are self-reported right now.</strong> Until band verification is live, don’t say “verified credit band”, “soft check” or “soft pull”. Say “share your band” or “self-reported band”. “Verified” is fine for ID and selfie only. Older assets that say “verified credit band” shouldn’t run until verification is on.</div>}
         <DoDont
           dos={['“Checking your band is a soft inquiry and won’t affect your credit score.”', '“Members see a band and a trend, never the number.”', '“ScoreDate never sees or stores your exact score or credit report.”', 'Show real prices with “auto-renews, cancel anytime” where a price appears']}
           donts={['Describe ScoreDate as a credit bureau, lender, credit repair or financial advice service', 'Promise better credit, matches, relationships or outcomes', 'Use fake reviews, invented testimonials or made-up member counts', 'Imply we share credit data with other members or partners', 'Target anyone under 25 or use imagery that looks under 25']}

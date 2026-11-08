@@ -7,6 +7,7 @@ import type { Profile } from '@/lib/types';
 import { checkIn, useExtraDrop, useSpotlight } from './features';
 import PushPrompt from '@/components/PushPrompt';
 import FounderBadge from '@/components/FounderBadge';
+import { getCreditMode } from '@/lib/creditMode';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,6 +39,7 @@ export default async function Drop({ searchParams }: { searchParams: Promise<{ o
   const byId = Object.fromEntries((people || []).map((p: Profile) => [p.id, p]));
   const photos = await photoUrls(supabase, ids);
   const preview = me.plan === 'preview';
+  const creditMode = await getCreditMode();
   const daysLeft = me.preview_ends_at ? Math.max(0, Math.ceil((new Date(me.preview_ends_at).getTime() - Date.now()) / 86400000)) : null;
   return (
     <div className="phone">
@@ -57,6 +59,11 @@ export default async function Drop({ searchParams }: { searchParams: Promise<{ o
           </Link>
         </span>
       </div>
+      {creditMode === 'verified' && me.band && !me.credit_verified_at && (
+        <Link href="/onboarding/credit" className="card row" style={{ textDecoration: 'none', color: 'inherit', justifyContent: 'space-between', borderColor: 'var(--gold-edge)' }}>
+          <span className="stack" style={{ gap: 2 }}><strong>Verify your band</strong><span className="small muted">Your band is self-reported. A one-minute soft check makes it verified.</span></span><span aria-hidden>›</span>
+        </Link>
+      )}
       <h1 className="serif" style={{ fontSize: 40 }}>{preview ? 'Your 5 matches' : 'Your Daily Drop'}</h1>
       <span className="muted small">{preview ? 'Look all you want. Members can say hello, or send a Note.' : 'Ranked by money values and preferences'}</span>
       {sp.ok && <div className="notice">{sp.ok}</div>}
@@ -101,9 +108,9 @@ export default async function Drop({ searchParams }: { searchParams: Promise<{ o
             <Link key={d.match_id} href={`/app/u/${p.id}`} className="card row" style={{ textDecoration: 'none', color: 'var(--ivory)', padding: 12 }}>
               <div className="photo" style={{ width: 76, flex: 'none' }}>{photos[p.id]?.[0] ? <img src={photos[p.id][0]} alt="" /> : <span className="serif">{p.first_name?.[0]}</span>}</div>
               <div className="stack grow" style={{ gap: 6, minWidth: 0 }}>
-                <span><strong style={{ fontSize: 17 }}>{p.first_name}</strong> <span className="muted">{age(p.birth_year)}</span>{p.spotlight_until && new Date(p.spotlight_until).getTime() > now && <span className="chip" style={{ marginLeft: 8, fontSize: 11, padding: '2px 8px', color: 'var(--gold-light)' }}>Featured</span>}{p.is_founder && <span style={{ marginLeft: 8 }}><FounderBadge /></span>}{isVerified(p) && <span style={{ marginLeft: 6 }}><VerifiedBadge /></span>}</span>
+                <span><strong style={{ fontSize: 17 }}>{p.first_name}</strong> <span className="muted">{age(p.birth_year)}</span>{p.spotlight_until && new Date(p.spotlight_until).getTime() > now && <span className="chip" style={{ marginLeft: 8, fontSize: 11, padding: '2px 8px', color: 'var(--gold-light)' }}>Featured</span>}{p.is_founder && <span style={{ marginLeft: 8 }}><FounderBadge /></span>}{isVerified(p) && <span style={{ marginLeft: 6 }}><VerifiedBadge credit={Boolean(p.credit_verified_at)} /></span>}</span>
                 <span className="small muted" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{[p.job, p.neighborhood].filter(Boolean).join(' · ')}</span>
-                <BandPill band={p.band} trend={p.trend} />
+                <BandPill band={p.band} trend={p.trend} verified={Boolean(p.credit_verified_at)} />
               </div>
               <div className="stack" style={{ alignItems: 'flex-end', gap: 0 }}><span className="serif" style={{ fontSize: 30, color: 'var(--gold-light)' }}>{d.compat}%</span><span className="small muted">match</span></div>
             </Link>

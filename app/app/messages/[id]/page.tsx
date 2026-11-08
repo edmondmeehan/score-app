@@ -38,7 +38,7 @@ export default async function Conversation({ params, searchParams }: { params: P
       <ScreenshotContext context="chat" target={otherId} />
       <div className="row appbar">
         <Link href="/app/messages" aria-label="Back" className="btn ghost sm" style={{ width: 44, padding: 0 }}>‹</Link>
-        <Link href={`/app/u/${otherId}`} className="stack grow" style={{ gap: 4, textDecoration: 'none', color: 'inherit' }}><strong>{o?.first_name || 'Member'}</strong>{o && <BandPill band={o.band} trend={o.trend} />}</Link>
+        <Link href={`/app/u/${otherId}`} className="stack grow" style={{ gap: 4, textDecoration: 'none', color: 'inherit' }}><strong>{o?.first_name || 'Member'}</strong>{o && <BandPill band={o.band} trend={o.trend} verified={Boolean(o.credit_verified_at)} />}</Link>
         <details className="chat-menu">
           <summary className="small muted" aria-label="More">More</summary>
           <div className="chat-menu-list">
