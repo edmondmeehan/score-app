@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireMember } from '@/lib/session';
 import { Gauge, age } from '@/components/ui';
-import { BANDS, type Profile } from '@/lib/types';
+import { BANDS, type MemberCard } from '@/lib/types';
 import { photoUrls } from '@/lib/photos';
 import { sayHello } from '../../actions';
 
@@ -10,12 +10,12 @@ export default async function Member({ params, searchParams }: { params: Promise
   const { id } = await params;
   const sp = await searchParams;
   const { supabase, me } = await requireMember();
-  const { data } = await supabase.from('profiles').select('*').eq('id', id).maybeSingle();
-  const p = data as Profile | null;
+  const { data } = await supabase.from('member_cards').select('*').eq('id', id).maybeSingle();
+  const p = data as MemberCard | null;
   if (!p) notFound();
   const photos = (await photoUrls(supabase, [p.id]))[p.id] || [];
   const { data: social } = await supabase.from('profile_socials').select('instagram').eq('user_id', p.id).maybeSingle();
-  const { data: inviter } = p.invited_by ? await supabase.from('profiles').select('first_name').eq('id', p.invited_by).maybeSingle() : { data: null };
+  const { data: inviter } = p.invited_by ? await supabase.from('member_cards').select('first_name').eq('id', p.invited_by).maybeSingle() : { data: null };
   const b = p.band ? BANDS[p.band] : null;
   return (
     <div className="phone" style={{ paddingTop: 0 }}>

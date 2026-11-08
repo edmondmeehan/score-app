@@ -19,6 +19,13 @@ export async function GET(request: NextRequest) {
     }
     store.delete('score_invite');
   }
-  const dest = next.startsWith('/') && !next.startsWith('//') ? next : '/onboarding';
-  return NextResponse.redirect(new URL(dest, url.origin));
+  // Only ever send people to a page on this site (blocks "//evil.com" and "/\\evil.com").
+  let dest = new URL('/onboarding', url.origin);
+  if (next.startsWith('/')) {
+    try {
+      const target = new URL(next, url.origin);
+      if (target.origin === url.origin) dest = target;
+    } catch {}
+  }
+  return NextResponse.redirect(dest);
 }

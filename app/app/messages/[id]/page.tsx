@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireMember } from '@/lib/session';
 import { BandPill } from '@/components/ui';
-import type { Profile } from '@/lib/types';
+import type { MemberCard } from '@/lib/types';
 import Chat from './Chat';
 
 export const dynamic = 'force-dynamic';
@@ -14,10 +14,10 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
   if (!conv) notFound();
   const otherId = conv.user_a === me.id ? conv.user_b : conv.user_a;
   const [{ data: other }, { data: messages }] = await Promise.all([
-    supabase.from('profiles').select('*').eq('id', otherId).maybeSingle(),
+    supabase.from('member_cards').select('*').eq('id', otherId).maybeSingle(),
     supabase.from('messages').select('*').eq('conversation_id', id).order('created_at').limit(200),
   ]);
-  const o = other as Profile | null;
+  const o = other as MemberCard | null;
   const shared = (o?.money_values || []).filter((v) => me.money_values?.includes(v));
   return (
     <div className="phone" style={{ paddingBottom: 160 }}>

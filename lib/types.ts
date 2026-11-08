@@ -31,6 +31,11 @@ export type Profile = {
   created_at: string;
 };
 
+/** What one member can see about another (the member_cards view). */
+export type MemberCard = Pick<Profile,
+  'id' | 'first_name' | 'birth_year' | 'gender' | 'job' | 'neighborhood' | 'city' | 'prompt_q' | 'prompt_a' | 'money_values'
+  | 'band' | 'trend' | 'credit_verified_at' | 'invited_by' | 'song_id' | 'song_title' | 'song_artist' | 'song_image'>;
+
 export const BANDS: Record<Band, { label: string; range: string; color: string; fill: number }> = {
   elite: { label: 'Elite', range: '800+', color: '#E8E8EC', fill: 0.95 },
   strong: { label: 'Strong', range: '740–799', color: '#D4B46A', fill: 0.8 },

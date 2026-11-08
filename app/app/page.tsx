@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { requireMember } from '@/lib/session';
 import { BandPill, age } from '@/components/ui';
 import { photoUrls } from '@/lib/photos';
-import type { Profile } from '@/lib/types';
+import type { MemberCard } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,8 +19,8 @@ export default async function Drop() {
   }
   const { data: drop } = await supabase.rpc('get_drop');
   const ids = (drop || []).map((d: { match_id: string }) => d.match_id);
-  const { data: people } = ids.length ? await supabase.from('profiles').select('*').in('id', ids) : { data: [] };
-  const byId = Object.fromEntries((people || []).map((p: Profile) => [p.id, p]));
+  const { data: people } = ids.length ? await supabase.from('member_cards').select('*').in('id', ids) : { data: [] };
+  const byId = Object.fromEntries((people || []).map((p: MemberCard) => [p.id, p]));
   const photos = await photoUrls(supabase, ids);
   const preview = me.plan === 'preview';
   const daysLeft = me.preview_ends_at ? Math.max(0, Math.ceil((new Date(me.preview_ends_at).getTime() - Date.now()) / 86400000)) : null;

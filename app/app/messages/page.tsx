@@ -10,7 +10,7 @@ export default async function Messages({ searchParams }: { searchParams: Promise
   const { data: convs } = await supabase.from('conversations').select('id, user_a, user_b, created_at').or(`user_a.eq.${me.id},user_b.eq.${me.id}`);
   const others = (convs || []).map((c) => (c.user_a === me.id ? c.user_b : c.user_a));
   const [{ data: people }, { data: msgs }, photos] = await Promise.all([
-    others.length ? supabase.from('profiles').select('id, first_name').in('id', others) : Promise.resolve({ data: [] as { id: string; first_name: string }[] }),
+    others.length ? supabase.from('member_cards').select('id, first_name').in('id', others) : Promise.resolve({ data: [] as { id: string; first_name: string }[] }),
     (convs || []).length ? supabase.from('messages').select('conversation_id, body, sender_id, created_at').in('conversation_id', convs!.map((c) => c.id)).order('created_at', { ascending: false }) : Promise.resolve({ data: [] as { conversation_id: string; body: string; sender_id: string; created_at: string }[] }),
     photoUrls(supabase, others),
   ]);

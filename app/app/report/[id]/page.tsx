@@ -7,7 +7,7 @@ const REASONS = ['Asked me for money', 'Harassment or threats', 'Fake photos or 
 export default async function Report({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { supabase } = await requireMember();
-  const { data: p } = await supabase.from('profiles').select('first_name').eq('id', id).maybeSingle();
+  const { data: p } = await supabase.from('member_cards').select('first_name').eq('id', id).maybeSingle();
   return (
     <form action={submitReport} className="phone">
       <input type="hidden" name="id" value={id} />

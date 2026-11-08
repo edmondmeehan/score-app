@@ -29,7 +29,7 @@ Privacy rules built into the database:
 
 ## Setup
 
-1. Apply `supabase/migrations/0001_init.sql` and `0002_integrations_billing.sql` to a new Supabase project.
+1. Apply every file in `supabase/migrations/` to a new Supabase project, in number order (`0001` through `0007`).
 2. Set the server secret in the database and in Vercel:
 
    ```sql
