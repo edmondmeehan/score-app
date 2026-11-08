@@ -14,11 +14,11 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
 
 const SITE = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.scoredate.app').replace(/\/$/, '');
 const LINKS: [string, string][] = [
-  ['Meta ads', `${SITE}/?utm_source=meta&utm_medium=paid_social&utm_campaign={{campaign.name}}&utm_content={{ad.name}}#invite`],
-  ['Google Search', `${SITE}/?utm_source=google&utm_medium=cpc&utm_campaign={campaignid}&utm_term={keyword}#invite`],
-  ['YouTube / AdMob', `${SITE}/?utm_source=youtube&utm_medium=paid_video&utm_campaign=CAMPAIGN#invite`],
-  ['ChatGPT ads', `${SITE}/?utm_source=chatgpt&utm_medium=paid_ai&utm_campaign=CAMPAIGN#invite`],
-  ['A creator', `${SITE}/?utm_source=creator&utm_medium=influencer&utm_campaign=CREATOR-HANDLE#invite`],
+  ['Meta ads', `${SITE}/meet?utm_source=meta&utm_medium=paid_social&utm_campaign={{campaign.name}}&utm_content={{ad.name}}#invite`],
+  ['Google Search', `${SITE}/meet?utm_source=google&utm_medium=cpc&utm_campaign={campaignid}&utm_term={keyword}#invite`],
+  ['YouTube / AdMob', `${SITE}/meet?utm_source=youtube&utm_medium=paid_video&utm_campaign=CAMPAIGN#invite`],
+  ['ChatGPT ads', `${SITE}/meet?utm_source=chatgpt&utm_medium=paid_ai&utm_campaign=CAMPAIGN#invite`],
+  ['A creator', `${SITE}/meet?utm_source=creator&utm_medium=influencer&utm_campaign=CREATOR-HANDLE#invite`],
 ];
 
 export default async function Campaigns({ searchParams }: { searchParams: Promise<{ from?: string; to?: string; ok?: string; error?: string }> }) {
