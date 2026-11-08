@@ -31,6 +31,8 @@ export async function saveEvent(form: FormData) {
   };
   const { data, error } = await supabase.rpc('staff_save_event', { p: payload });
   if (error) redirect(`${back}?error=` + encodeURIComponent(error.message));
+  const num = (k: string) => { const v = Number(form.get(k)); return form.get(k) && Number.isFinite(v) ? v : null; };
+  await supabase.rpc('staff_set_event_place', { p_id: data, p_place_id: String(form.get('place_id') || ''), p_lat: num('lat'), p_lng: num('lng') });
   revalidatePath('/admin/events');
   redirect(`/admin/events/${data}?saved=1`);
 }

@@ -2,6 +2,7 @@ export type EventRow = {
   id: string; title: string; description: string | null; venue: string; address: string | null; area: string;
   starts_at: string; ends_at: string | null; capacity: number; price_note: string | null; black_priority_hours: number; founders_only?: boolean;
   status: 'draft' | 'published' | 'cancelled'; published_at: string | null;
+  place_id?: string | null; lat?: number | null; lng?: number | null;
 };
 
 export const when = (iso: string) =>

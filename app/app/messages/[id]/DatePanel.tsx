@@ -1,8 +1,9 @@
 'use client';
 import { useState } from 'react';
 import { proposeDate, respondDate, revokeShare, shareDate } from '../../features';
+import PlaceFields, { PlaceMap } from '@/components/PlaceFields';
 
-export type Plan = { id: string; proposer_id: string; place: string; address: string | null; starts_at: string; note: string | null; status: 'proposed' | 'accepted' | 'declined' | 'cancelled' };
+export type Plan = { id: string; proposer_id: string; place: string; address: string | null; starts_at: string; note: string | null; status: 'proposed' | 'accepted' | 'declined' | 'cancelled'; place_id?: string | null; lat?: number | null; lng?: number | null };
 
 const fmt = (iso: string) => new Date(iso).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 
@@ -34,7 +35,7 @@ export default function DatePanel({ conversationId, meId, otherName, plan, share
         <span className="label">{plan.status === 'accepted' ? 'Date confirmed' : mine ? `Waiting on ${otherName}` : `${otherName} suggested a date`}</span>
         <span className="serif" style={{ fontSize: 24 }}>{plan.place}</span>
         <span className="small">{fmt(plan.starts_at)}{plan.address ? ` · ${plan.address}` : ''}</span>
-        {plan.address && <a className="small" href={`https://maps.apple.com/?q=${encodeURIComponent(`${plan.place} ${plan.address}`)}`} target="_blank" rel="noopener noreferrer">Open in Maps ↗</a>}
+        {(plan.address || plan.place_id) && <PlaceMap placeId={plan.place_id} lat={plan.lat} lng={plan.lng} label={plan.place} address={plan.address} height={plan.status === 'accepted' ? 180 : 140} />}
         {plan.note && <span className="small muted">“{plan.note}”</span>}
 
         {plan.status === 'proposed' && !mine && (
@@ -77,8 +78,7 @@ export default function DatePanel({ conversationId, meId, otherName, plan, share
     <form action={proposeDate} className="card stack" style={{ gap: 10 }}>
       <Hidden v={{ conversation_id: conversationId, tz_offset: tz }} />
       <span className="label">Suggest a date</span>
-      <label className="field">Where<input className="input" name="place" required maxLength={120} placeholder="Bar Pisellino" /></label>
-      <label className="field">Address (optional)<input className="input" name="address" maxLength={200} placeholder="52 Grove St" /></label>
+      <PlaceFields compact nameField="place" nameLabel="Where" namePlaceholder="Bar Pisellino" addressLabel="Address (optional)" addressPlaceholder="52 Grove St" />
       <label className="field">When<input className="input" type="datetime-local" name="starts_at" required min={minLocal} /></label>
       <label className="field">Note (optional)<input className="input" name="note" maxLength={300} placeholder="Drinks after work?" /></label>
       <span className="small muted">Pick somewhere public for a first date.</span>

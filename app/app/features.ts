@@ -102,11 +102,15 @@ export async function proposeDate(form: FormData) {
   const local = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(when) ? when : '';
   if (!local) back(`/app/messages/${conv}`, 'error', 'Pick a day and time.');
   const utc = new Date(Date.parse(local + ':00Z') + tz * 60000).toISOString();
-  const { error } = await supabase.rpc('propose_date', {
+  const { data: dateId, error } = await supabase.rpc('propose_date', {
     p_conversation: conv, p_place: String(form.get('place') || ''), p_address: String(form.get('address') || ''),
     p_starts_at: utc, p_note: String(form.get('note') || ''),
   });
   if (error) back(`/app/messages/${conv}`, 'error', error.message);
+  if (dateId && form.get('place_id')) {
+    const n = (k: string) => { const v = Number(form.get(k)); return form.get(k) && Number.isFinite(v) ? v : null; };
+    await supabase.rpc('set_date_place', { p_date: dateId, p_place_id: String(form.get('place_id')), p_lat: n('lat'), p_lng: n('lng') });
+  }
   after(() => flushNotifications(user.id));
   redirect(`/app/messages/${conv}`);
 }

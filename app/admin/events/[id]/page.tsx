@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import PlaceFields from '@/components/PlaceFields';
 import { notFound } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabase/server';
 import { BANDS } from '@/lib/types';
@@ -41,10 +42,8 @@ export default async function EditEvent({ params, searchParams }: { params: Prom
           <input type="hidden" name="id" value={e?.id || ''} />
           <label className="field">Title<input className="input" name="title" required maxLength={100} defaultValue={e?.title} placeholder="Rooftop supper club" /></label>
           <label className="field">Description<textarea className="input" name="description" rows={5} maxLength={2000} defaultValue={e?.description || ''} placeholder="What to expect, dress code, who's hosting." /></label>
-          <div className="row" style={{ gap: 10, flexWrap: 'wrap' }}>
-            <label className="field grow">Venue<input className="input" name="venue" required maxLength={120} defaultValue={e?.venue} /></label>
-            <label className="field grow">Address (members see it after RSVP)<input className="input" name="address" maxLength={200} defaultValue={e?.address || ''} /></label>
-          </div>
+          <PlaceFields nameField="venue" nameLabel="Venue" namePlaceholder="Start typing to search places" addressLabel="Address (members see it after RSVP)"
+            defaults={{ name: e?.venue, address: e?.address, place_id: e?.place_id, lat: e?.lat, lng: e?.lng }} />
           <div className="row" style={{ gap: 10, flexWrap: 'wrap' }}>
             <label className="field grow">Starts (New York time)<input className="input" type="datetime-local" name="starts_at" required defaultValue={nyLocal(e?.starts_at || null)} /></label>
             <label className="field grow">Ends (optional)<input className="input" type="datetime-local" name="ends_at" defaultValue={nyLocal(e?.ends_at || null)} /></label>

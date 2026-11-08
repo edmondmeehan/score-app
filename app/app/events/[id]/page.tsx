@@ -2,6 +2,7 @@ import Link from 'next/link';
 import FounderBadge from '@/components/FounderBadge';
 import { notFound } from 'next/navigation';
 import { requireMember } from '@/lib/session';
+import { PlaceMap } from '@/components/PlaceFields';
 import { getReserveVisible } from '@/lib/reserve';
 import { rsvp } from '../../features';
 import { when, type EventRow } from '@/lib/events';
@@ -40,7 +41,7 @@ export default async function EventPage({ params, searchParams }: { params: Prom
       <div className="card stack" style={{ gap: 6 }}>
         <strong>{e.venue}</strong>
         {e.address && (status === 'going'
-          ? <a className="small" href={`https://maps.apple.com/?q=${encodeURIComponent(`${e.venue} ${e.address}`)}`} target="_blank" rel="noopener noreferrer">{e.address} ↗</a>
+          ? <><span className="small">{e.address}</span><PlaceMap placeId={e.place_id} lat={e.lat} lng={e.lng} label={e.venue} address={e.address} /></>
           : <span className="small muted">Exact address shared once you&apos;re going.</span>)}
         <span className="small muted">{e.area}{e.price_note ? ` · ${e.price_note}` : ''}</span>
         <span className="small muted">{left > 0 ? `${left} of ${e.capacity} spots left` : `Full · ${counts?.waitlist ?? 0} on the waitlist`}</span>
