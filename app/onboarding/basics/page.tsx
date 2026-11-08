@@ -3,6 +3,7 @@ import { getMe } from '@/lib/session';
 import { Steps } from '@/components/ui';
 import { saveBasics } from '../actions';
 import ZipFields from './ZipFields';
+import PrivacyPromise from '@/components/PrivacyPromise';
 
 export default async function Basics({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { me } = await getMe();
@@ -24,6 +25,7 @@ export default async function Basics({ searchParams }: { searchParams: Promise<{
       </fieldset>
       <label className="field">What you do<input className="input" name="job" defaultValue={me.job || ''} /></label>
       <ZipFields zip={me.zip || ''} neighborhood={me.neighborhood || ''} />
+      <PrivacyPromise kind="signup" />
       <button className="btn block">Continue</button>
     </form>
   );

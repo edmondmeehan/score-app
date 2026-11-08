@@ -378,3 +378,12 @@ table.data td { padding: 12px 8px; border-top: 1px solid var(--line-soft); }
   .vsighting { grid-template-columns: 1fr 1fr; }
   .vhero h1 { font-size: 36px; }
 }
+
+/* Privacy promise card (signup steps) */
+.privacy-promise { display: flex; flex-direction: column; gap: 10px; padding: 16px 18px; border-radius: 18px; border: 1px solid var(--gold-edge); background: linear-gradient(160deg, var(--gold-wash), var(--graphite) 75%); }
+.privacy-promise ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.privacy-promise li { position: relative; padding-left: 20px; font-size: 13.5px; line-height: 1.5; color: var(--muted); }
+.privacy-promise li::before { content: ''; position: absolute; left: 4px; top: 8px; width: 6px; height: 6px; border-radius: 6px; background: var(--gold); }
+.pp-icon { width: 36px; height: 36px; flex: none; border-radius: 12px; display: grid; place-items: center; color: var(--gold-light); background: rgba(201,169,97,.12); border: 1px solid var(--gold-edge); }
+.pp-link { font-size: 13.5px; font-weight: 600; color: var(--gold-light); text-decoration: none; align-self: flex-start; }
+.pp-link:hover { color: var(--gold); text-decoration: underline; }
