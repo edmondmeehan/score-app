@@ -115,7 +115,7 @@ export default function PlaceFields({
 
   return (
     <div className={compact ? 'stack' : 'row'} style={{ gap: 10, flexWrap: 'wrap', alignItems: 'flex-start' }}>
-      <div ref={boxRef} className="field grow" style={{ position: 'relative', flex: '1 1 220px' }}>
+      <div ref={boxRef} className="field grow" style={{ position: 'relative', flex: compact ? 'none' : '1 1 220px' }}>
         <label className="field" style={{ margin: 0 }}>
           {nameLabel}
           <input className="input" name={nameField} value={name} required={required} maxLength={nameMax} placeholder={namePlaceholder}
@@ -135,7 +135,7 @@ export default function PlaceFields({
           </div>
         )}
       </div>
-      <label className="field grow" style={{ flex: '1 1 220px' }}>{addressLabel}
+      <label className="field grow" style={{ flex: compact ? 'none' : '1 1 220px' }}>{addressLabel}
         <input className="input" name={addressField} value={address} maxLength={addressMax} placeholder={addressPlaceholder}
           onChange={(e) => { setAddress(e.target.value); setPlaceId(''); setLat(''); setLng(''); }} />
       </label>

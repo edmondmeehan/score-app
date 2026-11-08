@@ -31,12 +31,16 @@ export default function DatePanel({ conversationId, meId, otherName, plan, share
   const tz = String(new Date().getTimezoneOffset());
   const minLocal = new Date(Date.now() + 60 * 60000 - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
 
+  const [showLink, setShowLink] = useState(false);
   async function shareLink() {
     if (!shareUrl) return;
     const text = `I'm on a date. Here are the details, just in case: ${shareUrl}`;
-    if (navigator.share) { try { await navigator.share({ title: 'My date plan', text, url: shareUrl }); return; } catch { /* fall through */ } }
-    await navigator.clipboard.writeText(shareUrl);
-    setCopied(true);
+    if (navigator.share) {
+      try { await navigator.share({ title: 'My date plan', text, url: shareUrl }); return; }
+      catch (e) { if ((e as Error)?.name === 'AbortError') return; /* closed the share sheet */ }
+    }
+    try { await navigator.clipboard.writeText(shareUrl); setCopied(true); }
+    catch { setShowLink(true); } // clipboard blocked (some in-app browsers): show the link to copy by hand
   }
 
   if (plan) {
@@ -117,6 +121,7 @@ export default function DatePanel({ conversationId, meId, otherName, plan, share
                   <button type="button" className="btn sm grow" onClick={shareLink}>{copied ? 'Link copied' : 'Send to a friend'}</button>
                   <form action={revokeShare}><Hidden v={ids} /><button className="btn ghost sm">Turn off link</button></form>
                 </div>
+                {(showLink || copied) && <input className="input mono small" readOnly value={shareUrl} onFocus={(e) => e.currentTarget.select()} aria-label="Your date plan link" />}
               </>
             ) : (
               <form action={shareDate} className="row" style={{ gap: 8 }}>
