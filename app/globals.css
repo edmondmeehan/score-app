@@ -148,7 +148,7 @@ table.data td { padding: 12px 8px; border-top: 1px solid var(--line-soft); }
 .app-footer a:hover { color: var(--ivory); }
 
 /* Splash footer: brand + 4 link columns on desktop, brand on top and links two-up on phones */
-.site-footer { display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 36px; }
+.site-footer { display: grid; grid-template-columns: 1.4fr repeat(var(--cols, 4), 1fr); gap: 36px; }
 @media (max-width: 860px) {
   .site-footer { grid-template-columns: 1fr 1fr; gap: 32px 20px; }
   .site-footer-brand { grid-column: 1 / -1; }

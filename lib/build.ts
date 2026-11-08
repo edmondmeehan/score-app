@@ -1,0 +1,1 @@
+export const BUILD_LABEL = `Score ${process.env.NEXT_PUBLIC_APP_VERSION || ''} · Build ${process.env.NEXT_PUBLIC_BUILD_NUMBER || 'dev'}${process.env.NEXT_PUBLIC_DEPLOY_ID ? ` (${process.env.NEXT_PUBLIC_DEPLOY_ID})` : ''}`;
