@@ -10,12 +10,16 @@ const unsubHeaders = (url?: string) => (url ? { 'List-Unsubscribe': `<${url.repl
  * Send a ScoreDate email through Resend. Never throws: a failed email must not break sign-up,
  * billing or verification. Every attempt is written to email_log for the admin.
  */
+/** Test accounts (…@seed.scoredate.test and any .test address) never get real email, so nothing bounces. */
+const isTestAddress = (to: string) => /\.test$/i.test(to.trim());
+
 export async function sendEmail<K extends TemplateName>(
   to: string | null | undefined,
   name: K,
   data: Parameters<typeof build<K>>[1],
 ): Promise<{ ok: boolean; id?: string; error?: string }> {
   if (!to) return { ok: false, error: 'no recipient' };
+  if (isTestAddress(to)) return { ok: true, id: 'skipped-test-address' };
   const { subject, html, text } = build(name, data);
   let result: { ok: boolean; id?: string; error?: string };
   try {
@@ -77,7 +81,8 @@ export async function testResend(): Promise<string> {
  * Send one template to many people through Resend's batch endpoint (100 per call).
  * Returns how many were accepted. Each recipient is logged.
  */
-export async function sendBatch<K extends TemplateName>(name: K, items: { to: string; data: Parameters<typeof build<K>>[1]; unsubUrl?: string }[]) {
+export async function sendBatch<K extends TemplateName>(name: K, allItems: { to: string; data: Parameters<typeof build<K>>[1]; unsubUrl?: string }[]) {
+  const items = allItems.filter((it) => !isTestAddress(it.to));
   const email = await getIntegration('email');
   const key = email.secrets.resend_api_key || process.env.RESEND_API_KEY;
   const from = email.config.from || process.env.EMAIL_FROM;
