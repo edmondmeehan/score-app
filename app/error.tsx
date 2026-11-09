@@ -8,7 +8,9 @@ export default function ErrorPage({ error, reset }: { error: Error & { digest?: 
     console.error(error);
     if (!stale) return;
     try {
-      if (sessionStorage.getItem('sd-reloaded') !== '1') { sessionStorage.setItem('sd-reloaded', '1'); window.location.reload(); }
+      // Reload at most once a minute, so a second update later in the same visit is also picked up.
+      const last = Number(sessionStorage.getItem('sd-reloaded') || 0);
+      if (Date.now() - last > 60000) { sessionStorage.setItem('sd-reloaded', String(Date.now())); window.location.reload(); }
     } catch { /* storage blocked */ }
   }, [error, stale]);
   return (

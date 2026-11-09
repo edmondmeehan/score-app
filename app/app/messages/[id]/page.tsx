@@ -54,7 +54,7 @@ export default async function Conversation({ params, searchParams }: { params: P
   const sameAnswers = (sharedQ as { q: string; a: string }[] | null) || [];
   const fromNote = conv.note_from && conv.note_from !== me.id;
   return (
-    <div className="phone" style={{ paddingBottom: 'calc(110px + env(safe-area-inset-bottom))' }}>
+    <div className="phone" style={{ paddingBottom: 'calc(240px + env(safe-area-inset-bottom))' }}>
       <ScreenshotContext context="chat" target={otherId} />
       <div className="row appbar">
         <Link href="/app/messages" aria-label="Back" className="btn ghost sm" style={{ width: 44, padding: 0 }}>‹</Link>
