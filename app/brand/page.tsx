@@ -31,7 +31,7 @@ const TOC = [
 const SWATCHES: { group: string; items: [string, string, string, boolean?][] }[] = [
   { group: 'Core', items: [['Onyx', '#0B0B0C', 'Primary background (dark)'], ['Graphite', '#131315', 'Cards and surfaces'], ['Ivory', '#F2F0EB', 'Primary text on dark', true], ['Stone', '#9A9890', 'Secondary text']] },
   { group: 'Gold', items: [['Gold', '#C9A961', 'Accent, buttons, the gauge'], ['Gold Light', '#E4CC8E', 'Highlights on dark', true], ['Gold Deep', '#A07F2E', 'Gold on light backgrounds'], ['Gold Wash', '#1A1712', 'Tinted panels on dark']] },
-  { group: 'Light theme', items: [['Mist', '#E4E4E1', 'Background (light)', true], ['Pearl', '#EFEFEC', 'Cards (light)', true], ['Ink', '#1A1916', 'Text on light'], ['Rise', '#7FC29B', 'Positive trend only', true]] },
+  { group: 'Light theme', items: [['Sand', '#E7E2DB', 'Background (light)', true], ['Linen', '#F1EDE7', 'Cards (light)', true], ['Ink', '#1A1916', 'Text on light'], ['Rise', '#7FC29B', 'Positive trend only', true]] },
 ];
 
 const ASSETS: [string, string, string, string][] = [
@@ -112,7 +112,7 @@ export default async function Brand() {
         <p>The ScoreDate logo is the <strong>gauge mark</strong> with the <strong>SCOREDATE wordmark</strong> set in JetBrains Mono with wide letter spacing. The gauge is a credit dial, three-quarters full, with a dot at the tip. Use the full logo wherever you can; use the gauge mark alone only where space is tight (avatars, favicons, small placements).</p>
         <div className="tool-grid" style={{ marginBottom: 14 }}>
           <div className="tool-card" style={{ alignItems: 'center', justifyContent: 'center', minHeight: 140, background: '#0B0B0C' }}><span style={{ color: '#F2F0EB' }}><Logo size={20} /></span></div>
-          <div className="tool-card" style={{ alignItems: 'center', justifyContent: 'center', minHeight: 140, background: '#E4E4E1' }}>
+          <div className="tool-card" style={{ alignItems: 'center', justifyContent: 'center', minHeight: 140, background: '#E7E2DB' }}>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, color: '#1A1916' }}><Gauge size={32} color="#A07F2E" track="#E6E0D2" /><span className="mono" style={{ fontSize: 20, letterSpacing: '.28em', fontWeight: 500 }}>SCOREDATE</span></span>
           </div>
         </div>
@@ -232,7 +232,7 @@ export default async function Brand() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 14 }}>
           {ASSETS.map(([file, label, spec, bg]) => (
             <a key={file} href={`/brand/${file}`} download className="tool-card" style={{ padding: 0, overflow: 'hidden', gap: 0, textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ height: 150, display: 'grid', placeItems: 'center', background: bg === 'light' ? '#E4E4E1' : '#0B0B0C', borderBottom: '1px solid var(--line-soft)' }}>
+              <div style={{ height: 150, display: 'grid', placeItems: 'center', background: bg === 'light' ? '#E7E2DB' : '#0B0B0C', borderBottom: '1px solid var(--line-soft)' }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={`/brand/thumbs/${file}`} alt={label} loading="lazy" style={{ maxWidth: '86%', maxHeight: 128, objectFit: 'contain' }} />
               </div>
@@ -259,7 +259,7 @@ export default async function Brand() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12 }}>
             {CAMPAIGN.map(([file, label, spec, bg]) => (
               <a key={file} href={`/brand/${file}`} download className="tool-card" style={{ padding: 0, overflow: 'hidden', gap: 0, textDecoration: 'none', color: 'inherit' }}>
-                <div style={{ height: 170, display: 'grid', placeItems: 'center', background: bg === 'light' ? '#E4E4E1' : '#0B0B0C', borderBottom: '1px solid var(--line-soft)' }}>
+                <div style={{ height: 170, display: 'grid', placeItems: 'center', background: bg === 'light' ? '#E7E2DB' : '#0B0B0C', borderBottom: '1px solid var(--line-soft)' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={`/brand/thumbs/${file}`} alt={label} loading="lazy" style={{ maxWidth: '86%', maxHeight: 150, objectFit: 'contain' }} />
                 </div>

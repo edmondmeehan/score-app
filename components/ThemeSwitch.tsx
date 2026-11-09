@@ -20,7 +20,7 @@ export default function ThemeSwitch() {
     document.documentElement.dataset.theme = t;
     document.cookie = `score_theme=${t}; path=/; max-age=31536000; samesite=lax`;
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', resolvedTheme() === 'light' ? '#E4E4E1' : '#0B0B0C');
+    if (meta) meta.setAttribute('content', resolvedTheme() === 'light' ? '#E7E2DB' : '#0B0B0C');
     window.dispatchEvent(new Event('score-theme'));
   };
   return (
