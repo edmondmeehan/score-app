@@ -1,3 +1,4 @@
+import AppFooter from '@/components/AppFooter';
 import Link from 'next/link';
 import { Gauge } from '@/components/ui';
 import { sendLink, sendReset, signInPassword, signUpPassword } from './actions';
@@ -83,6 +84,7 @@ export default async function SignIn({ searchParams }: { searchParams: Promise<S
           </p>
         </div>
       )}
+      <AppFooter />
     </div>
   );
 }

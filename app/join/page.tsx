@@ -2,6 +2,8 @@ import { Logo } from '@/components/ui';
 import { supabaseServer } from '@/lib/supabase/server';
 import { saveInvite } from './actions';
 import QuickWaitlist from './QuickWaitlist';
+import Link from 'next/link';
+import AppFooter from '@/components/AppFooter';
 import { getBasemap } from '@/lib/basemap';
 import HeatMap, { Legend, type Spot } from '@/components/HeatMap';
 
@@ -15,6 +17,14 @@ export default async function Join({ searchParams }: { searchParams: Promise<{ c
       <Logo />
       <span className="eyebrow">Invite only · New York</span>
       <h1 className="serif" style={{ fontSize: 44, lineHeight: 1.02 }}>Someone thinks you have your act together.</h1>
+      {user ? (
+        <Link href="/app" className="btn ghost block">Continue to ScoreDate{user.email ? ` as ${user.email}` : ''}</Link>
+      ) : (
+        <div className="row" style={{ gap: 10, alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderRadius: 16, border: '1px solid var(--line-soft)', background: 'var(--graphite)' }}>
+          <span className="small">Already a member?</span>
+          <Link href="/signin?next=/app" className="btn sm">Sign in</Link>
+        </div>
+      )}
       {sp.need && <div className="notice">ScoreDate is invite only. Enter the code a member sent you, or join the waitlist below.</div>}
       {sp.error && <div className="notice error">{sp.error}</div>}
       <form action={saveInvite} className="stack">
@@ -32,6 +42,7 @@ export default async function Join({ searchParams }: { searchParams: Promise<{ c
           <span className="small muted">New York City is open now. Other areas open as their waitlists grow. Shown by area only.</span>
         </section>
       )}
+      <AppFooter />
     </div>
   );
 }
