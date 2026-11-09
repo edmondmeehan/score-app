@@ -9,6 +9,7 @@ import { SITE_URL } from '@/lib/emails';
 import type { Profile } from '@/lib/types';
 import Chat from './Chat';
 import DatePanel, { type Pick, type Plan } from './DatePanel';
+import { openers } from '@/lib/engagement';
 
 export const dynamic = 'force-dynamic';
 
@@ -72,7 +73,7 @@ export default async function Conversation({ params, searchParams }: { params: P
         justShared={Boolean(sp.shared)}
         picks={(picksData as Pick[] | null) || []}
       />
-      <Chat conversationId={id} meId={me.id} otherName={o?.first_name || 'them'} initial={messages || []} canSend={canSend} initialReadAt={(readAt as string | null) || null} locked={conv.ended_at ? 'This conversation has ended' : 'Become a member to message'} />
+      <Chat conversationId={id} meId={me.id} otherName={o?.first_name || 'them'} initial={messages || []} canSend={canSend} initialReadAt={(readAt as string | null) || null} locked={conv.ended_at ? 'This conversation has ended' : 'Become a member to message'} openers={o ? openers(me, o) : []} open={!conv.ended_at} startedAt={conv.created_at} />
     </div>
   );
 }

@@ -71,6 +71,10 @@ export async function GET(request: NextRequest) {
         out.error_alert = await sendBatch('error_alert', a.to.map((to) => ({ to, data: { count, rows } })));
       }
 
+      // Daily Drop "ready" alert: runs in the first half hour after the 00:00 UTC flip (no-op otherwise).
+      const dropReady = await sb.rpc('queue_drop_ready', { p_secret: secret });
+      out.drop_ready = dropReady.data ?? dropReady.error?.message;
+
       const reverify = await claim('reverify');
       out.reverify = await sendBatch('reverify_reminder', reverify.map((r) => ({
         to: r.email!, data: { first_name: r.first_name, due: String(r.due || 'soon') }, unsubUrl: unsubUrl(r.user_id, 'reminders'),

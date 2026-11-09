@@ -2,7 +2,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { haptic } from '@/lib/haptics';
-import { otherReadAt, sendMessage, sendPhoto } from '../../actions';
+import { kindClose, otherReadAt, sendMessage, sendPhoto } from '../../actions';
+import { KIND_CLOSES, QUIET_HOURS } from '@/lib/engagement';
 
 type Msg = { id: string; sender_id: string; body: string; created_at: string; flag?: string | null; image_path?: string | null };
 
@@ -38,13 +39,18 @@ function Photo({ path, mine }: { path: string; mine: boolean }) {
   );
 }
 
-export default function Chat({ conversationId, meId, otherName, initial, canSend, initialReadAt, locked = 'Become a member to message' }: { conversationId: string; meId: string; otherName: string; initial: Msg[]; canSend: boolean; initialReadAt: string | null; locked?: string }) {
+export default function Chat({ conversationId, meId, otherName, initial, canSend, initialReadAt, locked = 'Become a member to message', openers = [], open = true, startedAt }: { conversationId: string; meId: string; otherName: string; initial: Msg[]; canSend: boolean; initialReadAt: string | null; locked?: string; openers?: string[]; open?: boolean; startedAt?: string }) {
   const [msgs, setMsgs] = useState<Msg[]>(initial);
   const [text, setText] = useState('');
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [readAt, setReadAt] = useState<string | null>(initialReadAt);
+  const [closing, setClosing] = useState(false);
+  const [closed, setClosed] = useState(false);
+  const [now, setNow] = useState<number | null>(null);
+  useEffect(() => { setNow(Date.now()); const t = setInterval(() => setNow(Date.now()), 60000); return () => clearInterval(t); }, []);
   const end = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -88,7 +94,21 @@ export default function Chat({ conversationId, meId, otherName, initial, canSend
     setBusy(false);
   }
 
+  async function close(choice: number) {
+    setBusy(true); setErr(null);
+    const r = await kindClose(conversationId, choice);
+    setBusy(false);
+    if (!r.ok) { setErr(r.error || 'Could not close the chat'); return; }
+    haptic('medium'); setClosed(true);
+    setTimeout(() => { window.location.href = '/app/messages?ok=' + encodeURIComponent('Sent, and the chat is closed. Kind move.'); }, 900);
+  }
+
   const lastMine = [...msgs].reverse().find((m) => m.sender_id === meId);
+  const last = msgs[msgs.length - 1];
+  const sentAny = Boolean(lastMine);
+  const yourTurn = open && canSend && last && last.sender_id !== meId;
+  const lastAt = new Date(last?.created_at || startedAt || Date.now()).getTime();
+  const quiet = open && !closed && now !== null && now - lastAt > QUIET_HOURS * 3600000;
   const seen = lastMine && readAt && new Date(readAt).getTime() >= new Date(lastMine.created_at).getTime();
 
   return (
@@ -108,14 +128,33 @@ export default function Chat({ conversationId, meId, otherName, initial, canSend
         })}
         <div ref={end} />
       </div>
+      {quiet && (
+        <div className="card stack kind-close" style={{ gap: 8, marginTop: 12 }}>
+          <span className="small"><strong>This chat’s been quiet for a couple of days.</strong> <span className="muted">Not feeling it? Send a kind goodbye and close it. {otherName} sees the message, nothing else.</span></span>
+          {!closing ? (
+            <button type="button" className="btn ghost sm" onClick={() => setClosing(true)} data-haptic="light">Close kindly</button>
+          ) : (
+            <div className="stack" style={{ gap: 6 }}>
+              {KIND_CLOSES.map((t, i) => <button key={i} type="button" className="choice-msg" disabled={busy} onClick={() => close(i + 1)}>{t}</button>)}
+              <button type="button" className="btn ghost sm" onClick={() => setClosing(false)}>Keep chatting</button>
+            </div>
+          )}
+        </div>
+      )}
       <form onSubmit={send} className="composer">
+        {yourTurn && !text && <div className="small" style={{ margin: '0 4px 6px', color: 'var(--gold-light)' }}>Your turn · {otherName} is waiting on you</div>}
+        {canSend && open && !sentAny && openers.length > 0 && !text && (
+          <div className="openers" aria-label="Opener ideas">
+            {openers.map((o) => <button key={o} type="button" data-haptic="light" onClick={() => { setText(o); setTimeout(() => inputRef.current?.focus(), 0); }}>{o}</button>)}
+          </div>
+        )}
         <div className="row" style={{ gap: 6 }}>
           <input ref={fileRef} type="file" accept="image/*" hidden onChange={pickPhoto} />
           <button type="button" className="btn ghost sm" style={{ minHeight: 44, width: 44, padding: 0 }} disabled={!canSend || busy} onClick={() => fileRef.current?.click()} aria-label="Send a photo">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden><rect x="3" y="5" width="18" height="14" rx="3" /><circle cx="12" cy="12" r="3.2" /></svg>
           </button>
           <label className="grow"><span style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden' }}>Message</span>
-            <input className="input" value={text} onChange={(e) => setText(e.target.value)} placeholder={canSend ? `Message ${otherName}` : locked} disabled={!canSend} maxLength={2000} />
+            <input ref={inputRef} className="input" value={text} onChange={(e) => setText(e.target.value)} placeholder={canSend ? `Message ${otherName}` : locked} disabled={!canSend} maxLength={2000} />
           </label>
           <button className="btn sm" style={{ minHeight: 44 }} disabled={!canSend || !text.trim()} aria-label="Send">Send</button>
         </div>

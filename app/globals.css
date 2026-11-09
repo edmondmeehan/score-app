@@ -447,3 +447,14 @@ html.native .event-hero { margin-top: calc(-12px - env(safe-area-inset-top)); }
 .scan-result.ok { border-color: var(--rise-line); background: rgba(127,194,155,.08); } .scan-result.ok .serif { color: var(--rise); }
 .scan-result.warn { border-color: var(--gold-edge); background: var(--gold-wash); } .scan-result.warn .serif { color: var(--gold-light); }
 .scan-result.bad { border-color: var(--danger-line); background: rgba(229,138,122,.08); } .scan-result.bad .serif { color: var(--alert); }
+
+/* Engagement batch 1 */
+.drop-countdown { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--gold-edge); background: var(--graphite); }
+.drop-countdown .mono { font-size: 18px; color: var(--gold-light); letter-spacing: .04em; }
+.drop-reason { font-size: 12px; color: var(--gold-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.your-turn { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--gold); color: var(--on-gold); flex: none; }
+.openers { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 8px; scrollbar-width: none; }
+.openers::-webkit-scrollbar { display: none; }
+.openers button { flex: none; max-width: 260px; text-align: left; font-size: 13px; line-height: 1.35; padding: 9px 12px; border-radius: 14px; border: 1px solid var(--gold-edge); background: var(--graphite); color: var(--ivory); cursor: pointer; white-space: normal; }
+.kind-close { border: 1px dashed var(--line-soft); }
+.kind-close button.choice-msg { display: block; width: 100%; text-align: left; font-size: 13px; line-height: 1.4; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line-soft); background: transparent; color: var(--ivory); cursor: pointer; }

@@ -49,6 +49,15 @@ export async function unmatchConversation(form: FormData) {
   redirect('/app/messages?ok=' + encodeURIComponent('Unmatched. You won’t see each other in Messages anymore.'));
 }
 
+export async function kindClose(conversationId: string, choice: number) {
+  const { supabase, user } = await ctx();
+  const { error } = await supabase.rpc('kind_close', { p_conversation: conversationId, p_choice: choice });
+  if (error) return { ok: false, error: error.message };
+  after(() => flushNotifications(user.id, 20));
+  revalidatePath('/app/messages');
+  return { ok: true };
+}
+
 export async function otherReadAt(conversationId: string) {
   const { supabase } = await ctx();
   const { data } = await supabase.rpc('other_read_at', { p_conversation: conversationId });

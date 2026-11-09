@@ -8,6 +8,8 @@ import { checkIn, useExtraDrop, useSpotlight } from './features';
 import PushPrompt from '@/components/PushPrompt';
 import FounderBadge from '@/components/FounderBadge';
 import { getCreditMode } from '@/lib/creditMode';
+import DropCountdown from '@/components/DropCountdown';
+import { dropReason, dropTimeLabel, nextDropAt } from '@/lib/engagement';
 
 export const dynamic = 'force-dynamic';
 
@@ -65,7 +67,8 @@ export default async function Drop({ searchParams }: { searchParams: Promise<{ o
         </Link>
       )}
       <h1 className="serif" style={{ fontSize: 40 }}>{preview ? 'Your 5 matches' : 'Your Daily Drop'}</h1>
-      <span className="muted small">{preview ? 'Look all you want. Members can say hello, or send a Note.' : 'Ranked by money values and preferences'}</span>
+      <span className="muted small">{preview ? 'Look all you want. Members can say hello, or send a Note.' : `New people every night at ${dropTimeLabel()} ET`}</span>
+      {!preview && <DropCountdown at={nextDropAt().toISOString()} label={`${dropTimeLabel()} ET`} />}
       {sp.ok && <div className="notice">{sp.ok}</div>}
       <PushPrompt />
       {sp.error && <div className="notice error">{sp.error}</div>}
@@ -104,6 +107,7 @@ export default async function Drop({ searchParams }: { searchParams: Promise<{ o
         {(drop || []).map((d: { match_id: string; compat: number }) => {
           const p = byId[d.match_id];
           if (!p) return null;
+          const why = dropReason(me, p);
           return (
             <Link key={d.match_id} href={`/app/u/${p.id}`} className="card row" style={{ textDecoration: 'none', color: 'var(--ivory)', padding: 12 }}>
               <div className="photo" style={{ width: 76, flex: 'none' }}>{photos[p.id]?.[0] ? <img src={photos[p.id][0]} alt="" /> : <span className="serif">{p.first_name?.[0]}</span>}</div>
@@ -111,6 +115,7 @@ export default async function Drop({ searchParams }: { searchParams: Promise<{ o
                 <span><strong style={{ fontSize: 17 }}>{p.first_name}</strong> <span className="muted">{age(p.birth_year)}</span>{p.spotlight_until && new Date(p.spotlight_until).getTime() > now && <span className="chip" style={{ marginLeft: 8, fontSize: 11, padding: '2px 8px', color: 'var(--gold-light)' }}>Featured</span>}{p.is_founder && <span style={{ marginLeft: 8 }}><FounderBadge /></span>}{isVerified(p) && <span style={{ marginLeft: 6 }}><VerifiedBadge credit={Boolean(p.credit_verified_at)} /></span>}</span>
                 <span className="small muted" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{[p.job, p.neighborhood].filter(Boolean).join(' · ')}</span>
                 <BandPill band={p.band} trend={p.trend} verified={Boolean(p.credit_verified_at)} />
+                {why && <span className="drop-reason">{why}</span>}
               </div>
               <div className="stack" style={{ alignItems: 'flex-end', gap: 0 }}><span className="serif" style={{ fontSize: 30, color: 'var(--gold-light)' }}>{d.compat}%</span><span className="small muted">match</span></div>
             </Link>
