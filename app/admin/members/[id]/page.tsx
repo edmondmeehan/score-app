@@ -17,6 +17,7 @@ type Overview = {
   safety: Record<string, number>;
   last_sign_in: string | null;
 };
+type Usage = { opens_7d: number; opens_30d: number; app_opens_30d: number; days_active_30d: number; minutes_30d: number; avg_minutes: number; last_open: string | null; first_tracked: string | null; by_day: { d: string; n: number }[] };
 
 const TZ = 'America/New_York';
 const day = (d?: string | null) => (d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: TZ }) : '—');
@@ -69,14 +70,17 @@ export default async function MemberDetail({ params, searchParams }: { params: P
   const { data } = await supabase.from('profiles').select('*').eq('id', id).maybeSingle();
   const p = data as Profile | null;
   if (!p) notFound();
-  const [{ data: ver }, { data: log }, { data: ov, error: ovErr }, { data: social }, photos] = await Promise.all([
+  const [{ data: ver }, { data: log }, { data: ov, error: ovErr }, { data: social }, photos, { data: us }] = await Promise.all([
     supabase.from('verifications').select('kind, provider, status, detail, created_at').eq('user_id', id).order('created_at', { ascending: false }).limit(10),
     supabase.from('audit_log').select('*').eq('target_user', id).order('created_at', { ascending: false }).limit(20),
     supabase.rpc('staff_member_overview', { p_user: id }),
     supabase.from('profile_socials').select('instagram, instagram_public').eq('user_id', id).maybeSingle(),
     photoUrls(supabase, [id], false),
+    supabase.rpc('staff_member_usage', { p_user: id }),
   ]);
   const o = (ov as Overview | null) || null;
+  const u = (us as Usage | null) || null;
+  const peak = Math.max(1, ...(u?.by_day || []).map((x) => x.n));
   const pics = photos[id] || [];
   const age = p.birth_year ? new Date().getFullYear() - p.birth_year : null;
   const height = p.height_cm ? `${Math.floor(p.height_cm / 2.54 / 12)}′${Math.round(p.height_cm / 2.54) % 12}″` : null;
@@ -117,19 +121,21 @@ export default async function MemberDetail({ params, searchParams }: { params: P
       {ovErr && <div className="notice">Run migration 0049 in the SQL Editor to see spending and activity for this member.</div>}
 
       {/* Key numbers */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
         <Stat k="Lifetime spend" v={usd(o?.spend.gross ?? 0)} sub={o ? `${o.spend.payments} payment${o.spend.payments === 1 ? '' : 's'}${o.spend.refunds ? ` · ${usd(o.spend.refunds)} refunded` : ''}` : undefined} tone="gold" />
         <Stat k="After store fees" v={usd(o?.spend.takehome ?? 0)} sub="Estimated take-home" />
         <Stat k="Member for" v={tenure(p.created_at)} sub={`Since ${day(p.created_at)}`} />
         <Stat k="Paying since" v={o?.spend.first_paid ? tenure(o.spend.first_paid) : 'Not yet'} sub={o?.spend.renews ? `Renews ${day(o.spend.renews)}` : o?.spend.last_paid ? `Last paid ${day(o.spend.last_paid)}` : undefined} />
+        <Stat k="Opens (30 days)" v={u?.opens_30d ?? '—'} sub={u ? `${u.days_active_30d} of 30 days active · ${u.app_opens_30d} in the app` : 'Run migration 0051'} />
         <Stat k="Matches & chats" v={a.conversations ?? 0} sub={`${a.active_chats ?? 0} active · ${a.messages_sent ?? 0} messages sent`} />
+        <Stat k="Likes received" v={a.likes_received ?? 0} sub={`${a.views_30d ?? 0} profile views in 30 days`} />
         <Stat k="Reports against" v={s.reports_against ?? 0} sub={s.reports_open ? `${s.reports_open} open` : 'None open'} tone={s.reports_open ? 'alert' : undefined} />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16, alignItems: 'start' }}>
         {/* Billing */}
         <Section title="Membership & billing">
-          <Row k="Plan" v={`${PLAN_NAME[p.plan] || p.plan}${(p as Profile & { plan_store?: string }).plan_store ? ` · ${(p as Profile & { plan_store?: string }).plan_store}` : ''}`} />
+          <Row k="Plan" v={`${PLAN_NAME[p.plan] || p.plan}${(p as Profile & { plan_store?: string }).plan_store ? ` · ${({ app_store: 'App Store', play_store: 'Google Play', stripe: 'Web' } as Record<string, string>)[(p as Profile & { plan_store?: string }).plan_store!] || (p as Profile & { plan_store?: string }).plan_store}` : ''}`} />
           {p.plan === 'preview' && <Row k="Preview ends" v={day(p.preview_ends_at)} />}
           <Row k="First payment" v={day(o?.spend.first_paid)} />
           <Row k="Last payment" v={day(o?.spend.last_paid)} />
@@ -149,6 +155,26 @@ export default async function MemberDetail({ params, searchParams }: { params: P
               ))}
             </div>
           )}
+        </Section>
+
+        {/* Usage */}
+        <Section title="App usage" right={<span className="small muted">Last open {ago(u?.last_open)}</span>}>
+          {u ? (
+            <>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, marginTop: 4 }}>
+                {([['Opens · 7 days', u.opens_7d], ['Opens · 30 days', u.opens_30d], ['Days active', `${u.days_active_30d}/30`], ['Minutes · 30 days', u.minutes_30d]] as [string, number | string][]).map(([k, v]) => (
+                  <div key={k} className="stack" style={{ gap: 2, padding: 10, borderRadius: 12, background: 'var(--onyx)', border: '1px solid var(--line-soft)' }}>
+                    <span className="serif" style={{ fontSize: 22 }}>{v}</span><span className="small muted" style={{ fontSize: 12 }}>{k}</span>
+                  </div>
+                ))}
+              </div>
+              <div aria-label="Opens per day, last 30 days" style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 64, marginTop: 12 }}>
+                {u.by_day.map((x) => <div key={x.d} title={`${x.d}: ${x.n} open${x.n === 1 ? '' : 's'}`} style={{ flex: 1, height: `${Math.max(4, (x.n / peak) * 100)}%`, borderRadius: 3, background: x.n ? 'var(--gold)' : 'var(--line)' }} />)}
+              </div>
+              <div className="row small muted" style={{ justifyContent: 'space-between', fontSize: 11 }}><span>30 days ago</span><span>Today</span></div>
+              <span className="small muted">About {u.avg_minutes} min per visit · {u.app_opens_30d} of {u.opens_30d} opens in the iPhone app.{u.first_tracked ? ` Tracking since ${day(u.first_tracked)}.` : ' Starts counting from their next visit.'}</span>
+            </>
+          ) : <span className="small muted">Run migration 0051 to start tracking app opens.</span>}
         </Section>
 
         {/* Activity */}

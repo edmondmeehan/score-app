@@ -3,6 +3,8 @@ import { requireMember } from '@/lib/session';
 import { when, type EventRow } from '@/lib/events';
 import { day, host, type Post, type Story } from '@/lib/content';
 import AppFooter from '@/components/AppFooter';
+import GiveawayCard from './GiveawayCard';
+import type { Giveaway } from '@/lib/giveaways';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,12 +22,22 @@ export default async function Discover({ searchParams }: { searchParams: Promise
     supabase.from('content_posts').select('*').eq('kind', 'perk').eq('status', 'published').order('pinned', { ascending: false }).order('published_at', { ascending: false }).limit(6),
     supabase.rpc('approved_stories', { p_limit: 3 }),
   ]);
+  const nowIso = new Date().toISOString();
+  const { data: gData } = await supabase.from('giveaways').select('*').eq('status', 'live').lte('starts_at', nowIso).gte('ends_at', nowIso).order('ends_at').limit(2);
+  const gives = (gData as Giveaway[]) || [];
+  const mineG = await Promise.all(gives.map((g) => supabase.rpc('my_giveaway', { p_g: g.id }).then((r) => r.data as { entered: boolean; entries: number } | null)));
   const ev = (events as EventRow[]) || [];
   const st = (stories as Story[]) || [];
   return (
     <div className="phone">
       <span className="eyebrow">Members only</span>
       <h1 className="serif" style={{ fontSize: 40 }}>Discover</h1>
+
+      {gives.length > 0 && (
+        <Section title="Giveaways">
+          {gives.map((g, i) => <GiveawayCard key={g.id} g={g} mine={mineG[i]} />)}
+        </Section>
+      )}
 
       <Section title="Upcoming events" more={{ href: '/app/events', label: 'All events' }}>
         {ev.length === 0 ? <Empty text="Nothing on the calendar yet. We'll email you when the next one opens." /> : ev.map((e) => (
