@@ -4,11 +4,11 @@
  * Plain HTML + CSS so it shows on the very first paint. Plays once per app launch (and on any page with ?intro=1
  * for previewing). Skipped on the website, and shortened for people who turn on Reduce Motion.
  */
-export const INTRO_SCRIPT = `(function(){try{var q=location.search.indexOf('intro=1')>-1;var app=/ScoreDateApp/.test(navigator.userAgent);if(app)document.documentElement.classList.add('native');if(q||(app&&!sessionStorage.getItem('sd_intro'))){document.documentElement.classList.add('sd-intro');try{sessionStorage.setItem('sd_intro','1')}catch(e){}setTimeout(function(){document.documentElement.classList.remove('sd-intro')},3200)}}catch(e){}})();`;
+export const INTRO_SCRIPT = `(function(){try{var q=location.search.indexOf('intro=1')>-1;var app=/ScoreDateApp/.test(navigator.userAgent);if(app)document.documentElement.classList.add('native');if(q||(app&&!sessionStorage.getItem('sd_intro'))){document.documentElement.classList.add('sd-intro');try{sessionStorage.setItem('sd_intro','1')}catch(e){}setTimeout(function(){document.documentElement.classList.remove('sd-intro')},5200)}}catch(e){}})();`;
 
 const CSS = `
 #sd-intro{display:none}
-html.sd-intro #sd-intro{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(70% 50% at 50% 42%,var(--hero-glow),transparent 70%),var(--onyx);animation:sdi-out .5s ease 2.55s forwards;pointer-events:none}
+html.sd-intro #sd-intro{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(70% 50% at 50% 42%,var(--hero-glow),transparent 70%),var(--onyx);animation:sdi-out .5s ease 4.55s forwards;pointer-events:none}
 #sd-intro svg{width:min(260px,70vw);height:auto;overflow:visible}
 .sdi-track{fill:none;stroke:var(--track);stroke-width:14;stroke-linecap:round;opacity:.6}
 .sdi-seg{fill:none;stroke-width:14;stroke-linecap:round;stroke-dasharray:68.7;stroke-dashoffset:68.7;animation:sdi-draw .45s cubic-bezier(.3,.7,.2,1) forwards}
@@ -29,7 +29,7 @@ html.sd-intro #sd-intro{position:fixed;inset:0;z-index:9999;display:flex;flex-di
 @keyframes sdi-rise{to{opacity:1;transform:none}}
 @keyframes sdi-out{to{opacity:0;visibility:hidden}}
 @media (prefers-reduced-motion:reduce){
-  html.sd-intro #sd-intro{animation-delay:1.1s}
+  html.sd-intro #sd-intro{animation-delay:3.1s}
   .sdi-seg{animation:none;stroke-dashoffset:0}
   .sdi-needle{animation:none;transform:rotate(68deg)}
   .sdi-band{animation:none} .sdi-band:last-child{opacity:1;transform:none}
