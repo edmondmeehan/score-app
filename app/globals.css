@@ -399,3 +399,21 @@ html:not(.native) body:has(.staff-bar) .event-hero-back { top: 18px; }
 html.native .phone { padding-top: calc(12px + env(safe-area-inset-top)); }
 html.native .appbar { margin-top: calc(-12px - env(safe-area-inset-top)); }
 html.native .event-hero { margin-top: calc(-12px - env(safe-area-inset-top)); }
+
+/* Profile: money style card, prompts, My NYC */
+.money-card { display: flex; flex-direction: column; gap: 14px; padding: 18px; border-radius: 20px; border: 1px solid var(--gold-edge); background: linear-gradient(160deg, var(--gold-wash), var(--graphite) 70%); }
+.money-match { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; padding: 8px 12px; border-radius: 14px; border: 1px solid var(--gold-edge); background: var(--glass); color: var(--gold-light); }
+.money-rows { display: flex; flex-direction: column; }
+.money-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 9px 0; border-top: 1px solid var(--row-line); }
+.money-row:first-child { border-top: 0; }
+.money-answer { font-size: 14.5px; font-weight: 500; text-align: right; display: inline-flex; align-items: center; gap: 8px; }
+.money-row.both .money-answer { color: var(--gold-light); }
+.money-you { font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 3px 7px; border-radius: 999px; background: var(--tab-on); color: var(--gold-light); border: 1px solid var(--gold-edge); }
+.prompt-card { display: flex; flex-direction: column; gap: 8px; padding: 18px; border-radius: 20px; background: var(--graphite); border: 1px solid var(--line-soft); }
+.prompt-card .serif { font-size: 24px; line-height: 1.2; }
+.prompt-reply summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--gold-light); }
+.prompt-reply summary::-webkit-details-marker { display: none; }
+.prompt-reply form { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+.looking-for { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--gold-edge); background: var(--gold-wash); color: var(--gold-light); font-size: 13px; font-weight: 600; }
+.nyc-spots { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.nyc-spot { display: flex; flex-direction: column; gap: 6px; padding: 14px; border-radius: 18px; background: var(--graphite); border: 1px solid var(--line-soft); }

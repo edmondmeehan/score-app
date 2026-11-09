@@ -33,12 +33,16 @@ function iosTick() {
 export function haptic(kind: HapticKind = 'light') {
   if (typeof window === 'undefined' || !hapticsOn()) return;
   const w = window as any;
-  // Native app wrappers (Capacitor / WKWebView) get real Taptic Engine haptics.
-  if (w.Capacitor?.Plugins?.Haptics) {
-    const H = w.Capacitor.Plugins.Haptics;
-    if (kind === 'success' || kind === 'warning') H.notification({ type: kind.toUpperCase() }).catch(() => null);
-    else if (kind === 'selection') H.selectionChanged?.().catch?.(() => null);
-    else H.impact({ style: kind === 'heavy' ? 'HEAVY' : kind === 'medium' ? 'MEDIUM' : 'LIGHT' }).catch(() => null);
+  // Native app (Capacitor): real Taptic Engine haptics through the Haptics plugin.
+  const C = w.Capacitor;
+  if (C?.isNativePlatform?.()) {
+    const call = (method: string, opts: object) => {
+      const H = C.Plugins?.Haptics;
+      const p = H?.[method] ? H[method](opts) : C.nativePromise?.('Haptics', method, opts);
+      p?.catch?.(() => null);
+    };
+    if (kind === 'success' || kind === 'warning') call('notification', { type: kind.toUpperCase() });
+    else call('impact', { style: kind === 'heavy' ? 'HEAVY' : kind === 'medium' ? 'MEDIUM' : 'LIGHT' });
     return;
   }
   if (w.webkit?.messageHandlers?.haptic) { w.webkit.messageHandlers.haptic.postMessage(kind); return; }

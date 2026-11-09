@@ -53,7 +53,7 @@ export default function Chat({ conversationId, meId, otherName, initial, canSend
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` }, (payload) => {
         const m = payload.new as Msg;
         setMsgs((cur) => (cur.some((x) => x.id === m.id) ? cur : [...cur, m]));
-        if (m.sender_id !== meId) haptic('light');
+        if (m.sender_id !== meId) haptic('medium');
       })
       .subscribe();
     const t = setInterval(() => { otherReadAt(conversationId).then(setReadAt).catch(() => null); }, 15000);

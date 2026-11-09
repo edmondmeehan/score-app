@@ -6,4 +6,12 @@ export const PROMPTS = [
   'First thing I’d do with a windfall…',
   'My ideal Sunday costs about…',
   'The splurge I’ll never apologize for…',
+  'My perfect NYC Saturday…',
+  'The way to win me over is…',
+  'I geek out on…',
+  'A green flag I look for…',
+  'We’ll get along if…',
+  'Two truths and a lie…',
+  'Most spontaneous thing I’ve done…',
+  'Typical Sunday…',
 ];

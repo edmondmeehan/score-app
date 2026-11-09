@@ -6,8 +6,9 @@ import { TestBanner } from '@/components/ui';
 import PhotoUploader from '../../onboarding/photos/PhotoUploader';
 import SongPicker from './SongPicker';
 import { PROMPTS } from '@/lib/prompts';
-import { clearSong, movePhoto, removePhoto, saveAbout, saveDetails, saveFlags, saveInstagram } from './actions';
-import { DRINKING, EDUCATION, EXERCISE, HAS_KIDS, HEIGHTS, SMOKING, WANTS_KIDS } from '@/lib/profileDetails';
+import { clearSong, movePhoto, removePhoto, saveAbout, saveDetails, saveFlags, saveInstagram, saveNycSpot, savePrompts } from './actions';
+import PlaceFields from '@/components/PlaceFields';
+import { DRINKING, EDUCATION, EXERCISE, HAS_KIDS, HEIGHTS, LOOKING_FOR, NYC_SLOTS, PETS, POLITICS, RELIGION, SMOKING, WANTS_KIDS } from '@/lib/profileDetails';
 
 export const dynamic = 'force-dynamic';
 
@@ -75,6 +76,7 @@ export default async function EditProfile({ searchParams }: { searchParams: Prom
       <form id="details" action={saveDetails} className="card stack">
         <span style={{ fontWeight: 600 }}>Details</span>
         <span className="small muted">Optional. Members can filter search by these, so filling them in helps the right people find you.</span>
+        <label className="field">Looking for<select className="input" name="looking_for" defaultValue={me.looking_for || ''}><option value="">Prefer not to say</option>{LOOKING_FOR.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
         <label className="field">Height<select className="input" name="height_cm" defaultValue={me.height_cm ? String(me.height_cm) : ''}><option value="">Prefer not to say</option>{HEIGHTS.map((h) => <option key={h.cm} value={h.cm}>{h.label}</option>)}</select></label>
         <label className="field">Education<select className="input" name="education" defaultValue={me.education || ''}><option value="">Prefer not to say</option>{EDUCATION.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
         <div className="row" style={{ gap: 10 }}>
@@ -86,6 +88,12 @@ export default async function EditProfile({ searchParams }: { searchParams: Prom
           <label className="field grow">Smoking<select className="input" name="smoking" defaultValue={me.smoking || ''}><option value="">—</option>{SMOKING.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
           <label className="field grow">Exercise<select className="input" name="exercise" defaultValue={me.exercise || ''}><option value="">—</option>{EXERCISE.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
         </div>
+        <label className="field">Pets<select className="input" name="pets" defaultValue={me.pets || ''}><option value="">Prefer not to say</option>{PETS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
+        <div className="row" style={{ gap: 10 }}>
+          <label className="field grow">Religion<select className="input" name="religion" defaultValue={me.religion || ''}><option value="">Prefer not to say</option>{RELIGION.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
+          <label className="field grow">Politics<select className="input" name="politics" defaultValue={me.politics || ''}><option value="">Prefer not to say</option>{POLITICS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
+        </div>
+        <span className="small muted">Religion and politics only show if you pick one. Leave them on “Prefer not to say” to keep them private.</span>
         {sp.saved === 'details' && <div className="notice">Saved.</div>}
         <button className="btn ghost sm" style={{ alignSelf: 'flex-start' }}>Save details</button>
       </form>
@@ -95,10 +103,47 @@ export default async function EditProfile({ searchParams }: { searchParams: Prom
         <span className="label">About you</span>
         <label className="field">What you do<input className="input" name="job" maxLength={80} defaultValue={me.job || ''} /></label>
         <label className="field">Neighborhood<input className="input" name="neighborhood" maxLength={80} defaultValue={me.neighborhood || ''} /></label>
-        <label className="field">Prompt<select className="input" name="prompt_q" defaultValue={me.prompt_q || PROMPTS[0]}>{PROMPTS.map((p) => <option key={p}>{p}</option>)}</select></label>
-        <label className="field">Your answer<textarea className="input" name="prompt_a" rows={2} maxLength={160} defaultValue={me.prompt_a || ''} /></label>
         <div className="row"><button className="btn ghost sm">Save</button><Link href="/onboarding/quiz" className="small">Retake money quiz</Link></div>
       </form>
+
+      {/* Prompts */}
+      <form id="prompts" action={savePrompts} className="card stack">
+        <span className="label">Your prompts</span>
+        <span className="small muted">Up to three. Members can reply to a prompt directly, so specific answers get the best conversations.</span>
+        {[0, 1, 2].map((i) => {
+          const cur = (me.prompts || [])[i] || (i === 0 && me.prompt_a ? { q: me.prompt_q || PROMPTS[0], a: me.prompt_a } : null);
+          return (
+            <div key={i} className="stack" style={{ gap: 6, paddingTop: i ? 10 : 0, borderTop: i ? '1px solid var(--line-soft)' : undefined }}>
+              <select className="input" name={`q${i}`} defaultValue={cur?.q || PROMPTS[(i * 4) % PROMPTS.length]} aria-label={`Prompt ${i + 1}`}>{PROMPTS.map((p) => <option key={p}>{p}</option>)}</select>
+              <textarea className="input" name={`a${i}`} rows={2} maxLength={200} defaultValue={cur?.a || ''} placeholder={i === 0 ? 'Your answer' : 'Your answer (optional)'} aria-label={`Answer ${i + 1}`} />
+            </div>
+          );
+        })}
+        {sp.saved === 'prompts' && <div className="notice">Saved.</div>}
+        <button className="btn ghost sm" style={{ alignSelf: 'flex-start' }}>Save prompts</button>
+      </form>
+
+      {/* My NYC */}
+      <section id="nyc" className="card stack">
+        <span className="label">My NYC</span>
+        <span className="small muted">Pin up to three places that feel like you. Matches can turn them into a date in one tap.</span>
+        {NYC_SLOTS.map((slot) => {
+          const cur = (me.my_nyc || []).find((s) => s.slot === slot.key);
+          return (
+            <form key={slot.key} action={saveNycSpot} className="stack" style={{ gap: 6, paddingTop: 10, borderTop: '1px solid var(--line-soft)' }}>
+              <input type="hidden" name="slot" value={slot.key} />
+              <span style={{ fontWeight: 600 }}>{slot.label}</span>
+              <PlaceFields compact required={false} nameField="spot_name" nameLabel="Place" namePlaceholder={slot.placeholder} addressField="spot_address" addressLabel="Address" defaults={{ name: cur?.name, place_id: cur?.place_id || undefined }} />
+              <input className="input" name="note" maxLength={120} defaultValue={cur?.note || ''} placeholder="Why you love it (optional)" />
+              <div className="row" style={{ gap: 8 }}>
+                <button className="btn ghost sm">Save</button>
+                {cur && <button className="btn ghost sm" name="clear" value="1">Remove</button>}
+              </div>
+            </form>
+          );
+        })}
+        {sp.saved === 'nyc' && <div className="notice">Saved.</div>}
+      </section>
 
       {/* Financial Green Flags */}
       <form id="flags" action={saveFlags} className="card stack">

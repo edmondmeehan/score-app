@@ -124,7 +124,7 @@ export default async function EventPage({ params, searchParams }: { params: Prom
             <form action={rsvp} className="stack" style={{ gap: 8 }}>
               <input type="hidden" name="event_id" value={e.id} /><input type="hidden" name="going" value="no" />
               <div className="notice" style={{ margin: 0 }}>{status === 'going' ? 'You’re going. See you there.' : 'You’re on the waitlist. We’ll move you in if a spot opens.'}</div>
-              <button className="btn ghost block">Cancel my RSVP</button>
+              <button className="btn ghost block" data-haptic="medium">Cancel my RSVP</button>
             </form>
           ) : !member ? (
             <Link href="/plans" className="btn block">Become a member to RSVP</Link>
@@ -133,7 +133,7 @@ export default async function EventPage({ params, searchParams }: { params: Prom
           ) : early && me.plan !== 'black' ? (
             <button className="btn block" disabled>RSVPs open {opensAt!.toLocaleString('en-US', { weekday: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' })}</button>
           ) : (
-            <form action={rsvp}><input type="hidden" name="event_id" value={e.id} /><input type="hidden" name="going" value="yes" /><button className="btn block">{left > 0 ? 'RSVP · I’m in' : 'Join the waitlist'}</button></form>
+            <form action={rsvp}><input type="hidden" name="event_id" value={e.id} /><input type="hidden" name="going" value="yes" /><button className="btn block" data-haptic="success">{left > 0 ? 'RSVP · I’m in' : 'Join the waitlist'}</button></form>
           )
         )}
         <span className="small muted" style={{ textAlign: 'center' }}>Plans change: cancel any time so someone on the waitlist can go.</span>

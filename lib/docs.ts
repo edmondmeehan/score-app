@@ -120,6 +120,7 @@ export const DOCS: Record<string, Doc> = {
           'Messages, photos you send in chat, Notes, likes, date plans and event RSVPs you send through ScoreDate.',
           'Answers you give in Hot or Financially Compatible rounds, and any $50 Date Challenge story you choose to submit.',
           'Event and date locations you enter, which are completed using Google Places.',
+          'Optional profile details you choose to add, such as what you’re looking for, pets, religion and political views, your prompts and your “My NYC” places. Religion and politics are shown on your profile only if you pick them, and you can remove them any time.',
           'Support requests and reports you file.',
         ] },
         { h3: 'From verification' },

@@ -39,6 +39,8 @@ export type Profile = {
   last_active_at?: string | null;
   invited_by: string | null;
   created_at: string;
+  prompts?: { q: string; a: string }[] | null; looking_for?: string | null; pets?: string | null; religion?: string | null; politics?: string | null;
+  my_nyc?: { slot: string; name: string; place_id?: string | null; note?: string | null }[] | null;
   flag_habit?: string | null; flag_splurge?: string | null; flag_save?: string | null; show_verified?: boolean;
 };
 

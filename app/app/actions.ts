@@ -107,3 +107,18 @@ export async function deleteAccount(form: FormData) {
   await supabase.auth.signOut();
   redirect('/?deleted=1');
 }
+
+/** Reply to one of a member's prompts: opens (or reuses) the conversation and sends the reply quoting the prompt. */
+export async function replyToPrompt(form: FormData) {
+  const { supabase, user } = await ctx();
+  const other = String(form.get('id'));
+  const prompt = String(form.get('prompt') || '').slice(0, 300);
+  const body = String(form.get('body') || '').trim().slice(0, 1000);
+  if (!body) redirect(`/app/u/${other}?error=` + encodeURIComponent('Write a reply first.'));
+  const { data: cid, error } = await supabase.rpc('start_conversation', { p_other: other });
+  if (error || !cid) redirect(`/app/u/${other}?error=` + encodeURIComponent(error?.message === 'upgrade to connect' ? 'Become a member to reply to prompts.' : error?.message || 'Couldn’t send that.'));
+  const { error: e2 } = await supabase.from('messages').insert({ conversation_id: cid, sender_id: user.id, body: `↩ “${prompt}”\n\n${body}` });
+  if (e2) redirect(`/app/u/${other}?error=` + encodeURIComponent(e2.message));
+  after(() => flushNotifications(user.id, 20));
+  redirect(`/app/messages/${cid}`);
+}

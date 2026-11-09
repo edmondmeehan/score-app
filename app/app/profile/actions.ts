@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { supabaseServer } from '@/lib/supabase/server';
 import { getTrack, parseTrackId } from '@/lib/spotify';
 import { PROMPTS } from '@/lib/prompts';
-import { DRINKING, EDUCATION, EXERCISE, HAS_KIDS, HEIGHTS, SMOKING, WANTS_KIDS, valid } from '@/lib/profileDetails';
+import { DRINKING, EDUCATION, EXERCISE, HAS_KIDS, HEIGHTS, LOOKING_FOR, NYC_SLOTS, PETS, POLITICS, RELIGION, SMOKING, WANTS_KIDS, valid, type NycSpot } from '@/lib/profileDetails';
 
 
 async function ctx() {
@@ -17,12 +17,9 @@ const back = (q: string) => redirect('/app/profile?' + q);
 
 export async function saveAbout(form: FormData) {
   const { supabase, user } = await ctx();
-  const q = String(form.get('prompt_q') || '');
   const { error } = await supabase.from('profiles').update({
     job: String(form.get('job') || '').trim().slice(0, 80) || null,
     neighborhood: String(form.get('neighborhood') || '').trim().slice(0, 80) || null,
-    prompt_q: PROMPTS.includes(q) ? q : PROMPTS[0],
-    prompt_a: String(form.get('prompt_a') || '').trim().slice(0, 160) || null,
   }).eq('id', user.id);
   back(error ? 'error=' + encodeURIComponent(error.message) : 'saved=about');
 }
@@ -106,8 +103,49 @@ export async function saveDetails(form: FormData) {
     drinking: valid(DRINKING, form.get('drinking')),
     smoking: valid(SMOKING, form.get('smoking')),
     exercise: valid(EXERCISE, form.get('exercise')),
+    looking_for: valid(LOOKING_FOR, form.get('looking_for')),
+    pets: valid(PETS, form.get('pets')),
+    religion: valid(RELIGION, form.get('religion')),
+    politics: valid(POLITICS, form.get('politics')),
   }).eq('id', user.id);
   if (error) back('error=' + encodeURIComponent(/column|schema/.test(error.message) ? 'Profile details are almost ready. Please try again later.' : error.message));
   revalidatePath('/app/profile');
   back('saved=details#details');
+}
+
+/** Up to three prompts. The first one also fills prompt_q / prompt_a, which older screens still read. */
+export async function savePrompts(form: FormData) {
+  const { supabase, user } = await ctx();
+  const prompts: { q: string; a: string }[] = [];
+  const seen = new Set<string>();
+  for (const i of [0, 1, 2]) {
+    const q = String(form.get(`q${i}`) || '');
+    const a = String(form.get(`a${i}`) || '').trim().slice(0, 200);
+    if (!a || !PROMPTS.includes(q) || seen.has(q)) continue;
+    seen.add(q);
+    prompts.push({ q, a });
+  }
+  const { error } = await supabase.from('profiles').update({
+    prompts, prompt_q: prompts[0]?.q ?? PROMPTS[0], prompt_a: prompts[0]?.a ?? null,
+  }).eq('id', user.id);
+  revalidatePath('/app/profile');
+  back(error ? 'error=' + encodeURIComponent(/column|schema/.test(error.message) ? 'Prompts are almost ready. Please try again later.' : error.message) : 'saved=prompts#prompts');
+}
+
+/** Save one My NYC spot (or clear it). */
+export async function saveNycSpot(form: FormData) {
+  const { supabase, user } = await ctx();
+  const slot = String(form.get('slot') || '');
+  if (!NYC_SLOTS.some((s) => s.key === slot)) back('error=' + encodeURIComponent('Pick a spot.'));
+  const { data: me } = await supabase.from('profiles').select('my_nyc').eq('id', user.id).single();
+  const current = ((me?.my_nyc as NycSpot[] | null) || []).filter((s) => s.slot !== slot && NYC_SLOTS.some((x) => x.key === s.slot));
+  const name = String(form.get('spot_name') || '').trim().slice(0, 100);
+  const placeId = String(form.get('place_id') || '').trim();
+  if (name && form.get('clear') !== '1') {
+    current.push({ slot, name, place_id: /^[A-Za-z0-9_-]{10,300}$/.test(placeId) ? placeId : null, note: String(form.get('note') || '').trim().slice(0, 120) || null });
+  }
+  current.sort((a, b) => NYC_SLOTS.findIndex((s) => s.key === a.slot) - NYC_SLOTS.findIndex((s) => s.key === b.slot));
+  const { error } = await supabase.from('profiles').update({ my_nyc: current }).eq('id', user.id);
+  revalidatePath('/app/profile');
+  back(error ? 'error=' + encodeURIComponent(/column|schema/.test(error.message) ? 'My NYC is almost ready. Please try again later.' : error.message) : 'saved=nyc#nyc');
 }
