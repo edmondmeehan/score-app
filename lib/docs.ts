@@ -3,7 +3,7 @@ export type Block = string | { ul: string[] } | { h3: string };
 export type Section = { id: string; h: string; body: Block[] };
 export type Doc = { title: string; eyebrow: string; summary: string; updated: string; draft?: boolean; sections: Section[] };
 
-const COMPANY = 'Please & Thank You, Inc.';
+const COMPANY = 'ScoreDate, Inc.';
 const ADDRESS = '1133 Broadway, Suite 1301, New York, NY 10010';
 const UPDATED = 'November 8, 2026';
 const DRAFT = true; // flip to false once counsel has reviewed

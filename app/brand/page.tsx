@@ -201,7 +201,7 @@ export default async function Brand() {
         <h3>Boilerplate (short)</h3>
         <p className="card" style={{ padding: 16 }}>ScoreDate is an invite-only dating app where every member verifies their identity and their credit band. Launching in New York City, ScoreDate makes honesty about money part of dating from the start, without ever showing anyone’s exact score.</p>
         <h3>Boilerplate (long)</h3>
-        <p className="card" style={{ padding: 16 }}>ScoreDate is an invite-only dating app for adults 25 and older who want a partner with their act together. Every member verifies a government ID, a live selfie and their credit band through a soft inquiry that never affects their credit score. Members see each other’s band (Elite, Strong, Solid or Building) and 12-month trend, never the number. ScoreDate is launching in New York City and expanding area by area as demand grows. ScoreDate is built by Please &amp; Thank You, Inc., based in New York.</p>
+        <p className="card" style={{ padding: 16 }}>ScoreDate is an invite-only dating app for adults 25 and older who want a partner with their act together. Every member verifies a government ID, a live selfie and their credit band through a soft inquiry that never affects their credit score. Members see each other’s band (Elite, Strong, Solid or Building) and 12-month trend, never the number. ScoreDate is launching in New York City and expanding area by area as demand grows. ScoreDate, Inc. is based in New York.</p>
       </section>
 
       <section id="claims">
@@ -339,7 +339,7 @@ export default async function Brand() {
           <span className="small muted">Email the team and include where and when the piece will run.</span>
           <a className="btn sm" href="mailto:press@scoredate.app?subject=Brand%20approval" style={{ alignSelf: 'flex-start' }}>press@scoredate.app</a>
         </div>
-        <p className="small muted" style={{ marginTop: 14 }}>ScoreDate and the ScoreDate logo are trademarks of Please &amp; Thank You, Inc. Using these assets doesn’t imply endorsement or partnership.</p>
+        <p className="small muted" style={{ marginTop: 14 }}>ScoreDate and the ScoreDate logo are trademarks of ScoreDate, Inc. Using these assets doesn’t imply endorsement or partnership.</p>
       </section>
     </DocLayout>
   );

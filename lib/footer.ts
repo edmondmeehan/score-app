@@ -16,7 +16,7 @@ export type FooterConfig = {
 
 export const FOOTER_DEFAULT: FooterConfig = {
   tagline: 'The invite-only dating app built around credit bands. Now open in New York City.',
-  company: 'Please & Thank You, Inc.',
+  company: 'ScoreDate, Inc.',
   address: '1133 Broadway, Suite 1301\nNew York, NY 10010',
   email: 'support@scoredate.app',
   columns: [
@@ -25,7 +25,7 @@ export const FOOTER_DEFAULT: FooterConfig = {
     { title: 'Company', links: [{ label: 'Partners', href: '/partners' }, { label: 'Press', href: '/press' }, { label: 'Brand & marketing', href: '/brand' }, { label: 'Contact', href: '/contact' }] },
     { title: 'Legal', links: [{ label: 'Terms of Service', href: '/legal/terms' }, { label: 'Privacy Policy', href: '/legal/privacy' }, { label: 'Your privacy choices', href: '/legal/choices' }, { label: 'Cookie notice', href: '/legal/cookies' }] },
   ],
-  copyright: '© {year} Please & Thank You, Inc. All rights reserved. Members must be 25+.',
+  copyright: '© {year} ScoreDate, Inc. All rights reserved. Members must be 25+.',
   disclaimer: 'ScoreDate is not a credit bureau, lender or credit repair service. ScoreDate never sees or stores your exact score or credit report. In an emergency, call 911.',
   app_links: [{ label: 'Partners', href: '/partners' }, { label: 'Privacy', href: '/legal/privacy' }, { label: 'Terms', href: '/legal/terms' }, { label: 'Biometric policy', href: '/legal/biometric' }],
 };

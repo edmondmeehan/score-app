@@ -2,7 +2,7 @@
 // Styling is inline and table-based so it holds up in Gmail, Apple Mail and Outlook.
 
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://score-app-eta-two.vercel.app').replace(/\/$/, '');
-export const POSTAL_ADDRESS = 'Please & Thank You, Inc. · 1133 Broadway, #1301, New York, NY 10010';
+export const POSTAL_ADDRESS = 'ScoreDate, Inc. · 1133 Broadway, #1301, New York, NY 10010';
 
 const C = {
   bg: '#0B0B0C', card: '#131315', line: '#26262A', ivory: '#F2F0EB', stone: '#B4B2AC', muted: '#8E8C86',
