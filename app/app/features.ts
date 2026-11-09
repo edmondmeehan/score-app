@@ -239,3 +239,15 @@ export async function writeVouch(form: FormData) {
   after(() => flushNotifications(user.id, 20));
   back('/app/invites', 'ok', 'Sent. They’ll choose whether it shows on their profile.');
 }
+
+export async function eventHere(eventId: string) {
+  const { supabase } = await ctx();
+  const { data } = await supabase.rpc('event_here', { p_event: eventId });
+  const d = data as { live: boolean; here?: number; me_here?: boolean; matches?: { id: string; first_name: string | null; conversation_id: string; photo?: string | null }[] } | null;
+  if (d?.matches?.length) {
+    const { photoUrls } = await import('@/lib/photos');
+    const photos = await photoUrls(supabase, d.matches.map((m) => m.id));
+    d.matches = d.matches.map((m) => ({ ...m, photo: photos[m.id]?.[0] || null }));
+  }
+  return d;
+}

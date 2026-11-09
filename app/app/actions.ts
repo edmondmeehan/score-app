@@ -71,6 +71,16 @@ export async function markTogether(form: FormData) {
   redirect(`/app/messages/${id}${data === 'mutual' ? '?together=1' : ''}`);
 }
 
+export async function changeEmail(form: FormData) {
+  const { supabase, user } = await ctx();
+  const email = String(form.get('email') || '').trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) redirect('/app/settings?error=' + encodeURIComponent('Enter a valid email address.') + '#email');
+  if (email === (user.email || '').toLowerCase()) redirect('/app/settings?error=' + encodeURIComponent('That’s already your email.') + '#email');
+  const { error } = await supabase.auth.updateUser({ email });
+  if (error) redirect('/app/settings?error=' + encodeURIComponent(/registered|exists/i.test(error.message) ? 'That email is already used by another account.' : error.message) + '#email');
+  redirect('/app/settings?saved=email_sent#email');
+}
+
 export async function setFocusMode(form: FormData) {
   const { supabase, user } = await ctx();
   const { error } = await supabase.from('profiles').update({ focus_mode: form.get('focus') === 'on' }).eq('id', user.id);

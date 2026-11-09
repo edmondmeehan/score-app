@@ -7,7 +7,7 @@ import ThemeSwitch from '@/components/ThemeSwitch';
 import HapticsToggle from '@/components/HapticsToggle';
 import AppFooter from '@/components/AppFooter';
 import { signOut } from '../../signin/actions';
-import { deleteAccount, setFocusMode, setStatus } from '../actions';
+import { changeEmail, deleteAccount, setFocusMode, setStatus } from '../actions';
 import { saveEmailPrefs, saveMapPrivacy, saveNotifyPrefs, setShowOnline } from '../features';
 import PushToggle from '@/components/PushToggle';
 import FounderBadge from '@/components/FounderBadge';
@@ -30,7 +30,7 @@ export default async function Settings({ searchParams }: { searchParams: Promise
       <div className="row"><div className="stack grow" style={{ gap: 4 }}><span className="serif" style={{ fontSize: 32 }}>{me.first_name || 'You'}</span><span className="small muted">{me.plan} · {me.status}</span>{me.is_founder && <FounderBadge />}</div><BandPill band={me.band} trend={me.trend} verified={Boolean(me.credit_verified_at)} /></div>
       {me.status === 'suspended' && <div className="notice error">Your account is suspended. Check your email for details and how to appeal.</div>}
       {sp.error && <div className="notice error">{sp.error}</div>}
-      {sp.saved && <div className="notice">Saved.</div>}
+      {sp.saved && <div className="notice">{sp.saved === 'email' ? 'Your email is updated.' : sp.saved === 'email_sent' ? 'Check your inbox to confirm the change. If you get a link at your old address too, confirm that one as well.' : 'Saved.'}</div>}
       {me.plan === 'black' && (
         <Link href="/app/matchmaker" className="card gold row" style={{ textDecoration: 'none', color: 'inherit' }}>
           <span className="stack grow" style={{ gap: 2 }}><strong>Your matchmaker</strong><span className="small muted">Book a call, message or email</span></span>
@@ -99,7 +99,7 @@ export default async function Settings({ searchParams }: { searchParams: Promise
       </form>
       <span className="label" style={{ marginTop: 8 }}>Membership &amp; add-ons</span>
       {['membership', 'premium', 'black', 'paused'].includes(me.plan) && (
-        <form action={setStatus} className="card stack">
+        <form id="status" action={setStatus} className="card stack">
           <span className="label">Status</span>
           {[['active', 'Active', 'In the Daily Drop, matching and messaging.'], ['paused', 'Paused · $4.99/mo', 'Hidden from matching. Keep chats and friends.'], ['taken', 'Taken · $4.99/mo', 'You met someone. Friends see Matched on ScoreDate.']].map(([v, l, d]) => (
             <label key={v} className="choice" style={{ alignItems: 'flex-start' }}><input type="radio" name="status" value={v} defaultChecked={current === v} style={{ accentColor: 'var(--gold)', marginTop: 4 }} /><span className="stack" style={{ gap: 2 }}><strong>{l}</strong><span className="small muted">{d}</span></span></label>
@@ -120,6 +120,14 @@ export default async function Settings({ searchParams }: { searchParams: Promise
       <Link href="/app/support" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="grow">Contact support</span><span className="muted">›</span>
       </Link>
+      <form id="email" action={changeEmail} className="card stack">
+        <span className="label">Email address</span>
+        <span className="small muted">Currently {me.email || 'not set'}. We’ll send a confirmation link to the new address; nothing changes until you tap it.</span>
+        <div className="row" style={{ gap: 8 }}>
+          <input className="input grow" type="email" name="email" required autoCapitalize="none" autoCorrect="off" placeholder="new@email.com" />
+          <button className="btn ghost sm">Change</button>
+        </div>
+      </form>
       <Link href="/signin/new-password?from=settings" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="grow">Set or change password</span><span className="muted">›</span>
       </Link>

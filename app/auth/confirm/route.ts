@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (type === 'recovery') return NextResponse.redirect(new URL('/signin/new-password', url.origin));
+  if (type === 'email_change') return NextResponse.redirect(new URL('/app/settings?saved=email#email', url.origin));
 
   // Confirm / sign-in links: apply a saved invite code, same as the password sign-in.
   const store = await cookies();

@@ -4,7 +4,8 @@ import { notFound } from 'next/navigation';
 import { requireMember } from '@/lib/session';
 import { getReserveVisible } from '@/lib/reserve';
 import { getBasemap } from '@/lib/basemap';
-import { rsvp } from '../../features';
+import { eventHere, rsvp } from '../../features';
+import HereNow, { type Here } from './HereNow';
 import { approx, countdown, dayParts, eventImage, timeOnly, when, type EventRow } from '@/lib/events';
 import EventMapAuto from '@/components/EventMapAuto';
 import { BANDS, type Band } from '@/lib/types';
@@ -25,6 +26,7 @@ export default async function EventPage({ params, searchParams }: { params: Prom
     supabase.rpc('event_social', { p_event: id }),
     getBasemap(),
   ]);
+  const here = (await eventHere(id)) as Here;
   const social = (socialData as Social) || { going: 0, waitlist: 0, this_week: 0, matches_going: 0, bands: null };
   const status = mine?.status as string | undefined;
   const isGoing = status === 'going';
@@ -76,6 +78,7 @@ export default async function EventPage({ params, searchParams }: { params: Prom
         </div>
       </div>
 
+      <HereNow eventId={e.id} initial={here} going={isGoing} />
       <section className="card stack" style={{ gap: 10 }}>
         <div className="row" style={{ justifyContent: 'space-between', alignItems: 'baseline' }}>
           <span><strong className="serif" style={{ fontSize: 30 }}>{going}</strong> <span className="muted">member{going === 1 ? '' : 's'} going</span></span>
