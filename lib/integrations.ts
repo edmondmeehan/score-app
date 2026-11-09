@@ -7,7 +7,8 @@ export type Integration = { enabled: boolean; config: Record<string, any>; secre
 /** Env vars win (useful for local dev); otherwise read from the admin Integrations settings (Vault). */
 const ENV: Record<string, Record<string, string | undefined>> = {
   persona: { api_key: process.env.PERSONA_API_KEY, webhook_secret: process.env.PERSONA_WEBHOOK_SECRET, template_id: process.env.PERSONA_TEMPLATE_ID },
-  aws: { access_key_id: process.env.AWS_ACCESS_KEY_ID, secret_access_key: process.env.AWS_SECRET_ACCESS_KEY, region: process.env.AWS_REGION },
+  // Vercel reserves the AWS_* names, so use REKOGNITION_* there.
+  aws: { access_key_id: process.env.REKOGNITION_ACCESS_KEY_ID, secret_access_key: process.env.REKOGNITION_SECRET_ACCESS_KEY, region: process.env.REKOGNITION_REGION },
   revenuecat: { secret_api_key: process.env.REVENUECAT_SECRET_API_KEY, webhook_auth: process.env.REVENUECAT_WEBHOOK_AUTH },
 };
 

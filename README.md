@@ -38,7 +38,7 @@ Privacy rules built into the database:
 
 3. Set the environment variables (see `.env.example`) in Vercel.
 4. Persona: create an inquiry template with Government ID + Selfie (with liveness). Set `PERSONA_API_KEY` and `PERSONA_TEMPLATE_ID`. Add a webhook to `https://<domain>/api/verify/webhook` and set `PERSONA_WEBHOOK_SECRET`.
-5. AWS: create an IAM user allowed only `rekognition:CompareFaces`. Set `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
+5. AWS: create an IAM user allowed only `rekognition:CompareFaces`. Enter the key in Admin → Integrations, or set `REKOGNITION_ACCESS_KEY_ID`, `REKOGNITION_SECRET_ACCESS_KEY` and `REKOGNITION_REGION` in Vercel (Vercel reserves the AWS_* names).
 6. Supabase Auth: set the Site URL and add `https://<domain>/auth/callback` to the redirect URLs.
 7. To leave test mode: `update app_config set value = 'false' where key = 'test_mode';` Paid plans then require real billing (App Store in the iPhone app, or Stripe on the web).
 
