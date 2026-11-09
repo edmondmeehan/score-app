@@ -21,6 +21,8 @@ export const metadata: Metadata = {
 };
 import IntroSplash, { INTRO_SCRIPT } from '@/components/IntroSplash';
 import LiveBeat from '@/components/LiveBeat';
+import NavProgress from '@/components/NavProgress';
+import { Suspense } from 'react';
 
 export const viewport: Viewport = { themeColor: '#0B0B0C', width: 'device-width', initialScale: 1, viewportFit: 'cover' };
 
@@ -46,7 +48,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
       </head>
-      <body><IntroSplash /><AdminBar />{children}{season && <SeasonLayer seasonKey={season.key} name={season.name} banner={season.banner} effect={season.effect} preview={Boolean(previewKey)} />}<Analytics /><SpeedInsights /><AdPixels /><LiveBeat /></body>
+      <body><Suspense fallback={null}><NavProgress /></Suspense><IntroSplash /><AdminBar />{children}{season && <SeasonLayer seasonKey={season.key} name={season.name} banner={season.banner} effect={season.effect} preview={Boolean(previewKey)} />}<Analytics /><SpeedInsights /><AdPixels /><LiveBeat /></body>
     </html>
   );
 }

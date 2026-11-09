@@ -475,3 +475,20 @@ html.native .event-hero { margin-top: calc(-12px - env(safe-area-inset-top)); }
 .score-row button { flex: 1; min-height: 44px; }
 .live-dot { width: 10px; height: 10px; border-radius: 999px; background: var(--rise); box-shadow: 0 0 0 0 var(--rise); animation: livepulse 2s infinite; }
 @keyframes livepulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--rise) 60%, transparent); } 70% { box-shadow: 0 0 0 10px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+/* Loading skeletons + navigation feedback */
+.bone { display: block; flex: none; background: linear-gradient(90deg, color-mix(in srgb, var(--line) 55%, var(--graphite)) 0%, var(--line) 40%, color-mix(in srgb, var(--line) 55%, var(--graphite)) 80%); background-size: 300% 100%; animation: bone 1.4s ease-in-out infinite; }
+@keyframes bone { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+.skeleton { animation: skin .18s ease-out both; }
+@keyframes skin { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .bone, .skeleton { animation: none; } }
+.navbar-progress { position: fixed; top: 0; left: 0; height: 2.5px; width: 0; background: var(--gold); box-shadow: 0 0 8px color-mix(in srgb, var(--gold) 60%, transparent); z-index: 9999; opacity: 0; transition: width .25s ease, opacity .3s ease; pointer-events: none; top: env(safe-area-inset-top); }
+.navbar-progress.on { opacity: 1; }
+.tabbar a.pending svg { animation: tabpulse .9s ease-in-out infinite; }
+@keyframes tabpulse { 50% { opacity: .45; } }
+button.is-busy, .btn.is-busy { position: relative; pointer-events: none; opacity: .7; }
+button.is-busy::after, .btn.is-busy::after { content: ''; display: inline-block; width: 12px; height: 12px; margin-left: 8px; vertical-align: -1px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+/* Smooth fade when a new screen arrives */
+main, .phone { animation: screenin .2s ease-out; }
+@keyframes screenin { from { opacity: .001; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { main, .phone { animation: none; } }

@@ -1,6 +1,14 @@
 'use client';
-import Link from 'next/link';
+import Link, { useLinkStatus } from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { haptic } from '@/lib/haptics';
+
+/** The icon pulses while its screen loads, so a tap always feels answered. */
+function TabIcon({ d }: { d: string }) {
+  const { pending } = useLinkStatus();
+  return <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={pending ? { animation: 'tabpulse .9s ease-in-out infinite' } : undefined}><path d={d} /></svg>;
+}
 
 const tabs = [
   { href: '/app', label: 'Daily Drop', d: 'M12 3v12M6 11l6 6 6-6M5 21h14' },
@@ -13,15 +21,20 @@ const tabs = [
 
 export default function TabBar() {
   const path = usePathname();
+  // Highlight the tapped tab immediately, before its screen has loaded.
+  const [tapped, setTapped] = useState<string | null>(null);
+  useEffect(() => { setTapped(null); }, [path]);
   // Inside a conversation the composer takes the bottom, like any messaging app.
   if (/^\/app\/messages\/[^/]+/.test(path)) return null;
   return (
     <nav className="tabbar icons" aria-label="App">
       {tabs.map((t) => {
-        const on = t.href === '/app' ? path === '/app' : path.startsWith(t.href) || ('also' in t && !!t.also && t.also.some((a) => path.startsWith(a)));
+        const current = t.href === '/app' ? path === '/app' : path.startsWith(t.href) || ('also' in t && !!t.also && t.also.some((a) => path.startsWith(a)));
+        const on = tapped ? tapped === t.href : current;
         return (
-          <Link key={t.href} href={t.href} className={on ? 'on' : ''} aria-current={on ? 'page' : undefined} aria-label={t.label} title={t.label}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={t.d} /></svg>
+          <Link key={t.href} href={t.href} className={on ? 'on' : ''} aria-current={current ? 'page' : undefined} aria-label={t.label} title={t.label}
+            onClick={() => { if (!current) { setTapped(t.href); haptic('selection'); } }}>
+            <TabIcon d={t.d} />
             <span className="sr-only">{t.label}</span>
           </Link>
         );

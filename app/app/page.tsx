@@ -32,11 +32,10 @@ export default async function Drop({ searchParams }: { searchParams: Promise<{ o
       </div>
     );
   }
-  const [{ data: drop }, { data: mineData }, { data: checkinData }, { data: unread }, { data: againData }, { data: dailyData }, { data: wildId }] = await Promise.all([
+  const [{ data: drop }, { data: mineData }, { data: checkinData }, { data: unread }, { data: againData }, { data: dailyData }, { data: wildId }, { data: wbData }, creditMode] = await Promise.all([
     supabase.rpc('get_drop'), supabase.rpc('my_addons'), supabase.rpc('pending_checkins'), supabase.rpc('unread_notifications'),
-    supabase.rpc('pending_again'), supabase.rpc('todays_question'), supabase.rpc('get_wildcard'),
+    supabase.rpc('pending_again'), supabase.rpc('todays_question'), supabase.rpc('get_wildcard'), supabase.rpc('wellbeing_state'), getCreditMode(),
   ]);
-  const { data: wbData } = await supabase.rpc('wellbeing_state');
   const wb = (wbData as { open_chats: number; closed_on_me: number; checkin_due: boolean } | null) || { open_chats: 0, closed_on_me: 0, checkin_due: false };
   const weekKey = new Date().toISOString().slice(0, 10).slice(0, 8) + String(Math.ceil(new Date().getUTCDate() / 7));
   const again = (againData as Again[] | null) || [];
@@ -49,11 +48,12 @@ export default async function Drop({ searchParams }: { searchParams: Promise<{ o
   const dropIds = (drop || []).map((d: { match_id: string }) => d.match_id);
   const wild = typeof wildId === 'string' && !dropIds.includes(wildId) ? wildId : null;
   const ids = wild ? [...dropIds, wild] : dropIds;
-  const { data: people } = ids.length ? await supabase.from('profiles').select('*').in('id', ids) : { data: [] };
+  const [{ data: people }, photos] = await Promise.all([
+    ids.length ? supabase.from('profiles').select('*').in('id', ids) : Promise.resolve({ data: [] as Profile[] }),
+    photoUrls(supabase, ids),
+  ]);
   const byId = Object.fromEntries((people || []).map((p: Profile) => [p.id, p]));
-  const photos = await photoUrls(supabase, ids);
   const preview = me.plan === 'preview';
-  const creditMode = await getCreditMode();
   const daysLeft = me.preview_ends_at ? Math.max(0, Math.ceil((new Date(me.preview_ends_at).getTime() - Date.now()) / 86400000)) : null;
   return (
     <div className="phone">
