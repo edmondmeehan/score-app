@@ -7,7 +7,7 @@ import { previewSeason, saveSeasons } from './actions';
 export const dynamic = 'force-dynamic';
 
 const EFFECTS: [Effect, string][] = [['none', 'No effect'], ['snow', 'Snow'], ['confetti', 'Confetti'], ['hearts', 'Hearts'], ['leaves', 'Falling leaves'], ['embers', 'Glowing embers'], ['sparks', 'Fireworks sparks']];
-const fmtMD = (md: string) => (/^\d\d-\d\d$/.test(md) ? new Date(`2000-${md}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : md);
+const fmtMD = (md: string) => (/^\d\d-\d\d$/.test(md) ? new Date(`2000-${md}T12:00:00`).toLocaleDateString('en-US', { timeZone: 'America/New_York', month: 'short', day: 'numeric' }) : md);
 
 export default async function Themes({ searchParams }: { searchParams: Promise<{ ok?: string; error?: string }> }) {
   const sp = await searchParams;

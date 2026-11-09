@@ -50,7 +50,7 @@ export default async function Member({ params, searchParams }: { params: Promise
           <div className="stack grow" style={{ gap: 2 }}>
             <span className="label">ScoreDate band</span>
             <span className="serif" style={{ fontSize: 32, color: b.color }}>{b.label}</span>
-            <span className="small muted">{p.credit_verified_at ? `Verified ${new Date(p.credit_verified_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}` : 'Self-reported'}{inviter?.first_name ? ` · Invited by ${inviter.first_name}` : ''}</span>
+            <span className="small muted">{p.credit_verified_at ? `Verified ${new Date(p.credit_verified_at).toLocaleDateString('en-US', { timeZone: 'America/New_York', month: 'short', year: 'numeric' })}` : 'Self-reported'}{inviter?.first_name ? ` · Invited by ${inviter.first_name}` : ''}</span>
           </div>
           {p.trend === 'up' && p.show_improving && <span className="small" style={{ color: 'var(--rise)', fontWeight: 600 }}>↑ Improving</span>}
         </div>

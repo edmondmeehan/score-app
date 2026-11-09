@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 
 type Admin = { email: string; name: string | null; role: string; added_by: string | null; created_at: string; welcomed_at: string | null; has_account: boolean; last_sign_in: string | null };
 const ROLE: Record<string, string> = { owner: 'Full access', moderator: 'Moderator', verification: 'Verification', community: 'Community' };
-const day = (s: string | null) => (s ? new Date(s).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—');
+const day = (s: string | null) => (s ? new Date(s).toLocaleDateString('en-US', { timeZone: 'America/New_York', month: 'short', day: 'numeric', year: 'numeric' }) : '—');
 
 export default async function Team({ searchParams }: { searchParams: Promise<{ ok?: string; error?: string }> }) {
   const sp = await searchParams;

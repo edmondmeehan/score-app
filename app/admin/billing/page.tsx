@@ -20,7 +20,7 @@ export default async function Billing() {
       </div>
       <div className="card scroll-x"><table className="data" style={{ minWidth: 820 }}>
         <thead><tr><th>Received</th><th>Event</th><th>Store</th><th>Product</th><th>Plan after</th><th>Env</th><th>Member</th></tr></thead>
-        <tbody>{(events || []).map((e) => <tr key={e.id}><td className="mono small muted">{new Date(e.received_at).toLocaleString()}</td><td>{e.type}</td><td className="muted">{e.store}</td><td className="muted small">{e.product_id}</td><td>{e.plan || '—'}</td><td className="muted small">{e.environment}</td><td className="muted small">{e.user_id?.slice(0, 8)}</td></tr>)}</tbody>
+        <tbody>{(events || []).map((e) => <tr key={e.id}><td className="mono small muted">{new Date(e.received_at).toLocaleString('en-US', { timeZone: 'America/New_York' })}</td><td>{e.type}</td><td className="muted">{e.store}</td><td className="muted small">{e.product_id}</td><td>{e.plan || '—'}</td><td className="muted small">{e.environment}</td><td className="muted small">{e.user_id?.slice(0, 8)}</td></tr>)}</tbody>
       </table></div>
       {(events || []).length === 0 && <p className="small muted">No billing events yet. They appear once RevenueCat is connected and the apps are live.</p>}
     </>

@@ -56,7 +56,7 @@ export default async function Integrations({ searchParams }: { searchParams: Pro
             <div className="row" style={{ flexWrap: 'wrap' }}>
               {owner && <button className="btn sm">Save {s.name}</button>}
               {owner && s.testable && <button className="btn ghost sm" formAction={testIntegration}>Test connection</button>}
-              {r?.last_test_at && <span className="small" style={{ color: r.last_test_ok ? 'var(--rise)' : 'var(--alert)' }}>{r.last_test_ok ? 'Passed' : 'Failed'}: {r.last_test_message} · {new Date(r.last_test_at).toLocaleString()}</span>}
+              {r?.last_test_at && <span className="small" style={{ color: r.last_test_ok ? 'var(--rise)' : 'var(--alert)' }}>{r.last_test_ok ? 'Passed' : 'Failed'}: {r.last_test_message} · {new Date(r.last_test_at).toLocaleString('en-US', { timeZone: 'America/New_York' })}</span>}
               {r?.updated_by && <span className="small muted">Last changed by {r.updated_by}</span>}
             </div>
           </form>

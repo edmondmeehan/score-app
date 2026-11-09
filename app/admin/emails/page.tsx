@@ -52,7 +52,7 @@ export default async function Emails({ searchParams }: { searchParams: Promise<{
         <h2 style={{ margin: '0 0 12px', fontSize: 16 }}>Recent sends</h2>
         <table className="data" style={{ minWidth: 640 }}>
           <thead><tr><th>When</th><th>To</th><th>Email</th><th>Result</th></tr></thead>
-          <tbody>{(log || []).map((l) => <tr key={l.id}><td className="muted">{new Date(l.created_at).toLocaleString()}</td><td>{l.to_email}</td><td className="muted">{TEMPLATE_INFO[l.template as TemplateName]?.label || l.template}</td><td style={{ color: l.ok ? 'var(--rise)' : 'var(--alert)' }}>{l.ok ? 'Sent' : l.error}</td></tr>)}
+          <tbody>{(log || []).map((l) => <tr key={l.id}><td className="muted">{new Date(l.created_at).toLocaleString('en-US', { timeZone: 'America/New_York' })}</td><td>{l.to_email}</td><td className="muted">{TEMPLATE_INFO[l.template as TemplateName]?.label || l.template}</td><td style={{ color: l.ok ? 'var(--rise)' : 'var(--alert)' }}>{l.ok ? 'Sent' : l.error}</td></tr>)}
           {!log?.length && <tr><td colSpan={4} className="muted">Nothing sent yet.</td></tr>}</tbody>
         </table>
       </div>

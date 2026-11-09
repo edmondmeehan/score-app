@@ -33,7 +33,7 @@ export default async function DateChallenge({ searchParams }: { searchParams: Pr
         <div key={r.id} className="card stack" style={{ gap: 6 }}>
           <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
             <strong>{r.title}</strong>
-            <span className="small"><span style={{ color: 'var(--rise)' }}>${Number(r.spent).toFixed(2)}</span> · {name[r.user_id] || 'Member'} · {new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+            <span className="small"><span style={{ color: 'var(--rise)' }}>${Number(r.spent).toFixed(2)}</span> · {name[r.user_id] || 'Member'} · {new Date(r.created_at).toLocaleDateString('en-US', { timeZone: 'America/New_York', month: 'short', day: 'numeric' })}</span>
           </div>
           <p style={{ margin: 0, lineHeight: 1.55, whiteSpace: 'pre-wrap' }}>{r.story}</p>
           <div className="row small" style={{ gap: 8, flexWrap: 'wrap' }}>

@@ -16,7 +16,7 @@ export default async function Moderation() {
       {(reports || []).sort((a, b) => Number(urgent(b.reason)) - Number(urgent(a.reason))).map((r) => (
         <section key={r.id} className="card stack">
           <div className="row" style={{ justifyContent: 'space-between' }}><strong>{r.reason}</strong>{urgent(r.reason) && <span className="chip small" style={{ color: 'var(--alert)', borderColor: 'var(--alert)' }}>URGENT</span>}</div>
-          <span className="small muted">Reported by {name[r.reporter_id] || 'a member'} about <Link href={`/admin/members/${r.reported_id}`}>{name[r.reported_id] || 'member'}</Link> · {new Date(r.created_at).toLocaleString()}</span>
+          <span className="small muted">Reported by {name[r.reporter_id] || 'a member'} about <Link href={`/admin/members/${r.reported_id}`}>{name[r.reported_id] || 'member'}</Link> · {new Date(r.created_at).toLocaleString('en-US', { timeZone: 'America/New_York' })}</span>
           {r.note && <div className="notice" style={{ color: 'var(--ivory)' }}>{r.note}</div>}
           <form action={staffAct} className="row" style={{ flexWrap: 'wrap' }}>
             <input type="hidden" name="user" value={r.reported_id} /><input type="hidden" name="report" value={r.id} /><input type="hidden" name="back" value="/admin/moderation" />

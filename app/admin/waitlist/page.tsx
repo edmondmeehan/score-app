@@ -170,7 +170,7 @@ export default async function Waitlist({ searchParams }: { searchParams: Promise
                   <button className="btn ghost sm" title={w.founder ? `Founder (${w.founder_reason || 'staff'}). Click to remove.` : 'Make founder'}>{w.founder ? `★ ${w.founder_reason || 'yes'}` : '—'}</button>
                 </form>
               </td>
-              <td className="muted">{new Date(w.created_at).toLocaleDateString()}</td>
+              <td className="muted">{new Date(w.created_at).toLocaleDateString('en-US', { timeZone: 'America/New_York' })}</td>
               <td>{w.status}{w.invite_code ? <span className="mono small muted"> · {w.invite_code}</span> : null}</td>
               <td>
                 {w.status === 'waiting' && <form action={emailInvite}><input type="hidden" name="id" value={w.id} /><button className="btn sm">Email invite</button></form>}

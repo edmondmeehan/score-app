@@ -8,7 +8,7 @@ import PlaceDetails from '@/components/PlaceDetails';
 export type Plan = { id: string; proposer_id: string; place: string; address: string | null; starts_at: string; note: string | null; status: 'proposed' | 'accepted' | 'declined' | 'cancelled'; place_id?: string | null; lat?: number | null; lng?: number | null; budget_challenge?: boolean;
   reservation_by?: string | null; reservation_at?: string | null; reservation_name?: string | null; reservation_party?: number | null; reservation_conf?: string | null; reservation_note?: string | null };
 
-const fmt = (iso: string) => new Date(iso).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+const fmt = (iso: string) => new Date(iso).toLocaleString('en-US', { timeZone: 'America/New_York', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 
 function gcal(p: Plan) {
   const start = new Date(p.reservation_at || p.starts_at);

@@ -30,9 +30,9 @@ export default async function MemberDetail({ params, searchParams }: { params: P
         <section className="card stack" style={{ flex: '1 1 300px' }}>
           <h2 style={{ fontSize: 16, fontWeight: 600 }}>Verification</h2>
           <span className="small">ID: {p.id_status} · Photos: {p.photo_status}</span>
-          <span className="small">Band verified: {p.credit_verified_at ? new Date(p.credit_verified_at).toLocaleDateString() : 'not yet'}</span>
+          <span className="small">Band verified: {p.credit_verified_at ? new Date(p.credit_verified_at).toLocaleDateString('en-US', { timeZone: 'America/New_York' }) : 'not yet'}</span>
           <div className="notice">ScoreDate never stores exact credit scores, reports, or ID images.</div>
-          {(ver || []).map((v, i) => <span key={i} className="small muted">{new Date(v.created_at).toLocaleString()} · {v.kind} · {v.provider} · {v.status} {v.detail ? `· ${v.detail}` : ''}</span>)}
+          {(ver || []).map((v, i) => <span key={i} className="small muted">{new Date(v.created_at).toLocaleString('en-US', { timeZone: 'America/New_York' })} · {v.kind} · {v.provider} · {v.status} {v.detail ? `· ${v.detail}` : ''}</span>)}
         </section>
         <section className="card stack" style={{ flex: '1 1 300px' }}>
           <h2 style={{ fontSize: 16, fontWeight: 600 }}>Account</h2>
@@ -44,7 +44,7 @@ export default async function MemberDetail({ params, searchParams }: { params: P
       <div className="row" style={{ flexWrap: 'wrap' }}>
         {act('approve_id', 'Approve ID')}{act('decline_id', 'Decline ID')}{act('approve_photos', 'Approve photos')}{act('suspend', 'Suspend')}{act('reinstate', 'Reinstate')}{act('remove', 'Remove', 'btn danger sm')}
       </div>
-      <section className="card stack"><h2 style={{ fontSize: 16, fontWeight: 600 }}>History</h2>{(log || []).map((l) => <span key={l.id} className="small muted">{new Date(l.created_at).toLocaleString()} · {l.staff_email} · {l.action} · {l.reason}</span>)}</section>
+      <section className="card stack"><h2 style={{ fontSize: 16, fontWeight: 600 }}>History</h2>{(log || []).map((l) => <span key={l.id} className="small muted">{new Date(l.created_at).toLocaleString('en-US', { timeZone: 'America/New_York' })} · {l.staff_email} · {l.action} · {l.reason}</span>)}</section>
     </>
   );
 }

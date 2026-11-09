@@ -62,7 +62,7 @@ export default async function Verification({ searchParams }: { searchParams: Pro
               {['review', 'pending'].includes(p.id_status) && <span className="chip small" style={{ color: 'var(--gold)' }}>ID {p.id_status}</span>}
               {p.photo_status === 'review' && <span className="chip small" style={{ color: 'var(--gold)' }}>Photos{low != null ? ` · ${low}%` : ''}</span>}
               {sig && <span className="small muted">{[sig.city, sig.country].filter(Boolean).join(', ')}{sig.country && sig.country !== 'US' ? ' ⚠' : ''}</span>}
-              <span className="small muted">{new Date(p.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} ›</span>
+              <span className="small muted">{new Date(p.created_at).toLocaleDateString('en-US', { timeZone: 'America/New_York', month: 'short', day: 'numeric' })} ›</span>
             </Link>
           );
         }) : <span className="small muted">Nothing waiting.</span>}

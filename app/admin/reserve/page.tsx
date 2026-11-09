@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 type MM = { id: string; name: string; staff_email: string | null; photo_url: string | null; bio: string | null; booking_url: string | null; contact_email: string; active: boolean };
 type Member = { id: string; first_name: string | null; band: Band | null; neighborhood: string | null; matchmaker_id: string | null; matchmaker: string | null; assigned_at: string | null; waiting: number; last_at: string | null };
-const ago = (s: string | null) => (s ? new Date(s).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—');
+const ago = (s: string | null) => (s ? new Date(s).toLocaleDateString('en-US', { timeZone: 'America/New_York', month: 'short', day: 'numeric' }) : '—');
 
 function MatchmakerForm({ m }: { m?: MM }) {
   return (

@@ -119,7 +119,7 @@ export default async function Analytics({ searchParams }: { searchParams: Promis
                 <td style={{ color: m.band ? BANDS[m.band].color : undefined }}>{m.band ? BANDS[m.band].label : '—'}</td>
                 <td className="muted">{m.borough || '—'}</td><td className="muted">{m.status}</td>
                 <td className="mono">{m.views}</td><td className="mono">{m.messages}</td>
-                <td className="muted">{new Date(m.last_seen).toLocaleString()}</td>
+                <td className="muted">{new Date(m.last_seen).toLocaleString('en-US', { timeZone: 'America/New_York' })}</td>
               </tr>
             ))}
             {a.most_active.length === 0 && <tr><td colSpan={7} className="muted">No member activity yet.</td></tr>}

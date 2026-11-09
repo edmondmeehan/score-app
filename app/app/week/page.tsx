@@ -39,7 +39,7 @@ export default async function WeekRecap() {
         <div className="card stack" style={{ gap: 8 }}>
           <span className="label">What you’ve noticed</span>
           <span className="small muted">Your private notes after dates. Patterns here say a lot about what you’re really looking for.</span>
-          {notes.map((n, i) => <div key={i} className="stack" style={{ gap: 2 }}><span className="small muted">{n.place} · {new Date(n.at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span><span>{n.note}</span></div>)}
+          {notes.map((n, i) => <div key={i} className="stack" style={{ gap: 2 }}><span className="small muted">{n.place} · {new Date(n.at).toLocaleDateString('en-US', { timeZone: 'America/New_York', month: 'short', day: 'numeric' })}</span><span>{n.note}</span></div>)}
         </div>
       )}
       <div className="card gold stack" style={{ gap: 6 }}>

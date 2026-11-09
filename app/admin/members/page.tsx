@@ -21,7 +21,7 @@ export default async function Members({ searchParams }: { searchParams: Promise<
       <div className="card scroll-x"><table className="data" style={{ minWidth: 820 }}>
         <thead><tr><th>Member</th><th>Band</th><th>Status</th><th>Plan</th><th>ID</th><th>Photos</th><th>Joined</th></tr></thead>
         <tbody>{(data as Profile[] | null)?.map((p) => (
-          <tr key={p.id}><td><Link href={`/admin/members/${p.id}`} style={{ color: 'var(--ivory)', fontWeight: 600 }}>{p.first_name || p.email}</Link></td><td><BandPill band={p.band} trend={p.trend} verified={Boolean(p.credit_verified_at)} /></td><td>{p.status}</td><td className="muted">{p.plan}</td><td className="muted">{p.id_status}</td><td className="muted">{p.photo_status}</td><td className="muted">{new Date(p.created_at).toLocaleDateString()}</td></tr>
+          <tr key={p.id}><td><Link href={`/admin/members/${p.id}`} style={{ color: 'var(--ivory)', fontWeight: 600 }}>{p.first_name || p.email}</Link></td><td><BandPill band={p.band} trend={p.trend} verified={Boolean(p.credit_verified_at)} /></td><td>{p.status}</td><td className="muted">{p.plan}</td><td className="muted">{p.id_status}</td><td className="muted">{p.photo_status}</td><td className="muted">{new Date(p.created_at).toLocaleDateString('en-US', { timeZone: 'America/New_York' })}</td></tr>
         ))}</tbody>
       </table></div>
     </>
