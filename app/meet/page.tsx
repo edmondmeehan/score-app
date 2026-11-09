@@ -1,3 +1,4 @@
+import ShownMetrics from '@/components/ShownMetrics';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import WaitlistForm from '../WaitlistForm';
@@ -23,6 +24,7 @@ export default async function Meet() {
   return (
     <div>
       <SiteHeader />
+      <ShownMetrics />
 
       <section className="page" style={{ padding: '56px 24px 72px', display: 'flex', flexWrap: 'wrap', gap: 48, alignItems: 'flex-start' }}>
         <div className="stack" style={{ flex: '1 1 440px', gap: 22 }}>

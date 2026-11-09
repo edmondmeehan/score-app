@@ -1,3 +1,4 @@
+import ShownMetrics from '@/components/ShownMetrics';
 import Link from 'next/link';
 import ThemeSwitch from '@/components/ThemeSwitch';
 import { Gauge, Logo } from '@/components/ui';
@@ -16,6 +17,7 @@ export default async function Landing() {
   return (
     <div>
       <SiteHeader />
+      <ShownMetrics />
 
       <section className="page" style={{ padding: '64px 24px 88px', display: 'flex', flexWrap: 'wrap', gap: 48, alignItems: 'center' }}>
         <div className="stack" style={{ flex: '1 1 480px', gap: 26 }}>
