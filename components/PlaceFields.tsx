@@ -31,16 +31,20 @@ export type PlaceValue = { name?: string | null; address?: string | null; place_
  */
 export default function PlaceFields({
   nameField = 'venue', nameLabel = 'Venue', namePlaceholder, addressField = 'address', addressLabel = 'Address', addressPlaceholder,
-  defaults = {}, required = true, nameMax = 120, addressMax = 200, compact = false, onPick,
+  defaults = {}, required = true, nameMax = 120, addressMax = 200, compact = false, onPick, requireVerified = false,
 }: {
   nameField?: string; nameLabel?: string; namePlaceholder?: string; addressField?: string; addressLabel?: string; addressPlaceholder?: string;
   defaults?: PlaceValue; required?: boolean; nameMax?: number; addressMax?: number; compact?: boolean;
   /** Called with the Google place ID when someone picks a suggestion (null when they type over it). */
   onPick?: (placeId: string | null) => void;
+  /** With a Maps key: show whether the place is a verified Google place, and block form submit until one is picked. */
+  requireVerified?: boolean;
 }) {
   const [name, setName] = useState(defaults.name || '');
   const [address, setAddress] = useState(defaults.address || '');
   const [placeId, setPlaceId] = useState(defaults.place_id || '');
+  const verifyRef = useRef<HTMLInputElement>(null);
+  useEffect(() => { verifyRef.current?.setCustomValidity(''); }, [placeId]);
   const [lat, setLat] = useState(defaults.lat != null ? String(defaults.lat) : '');
   const [lng, setLng] = useState(defaults.lng != null ? String(defaults.lng) : '');
   const [items, setItems] = useState<Suggestion[]>([]);
@@ -139,6 +143,17 @@ export default function PlaceFields({
         <input className="input" name={addressField} value={address} maxLength={addressMax} placeholder={addressPlaceholder}
           onChange={(e) => { setAddress(e.target.value); setPlaceId(''); setLat(''); setLng(''); }} />
       </label>
+      {requireVerified && KEY && (
+        <>
+          {/* Visually hidden but validated: the form can't be sent until a real place is picked from the list. */}
+          <input ref={verifyRef} aria-hidden tabIndex={-1} required value={placeId} onChange={() => null}
+            onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Pick the place from the list so the address is verified.')}
+            style={{ position: 'absolute', opacity: 0, width: 1, height: 1, pointerEvents: 'none' }} />
+          <span className="small" style={{ color: placeId ? 'var(--rise)' : 'var(--muted)', width: '100%' }}>
+            {placeId ? '✓ Verified place from Google Maps' : 'Start typing, then pick the place from the list so the address is verified.'}
+          </span>
+        </>
+      )}
       <input type="hidden" name="place_id" value={placeId} />
       <input type="hidden" name="lat" value={lat} />
       <input type="hidden" name="lng" value={lng} />

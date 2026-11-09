@@ -102,6 +102,10 @@ export async function proposeDate(form: FormData) {
   const local = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(when) ? when : '';
   if (!local) back(`/app/messages/${conv}`, 'error', 'Pick a day and time.');
   const utc = new Date(Date.parse(local + ':00Z') + tz * 60000).toISOString();
+  // When Google Maps is set up, a date has to be a real, verified place (picked from the list), not free text.
+  if (process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY && !String(form.get('place_id') || '').trim()) {
+    back(`/app/messages/${conv}`, 'error', 'Pick the place from the list so the address is verified.');
+  }
   const { data: dateId, error } = await supabase.rpc('propose_date', {
     p_conversation: conv, p_place: String(form.get('place') || ''), p_address: String(form.get('address') || ''),
     p_starts_at: utc, p_note: String(form.get('note') || ''),

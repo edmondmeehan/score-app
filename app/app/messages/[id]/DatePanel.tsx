@@ -73,6 +73,7 @@ export default function DatePanel({ conversationId, meId, otherName, plan, share
         <span className="serif" style={{ fontSize: 24 }}>{plan.place}</span>
         {plan.budget_challenge && <span className="chip small" style={{ alignSelf: 'flex-start', color: 'var(--rise)', borderColor: 'var(--rise-line)' }}>$50 Date Challenge</span>}
         <span className="small">{fmt(plan.starts_at)}{plan.address ? ` · ${plan.address}` : ''}</span>
+        <span className="small" style={{ color: plan.place_id ? 'var(--rise)' : 'var(--muted)' }}>{plan.place_id ? '✓ Verified address' : 'Address not verified. Double-check it before you go.'}</span>
         {planPick && <div className="pick-perk"><span className="pick-badge">{planPick.badge}</span>{planPick.perk ? <span className="small">ScoreDate perk: {planPick.perk}. Show this screen when you arrive.</span> : <span className="small">A ScoreDate Partner venue.</span>}</div>}
         {plan.place_id && (
           <div onClickCapture={(e) => { if (planPick && (e.target as HTMLElement).closest('a')) logPick(planPick.id, 'reserve'); }}>
@@ -187,7 +188,7 @@ export default function DatePanel({ conversationId, meId, otherName, plan, share
           </div>
         </div>
       )}
-      <PlaceFields key={preset?.id || 'search'} compact nameField="place" nameLabel="Where" namePlaceholder="Search restaurants, bars, places" addressLabel="Address (optional)" addressPlaceholder="52 Grove St" onPick={setPickedPlace}
+      <PlaceFields key={preset?.id || 'search'} compact requireVerified nameField="place" nameLabel="Where" namePlaceholder="Search restaurants, bars, places" addressLabel="Address (optional)" addressPlaceholder="52 Grove St" onPick={setPickedPlace}
         defaults={preset ? { name: preset.name, address: preset.address || '', place_id: preset.place_id || '', lat: preset.lat, lng: preset.lng } : undefined} />
       {pickedPlace && <PlaceDetails placeId={pickedPlace} compact />}
       <label className="field">When<input className="input" type="datetime-local" name="starts_at" required min={minLocal} /></label>

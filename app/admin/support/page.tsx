@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import { supabaseServer } from '@/lib/supabase/server';
-import { updateTicket } from './actions';
+import { setTicketStatus, updateTicket } from './actions';
 
 const LABEL: Record<string, string> = { billing: 'Billing', account: 'Account', verification: 'Verification', safety: 'Safety', bug: 'Bug', feedback: 'Feedback', other: 'Other' };
 
-export default async function SupportQueue({ searchParams }: { searchParams: Promise<{ view?: string; error?: string }> }) {
+export default async function SupportQueue({ searchParams }: { searchParams: Promise<{ view?: string; error?: string; ok?: string }> }) {
   const sp = await searchParams;
   const view = sp.view === 'resolved' ? 'resolved' : 'open';
   const supabase = await supabaseServer();
@@ -21,6 +21,7 @@ export default async function SupportQueue({ searchParams }: { searchParams: Pro
         <div className="row small"><Link href="/admin/support" className={view === 'open' ? '' : 'muted'}>Open</Link><span className="muted">·</span><Link href="/admin/support?view=resolved" className={view === 'resolved' ? '' : 'muted'}>Resolved</Link></div>
       </div>
       {sp.error && <div className="notice error">{sp.error}</div>}
+      {sp.ok === 'resolved' && <div className="notice">Ticket resolved. Find it under Resolved.</div>}
       {(tickets || []).length === 0 && <p className="muted">{view === 'open' ? 'Inbox zero. Nothing waiting.' : 'Nothing resolved yet.'}</p>}
       {(tickets || []).map((t) => {
         const p = t.user_id ? who[t.user_id] : null;
@@ -45,10 +46,10 @@ export default async function SupportQueue({ searchParams }: { searchParams: Pro
               <input className="input" name="note" placeholder="Internal note (logged, not sent to the member)" defaultValue={t.staff_note || ''} />
               <div className="row" style={{ flexWrap: 'wrap' }}>
                 {t.email && <a className="btn ghost sm" href={`mailto:${t.email}?subject=${subject}`}>Reply by email</a>}
-                <button className="btn ghost sm" name="status" value="">Save note</button>
-                <button className="btn ghost sm" name="status" value="pending">Mark in progress</button>
-                <button className="btn sm" name="status" value="resolved">Resolve</button>
-                {t.status === 'resolved' && <button className="btn ghost sm" name="status" value="open">Reopen</button>}
+                <button className="btn ghost sm" formAction={setTicketStatus.bind(null, 'keep')}>Save note</button>
+                {t.status !== 'pending' && t.status !== 'resolved' && <button className="btn ghost sm" formAction={setTicketStatus.bind(null, 'pending')}>Mark in progress</button>}
+                {t.status !== 'resolved' && <button className="btn sm" formAction={setTicketStatus.bind(null, 'resolved')}>Resolve</button>}
+                {t.status === 'resolved' && <button className="btn ghost sm" formAction={setTicketStatus.bind(null, 'open')}>Reopen</button>}
               </div>
             </form>
           </section>
