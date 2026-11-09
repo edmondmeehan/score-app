@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation';
 import DocLayout from '@/components/DocLayout';
 import RichText from '@/components/RichText';
 import { DOCS } from '@/lib/docs';
+import { getPolicy, isPolicySlug } from '@/lib/policies';
 import AdsChoice from '@/components/AdsChoice';
 
 export function generateStaticParams() {
@@ -11,14 +12,14 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ doc: string }> }): Promise<Metadata> {
   const { doc } = await params;
-  const d = DOCS[doc];
+  const d = isPolicySlug(doc) ? await getPolicy(doc) : DOCS[doc];
   return d ? { title: `${d.title} · ScoreDate`, description: d.summary } : {};
 }
 
 export default async function Legal({ params }: { params: Promise<{ doc: string }> }) {
   const { doc } = await params;
   if (doc === 'safety') redirect('/safety');
-  const d = DOCS[doc];
+  const d = isPolicySlug(doc) ? await getPolicy(doc) : DOCS[doc];
   if (!d) notFound();
   return (
     <DocLayout eyebrow={d.eyebrow} title={d.title} summary={d.summary} updated={d.updated} toc={d.sections}>

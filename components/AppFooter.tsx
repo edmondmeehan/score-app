@@ -1,7 +1,7 @@
-import Link from 'next/link';
 import { getFooter } from '@/lib/footer';
 import { BUILD_LABEL } from '@/lib/build';
 import NativeVersion from './NativeVersion';
+import NewWindowLink from './NewWindowLink';
 
 export { BUILD_LABEL };
 
@@ -12,7 +12,7 @@ export default async function AppFooter({ meta = false }: { meta?: boolean } = {
   return (
     <footer className="app-footer">
       <nav aria-label="About ScoreDate">
-        {f.app_links.map((l) => (l.href.startsWith('/') ? <Link key={l.label + l.href} href={l.href}>{l.label}</Link> : <a key={l.label + l.href} href={l.href}>{l.label}</a>))}
+        {f.app_links.map((l) => (l.href.startsWith('mailto:') ? <a key={l.label + l.href} href={l.href}>{l.label}</a> : <NewWindowLink key={l.label + l.href} href={l.href}>{l.label}</NewWindowLink>))}
       </nav>
       {meta && <>
         <span className="small" style={{ color: 'var(--faint)', fontSize: 12 }}>© {new Date().getFullYear()} {f.company}. All rights reserved.</span>
