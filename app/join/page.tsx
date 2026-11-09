@@ -4,6 +4,7 @@ import { saveInvite } from './actions';
 import QuickWaitlist from './QuickWaitlist';
 import Link from 'next/link';
 import AppFooter from '@/components/AppFooter';
+import { hasInvite } from '@/lib/session';
 import { getBasemap } from '@/lib/basemap';
 import HeatMap, { Legend, type Spot } from '@/components/HeatMap';
 
@@ -12,13 +13,16 @@ export default async function Join({ searchParams }: { searchParams: Promise<{ c
   const supabase = await supabaseServer();
   const [{ data: { user } }, { data: heat }] = await Promise.all([supabase.auth.getUser(), supabase.rpc('public_area_heat')]);
   const spots = (heat as Spot[]) || [];
+  const invited = user ? await hasInvite(supabase, user.id) : false;
   return (
     <div className="phone" style={{ justifyContent: 'center', paddingBottom: 'calc(24px + env(safe-area-inset-bottom))' }}>
       <Logo />
       <span className="eyebrow">Invite only · New York</span>
       <h1 className="serif" style={{ fontSize: 44, lineHeight: 1.02 }}>Someone thinks you have your act together.</h1>
-      {user ? (
+      {user && invited ? (
         <Link href="/app" className="btn ghost block">Continue to ScoreDate{user.email ? ` as ${user.email}` : ''}</Link>
+      ) : user ? (
+        <div className="small muted" style={{ textAlign: 'center' }}>Signed in{user.email ? ` as ${user.email}` : ''}. Enter your invite code to continue, or join the waitlist below.</div>
       ) : (
         <div className="row" style={{ gap: 10, alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderRadius: 16, border: '1px solid var(--line-soft)', background: 'var(--graphite)' }}>
           <span className="small">Already a member?</span>

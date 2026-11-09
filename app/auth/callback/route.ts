@@ -1,5 +1,6 @@
 import { NextResponse, after, type NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
+import { afterSignIn } from '@/lib/session';
 import { supabaseServer } from '@/lib/supabase/server';
 import { trackEvent } from '@/lib/track';
 import { flushNotifications } from '@/lib/notify';
@@ -22,5 +23,5 @@ export async function GET(request: NextRequest) {
     store.delete('score_invite');
   }
   const dest = next.startsWith('/') && !next.startsWith('//') ? next : '/onboarding';
-  return NextResponse.redirect(new URL(dest, url.origin));
+  return NextResponse.redirect(new URL(await afterSignIn(supabase, dest), url.origin));
 }

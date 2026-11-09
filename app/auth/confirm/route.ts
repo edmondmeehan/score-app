@@ -1,6 +1,7 @@
 import { NextResponse, after, type NextRequest } from 'next/server';
 import type { EmailOtpType } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
+import { afterSignIn } from '@/lib/session';
 import { supabaseServer } from '@/lib/supabase/server';
 import { trackEvent } from '@/lib/track';
 import { flushNotifications } from '@/lib/notify';
@@ -42,5 +43,5 @@ export async function GET(request: NextRequest) {
     }
     store.delete('score_invite');
   }
-  return NextResponse.redirect(new URL(next || (type === 'signup' ? '/onboarding' : '/app'), url.origin));
+  return NextResponse.redirect(new URL(await afterSignIn(supabase, next || (type === 'signup' ? '/onboarding' : '/app')), url.origin));
 }

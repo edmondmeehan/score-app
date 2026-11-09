@@ -2,6 +2,7 @@
 import { redirect } from 'next/navigation';
 import { after } from 'next/server';
 import { cookies, headers } from 'next/headers';
+import { afterSignIn } from '@/lib/session';
 import { supabaseServer } from '@/lib/supabase/server';
 import { trackEvent } from '@/lib/track';
 import { flushNotifications } from '@/lib/notify';
@@ -29,7 +30,7 @@ async function finish(next: string, fallback: string) {
     }
     store.delete('score_invite');
   }
-  redirect(safeNext(next) || fallback);
+  redirect(await afterSignIn(supabase, safeNext(next) || fallback));
 }
 
 export async function signInPassword(form: FormData) {

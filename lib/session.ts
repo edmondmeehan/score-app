@@ -24,11 +24,35 @@ export function nextStep(me: Profile): string {
   return '/app';
 }
 
+type Sb = Awaited<ReturnType<typeof supabaseServer>>;
+/** ScoreDate is invite only: true once this person redeemed an invite (staff always pass). */
+export async function hasInvite(supabase: Sb, userId: string): Promise<boolean> {
+  const [{ data: isStaff }, { count }] = await Promise.all([
+    supabase.rpc('is_staff'),
+    supabase.from('invites').select('code', { count: 'exact', head: true }).eq('redeemed_by', userId),
+  ]);
+  return Boolean(isStaff) || Boolean(count);
+}
+
+/**
+ * Where to send someone right after they sign in or confirm their email. People without an invite go
+ * straight to the invite screen, so they never see the app (or its loading screen) for a moment first.
+ */
+export async function afterSignIn(supabase: Sb, dest: string): Promise<string> {
+  if (!(dest === '/app' || dest.startsWith('/app/') || dest.startsWith('/onboarding'))) return dest;
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return dest;
+  return (await hasInvite(supabase, user.id)) ? dest : '/join?need=1';
+}
+
 export async function requireMember() {
   const ctx = await getMe();
   if (!ctx.user || !ctx.me) redirect('/signin');
   const step = nextStep(ctx.me);
-  if (step !== '/app' && !['paused', 'taken'].includes(ctx.me.status)) redirect(step);
+  if (step !== '/app' && !['paused', 'taken'].includes(ctx.me.status)) {
+    if (step.startsWith('/onboarding') && !(await hasInvite(ctx.supabase, ctx.user.id))) redirect('/join?need=1');
+    redirect(step);
+  }
   // Paused or Taken: you can sign in and manage your account, but everything else waits until you reactivate.
   if (['paused', 'taken'].includes(ctx.me.status)) {
     const path = (await headers()).get('x-sd-path') || '';
