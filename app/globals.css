@@ -493,3 +493,8 @@ button.is-busy::after, .btn.is-busy::after { content: ''; display: inline-block;
 main, .phone { animation: screenin .2s ease-out; }
 @keyframes screenin { from { opacity: .001; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { main, .phone { animation: none; } }
+
+/* Drop page: +5 / Spotlight / Add-ons / Map on one row, even on small phones */
+.drop-actions { display: grid; grid-template-columns: 1.15fr 1.15fr 1fr 0.8fr; gap: 6px; }
+.drop-actions > form, .drop-actions > a { min-width: 0; }
+.drop-actions .btn { width: 100%; padding-left: 6px; padding-right: 6px; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; justify-content: center; text-align: center; }

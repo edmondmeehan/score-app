@@ -144,9 +144,9 @@ export default async function Drop({ searchParams }: { searchParams: Promise<{ o
           <span className="small muted">{daily.mine ? 'Saved. Matches who picked the same see it in your chat.' : 'Matches who pick the same answer see it in your chat.'}</span>
         </div>
       )}
-      <div className="row" style={{ gap: 8, flexWrap: 'wrap' }}>
-        <form action={useExtraDrop}><input type="hidden" name="return" value="/app" /><button className="btn ghost sm" disabled={!mine.included && mine.extra_drop < 1} title="Add 5 more people to today's Drop">+5 more today{!mine.included ? ` (${mine.extra_drop})` : ''}</button></form>
-        <form action={useSpotlight}><input type="hidden" name="return" value="/app" /><button className="btn ghost sm" disabled={Boolean(spotlightUntil) || (!mine.included && mine.spotlight < 1)}>{spotlightUntil ? `Spotlight on until ${spotlightUntil.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' })}` : `Spotlight${!mine.included ? ` (${mine.spotlight})` : ''}`}</button></form>
+      <div className="drop-actions">
+        <form action={useExtraDrop}><input type="hidden" name="return" value="/app" /><button className="btn ghost sm" disabled={!mine.included && mine.extra_drop < 1} title="Add 5 more people to today's Drop">+5 today{!mine.included ? ` (${mine.extra_drop})` : ''}</button></form>
+        <form action={useSpotlight}><input type="hidden" name="return" value="/app" /><button className="btn ghost sm" disabled={Boolean(spotlightUntil) || (!mine.included && mine.spotlight < 1)} title={spotlightUntil ? 'Spotlight is on' : 'Show your profile first in more Drops for an hour'}>{spotlightUntil ? `On · ${spotlightUntil.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' }).replace(/ [AP]M$/, '')}` : `Spotlight${!mine.included ? ` (${mine.spotlight})` : ''}`}</button></form>
         <Link href="/app/shop" className="btn ghost sm">Add-ons</Link>
         <Link href="/app/map" className="btn ghost sm">Map</Link>
       </div>
