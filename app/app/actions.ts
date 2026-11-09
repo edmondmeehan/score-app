@@ -1,4 +1,5 @@
 'use server';
+import { headers } from 'next/headers';
 import { after } from 'next/server';
 import { flushNotifications } from '@/lib/notify';
 import { redirect } from 'next/navigation';
@@ -174,7 +175,7 @@ export async function deleteAccount(form: FormData) {
   if (error) redirect('/app/settings?error=' + encodeURIComponent(error.message));
   await sendEmail(me?.email || user.email, 'deletion_confirm', { first_name: me?.first_name });
   await supabase.auth.signOut();
-  redirect('/?deleted=1');
+  redirect(/ScoreDateApp/.test((await headers()).get('user-agent') || '') ? '/join?deleted=1' : '/?deleted=1');
 }
 
 /** Reply to one of a member's prompts: opens (or reuses) the conversation and sends the reply quoting the prompt. */

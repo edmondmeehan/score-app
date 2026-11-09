@@ -8,7 +8,7 @@ import { hasInvite } from '@/lib/session';
 import { getBasemap } from '@/lib/basemap';
 import HeatMap, { Legend, type Spot } from '@/components/HeatMap';
 
-export default async function Join({ searchParams }: { searchParams: Promise<{ code?: string; need?: string; error?: string }> }) {
+export default async function Join({ searchParams }: { searchParams: Promise<{ code?: string; need?: string; error?: string; deleted?: string }> }) {
   const sp = await searchParams;
   const supabase = await supabaseServer();
   const [{ data: { user } }, { data: heat }] = await Promise.all([supabase.auth.getUser(), supabase.rpc('public_area_heat')]);
@@ -29,6 +29,7 @@ export default async function Join({ searchParams }: { searchParams: Promise<{ c
           <Link href="/signin?next=/app" className="btn sm">Sign in</Link>
         </div>
       )}
+      {sp.deleted && <div className="notice">Your account is being deleted. Thanks for trying ScoreDate.</div>}
       {sp.need && <div className="notice">ScoreDate is invite only. Enter the code a member sent you, or join the waitlist below.</div>}
       {sp.error && <div className="notice error">{sp.error}</div>}
       <form action={saveInvite} className="stack">

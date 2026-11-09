@@ -105,5 +105,7 @@ export async function sendLink(form: FormData) {
 export async function signOut() {
   const supabase = await supabaseServer();
   await supabase.auth.signOut();
-  redirect('/');
+  // In the iPhone/Android app, go back to the app's start screen (sign in / invite code); on the web, the home page.
+  const ua = (await headers()).get('user-agent') || '';
+  redirect(/ScoreDateApp/.test(ua) ? '/join' : '/');
 }
