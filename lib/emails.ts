@@ -62,13 +62,13 @@ export function render(e: Email, opts: RenderOpts = {}): { subject: string; html
       ? `<a href="${SITE_URL}/app/settings#email" style="color:${C.muted};text-decoration:underline;">Manage email settings</a> · ${opts.unsubUrl ? `<a href="${esc(opts.unsubUrl)}" style="color:${C.muted};text-decoration:underline;">Unsubscribe</a> · ` : ''}`
       : '';
   const html = `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark light"><meta name="supported-color-schemes" content="dark light">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark only"><meta name="supported-color-schemes" content="dark">
 <title>${esc(e.subject)}</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<style>@media (max-width:620px){.wrap{padding:28px 22px!important}.h1{font-size:34px!important}}</style></head>
-<body style="margin:0;padding:0;background:${C.bg};">
+<style>:root{color-scheme:dark only;supported-color-schemes:dark}u+.body .gmail-bg{background:#0B0B0C!important}@media (max-width:620px){.wrap{padding:28px 22px!important}.h1{font-size:34px!important}}</style></head>
+<body class="body" bgcolor="${C.bg}" style="margin:0;padding:0;background:${C.bg};background-color:${C.bg};">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${esc(e.preheader)}&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${C.bg}" style="background:${C.bg};"><tr><td align="center" style="padding:32px 12px;">
+<table role="presentation" class="gmail-bg" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${C.bg}" style="background:${C.bg};background-color:${C.bg};"><tr><td align="center" style="padding:32px 12px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;">
 <tr><td style="padding:0 6px 22px;"><a href="${SITE_URL}" style="text-decoration:none;"><img src="${SITE_URL}/email/logo.png" width="172" height="28" alt="SCOREDATE" style="display:block;border:0;color:${C.ivory};font:500 16px ${MONO};letter-spacing:6px;"></a></td></tr>
 <tr><td class="wrap" bgcolor="${C.card}" style="background:${C.card};border:1px solid ${C.line};border-radius:20px;padding:40px 40px 22px;">
