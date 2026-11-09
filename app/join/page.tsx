@@ -46,7 +46,7 @@ export default async function Join({ searchParams }: { searchParams: Promise<{ c
           <span className="small muted">New York City is open now. Other areas open as their waitlists grow. Shown by area only.</span>
         </section>
       )}
-      <AppFooter meta />
+      <AppFooter meta logout={Boolean(user)} />
     </div>
   );
 }

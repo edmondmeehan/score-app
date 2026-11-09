@@ -162,6 +162,8 @@ table.data td { padding: 12px 8px; border-top: 1px solid var(--line-soft); }
 .app-footer nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 16px; }
 .app-footer a { color: var(--faint); font-size: 13px; text-decoration: none; }
 .app-footer a:hover { color: var(--ivory); }
+.app-footer .footer-link { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: var(--faint); font-size: 13px; cursor: pointer; }
+.app-footer .footer-link:hover { color: var(--ivory); }
 .app-footer .meta { color: var(--faint); font-size: 12px; line-height: 1.5; font-family: inherit; letter-spacing: 0; }
 
 /* Splash footer: brand + 4 link columns on desktop, brand on top and links two-up on phones */
