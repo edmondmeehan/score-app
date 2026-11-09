@@ -19,7 +19,7 @@ export async function saveSpot(form: FormData) {
     name, place_id: /^[A-Za-z0-9_-]{10,300}$/.test(placeId) ? placeId : null,
     address: t(form, 'address', 200), lat: num(form, 'lat'), lng: num(form, 'lng'),
     neighborhood: t(form, 'neighborhood', 80), blurb: t(form, 'blurb', 160), perk: t(form, 'perk', 140),
-    badge: t(form, 'badge', 30) || 'ScoreDate pick', priority: Math.round(num(form, 'priority') || 0),
+    badge: t(form, 'badge', 30) || 'ScoreDate Partner', priority: Math.round(num(form, 'priority') || 0),
     active: form.get('active') === 'on', starts_on: day(form, 'starts_on'), ends_on: day(form, 'ends_on'),
     monthly_fee: num(form, 'monthly_fee'), contact_name: t(form, 'contact_name', 80), contact_email: t(form, 'contact_email', 160),
     notes: t(form, 'notes', 1000), updated_at: new Date().toISOString(),

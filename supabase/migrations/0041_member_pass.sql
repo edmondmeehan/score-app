@@ -41,3 +41,7 @@ begin
     'checked_in', (select count(*) from event_rsvps where event_id = p_event and checked_in_at is not null));
 end $$;
 grant execute on function public.staff_scan_member(uuid, uuid) to authenticated;
+
+-- Featured spots are labeled "ScoreDate Partner".
+alter table public.featured_spots alter column badge set default 'ScoreDate Partner';
+update public.featured_spots set badge = 'ScoreDate Partner' where badge = 'ScoreDate pick';

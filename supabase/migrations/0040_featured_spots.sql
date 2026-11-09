@@ -11,7 +11,7 @@ create table if not exists public.featured_spots (
   neighborhood text check (length(neighborhood) <= 80),
   blurb text check (length(blurb) <= 160),
   perk text check (length(perk) <= 140),
-  badge text not null default 'ScoreDate pick' check (length(badge) <= 30),
+  badge text not null default 'ScoreDate Partner' check (length(badge) <= 30),
   priority int not null default 0,
   active boolean not null default true,
   starts_on date,

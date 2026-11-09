@@ -16,7 +16,7 @@ function SpotForm({ s }: { s?: Spot }) {
       <PlaceFields nameField="name" nameLabel="Venue" namePlaceholder="Search the restaurant or bar" addressLabel="Address" defaults={s ? { name: s.name, address: s.address || '', place_id: s.place_id || '', lat: s.lat, lng: s.lng } : {}} />
       <div className="row" style={{ gap: 10, flexWrap: 'wrap' }}>
         <label className="field grow">Neighborhood<input className="input" name="neighborhood" maxLength={80} defaultValue={s?.neighborhood || ''} placeholder="West Village" /></label>
-        <label className="field" style={{ width: 170 }}>Badge<input className="input" name="badge" maxLength={30} defaultValue={s?.badge || 'ScoreDate pick'} /></label>
+        <label className="field" style={{ width: 170 }}>Badge<input className="input" name="badge" maxLength={30} defaultValue={s?.badge || 'ScoreDate Partner'} /></label>
         <label className="field" style={{ width: 110 }}>Priority<input className="input" name="priority" type="number" defaultValue={s?.priority ?? 0} /></label>
       </div>
       <label className="field">Member perk (optional)<input className="input" name="perk" maxLength={140} defaultValue={s?.perk || ''} placeholder="Free glass of bubbly for ScoreDate couples" /></label>
@@ -55,7 +55,7 @@ export default async function Featured({ searchParams }: { searchParams: Promise
   return (
     <>
       <h1 className="serif" style={{ fontSize: 44 }}>Featured spots</h1>
-      <span className="small muted">Venues that pay to appear first in Suggest a date as “ScoreDate picks”, with an optional perk for members. Tracking: how many members saw the pick, tapped it, tapped its menu or reservation links, and how many dates were suggested and accepted there.</span>
+      <span className="small muted">Venues that pay to appear first in Suggest a date as “ScoreDate Partners”, with an optional perk for members. Tracking: how many members saw the pick, tapped it, tapped its menu or reservation links, and how many dates were suggested and accepted there.</span>
       {sp.ok && <div className="notice">{sp.ok}</div>}
       {sp.error && <div className="notice error">{sp.error}</div>}
       {error && /relation|schema/.test(error.message) && <div className="notice error">Run migration 0040 in the ScoreDate SQL Editor first.</div>}

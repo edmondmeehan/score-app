@@ -22,7 +22,7 @@ function Hidden({ v }: { v: Record<string, string> }) {
   return <>{Object.entries(v).map(([k, val]) => <input key={k} type="hidden" name={k} value={val} />)}</>;
 }
 
-/** A featured venue ("ScoreDate pick") that pays to appear first in Suggest a date. */
+/** A featured venue ("ScoreDate Partner") that pays to appear first in Suggest a date. */
 export type Pick = { id: string; name: string; place_id: string | null; address: string | null; lat: number | null; lng: number | null; neighborhood: string | null; blurb: string | null; perk: string | null; badge: string };
 const logPick = (id: string, kind: 'view' | 'click' | 'reserve') => { supabaseBrowser().rpc('log_featured', { p_spot: id, p_kind: kind }).then(() => null, () => null); };
 
@@ -61,7 +61,7 @@ export default function DatePanel({ conversationId, meId, otherName, plan, share
         <span className="serif" style={{ fontSize: 24 }}>{plan.place}</span>
         {plan.budget_challenge && <span className="chip small" style={{ alignSelf: 'flex-start', color: 'var(--rise)', borderColor: 'var(--rise-line)' }}>$50 Date Challenge</span>}
         <span className="small">{fmt(plan.starts_at)}{plan.address ? ` · ${plan.address}` : ''}</span>
-        {planPick && <div className="pick-perk"><span className="pick-badge">{planPick.badge}</span>{planPick.perk ? <span className="small">ScoreDate perk: {planPick.perk}. Show this screen when you arrive.</span> : <span className="small">A ScoreDate favorite for dates.</span>}</div>}
+        {planPick && <div className="pick-perk"><span className="pick-badge">{planPick.badge}</span>{planPick.perk ? <span className="small">ScoreDate perk: {planPick.perk}. Show this screen when you arrive.</span> : <span className="small">A ScoreDate Partner venue.</span>}</div>}
         {plan.place_id && (
           <div onClickCapture={(e) => { if (planPick && (e.target as HTMLElement).closest('a')) logPick(planPick.id, 'reserve'); }}>
             <PlaceDetails placeId={plan.place_id} on={plan.starts_at} />
@@ -161,7 +161,7 @@ export default function DatePanel({ conversationId, meId, otherName, plan, share
       <span className="label">Suggest a date</span>
       {picks.length > 0 && (
         <div className="stack" style={{ gap: 8 }}>
-          <span className="small muted">ScoreDate picks</span>
+          <span className="small muted">ScoreDate Partners</span>
           <div className="picks-row">
             {picks.map((p) => (
               <button key={p.id} type="button" className={`pick-card${preset?.id === p.id ? ' on' : ''}`} data-haptic="selection"
