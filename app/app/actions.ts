@@ -48,6 +48,11 @@ export async function sendVoice(conversationId: string, path: string, seconds: n
   return { ok: !error, error: error?.message };
 }
 
+export async function voiceListened(messageId: string) {
+  const { supabase } = await ctx();
+  await supabase.rpc('mark_voice_listened', { p_message: messageId });
+}
+
 export async function answerDeeper(conversationId: string, questionId: number, answer: string) {
   const { supabase, user } = await ctx();
   const { error } = await supabase.rpc('answer_deeper', { p_conversation: conversationId, p_question: questionId, p_answer: answer });

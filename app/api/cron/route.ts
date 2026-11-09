@@ -4,6 +4,7 @@ import { sendBatch } from '@/lib/mailer';
 import { unsubUrl } from '@/lib/unsub';
 import { flushNotifications } from '@/lib/notify';
 import { reportBlocks } from '@/lib/adminReport';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -78,6 +79,15 @@ export async function GET(request: NextRequest) {
         const rows = a.errors.map((e) => [e.path || 'unknown', `${e.n} error${e.n === 1 ? '' : 's'} · ${(e.message || '').slice(0, 90)}`] as [string, string]);
         out.error_alert = await sendBatch('error_alert', a.to.map((to) => ({ to, data: { count, rows } })));
       }
+
+      // Disappearing voice notes: mark what's due (members lose access right away), then delete the files.
+      const voice = await sb.rpc('cron_expire_voice', { p_secret: secret });
+      const paths = (voice.data as string[] | null) || [];
+      const admin = supabaseAdmin();
+      if (paths.length && admin) {
+        for (let i = 0; i < paths.length; i += 100) await admin.storage.from('chat').remove(paths.slice(i, i + 100));
+      }
+      out.voice_expired = voice.error ? voice.error.message : admin ? paths.length : `${paths.length} (files kept: add SUPABASE_SERVICE_ROLE_KEY to delete)`;
 
       // Daily Drop "ready" alert: runs in the first half hour after the 00:00 UTC flip (no-op otherwise).
       const dropReady = await sb.rpc('queue_drop_ready', { p_secret: secret });

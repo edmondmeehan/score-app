@@ -2,12 +2,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { haptic } from '@/lib/haptics';
-import { kindClose, otherReadAt, sendMessage, sendPhoto, sendVoice } from '../../actions';
+import { kindClose, otherReadAt, sendMessage, sendPhoto, sendVoice, voiceListened } from '../../actions';
 import VoiceRecorder, { type Recording } from '@/components/VoiceRecorder';
 import { KIND_CLOSES, QUIET_HOURS, planItReady } from '@/lib/engagement';
 import type { Pick } from './DatePanel';
 
-type Msg = { id: string; sender_id: string; body: string; created_at: string; flag?: string | null; image_path?: string | null; audio_path?: string | null; audio_seconds?: number | null };
+type Msg = { id: string; sender_id: string; body: string; created_at: string; flag?: string | null; image_path?: string | null; audio_path?: string | null; audio_seconds?: number | null; audio_listened_at?: string | null; audio_expired?: boolean | null };
 
 const WARN: Record<string, string> = {
   money: 'Be careful: never send money, gift cards or crypto to someone you haven’t met, and don’t share bank details. If this feels off, tap More → Report.',
@@ -41,17 +41,27 @@ function Photo({ path, mine }: { path: string; mine: boolean }) {
   );
 }
 
-function Voice({ path, mine, seconds }: { path: string; mine: boolean; seconds?: number | null }) {
+function Voice({ m, mine }: { m: Msg; mine: boolean }) {
   const [url, setUrl] = useState<string | null>(null);
+  const [heard, setHeard] = useState(Boolean(m.audio_listened_at));
+  const expired = Boolean(m.audio_expired);
   useEffect(() => {
+    if (expired || !m.audio_path) return;
     let live = true;
-    supabaseBrowser().storage.from('chat').createSignedUrl(path, 3600).then(({ data }) => { if (live) setUrl(data?.signedUrl || null); });
+    supabaseBrowser().storage.from('chat').createSignedUrl(m.audio_path, 3600).then(({ data }) => { if (live) setUrl(data?.signedUrl || null); });
     return () => { live = false; };
-  }, [path]);
+  }, [m.audio_path, expired]);
+  const style = { background: mine ? 'var(--gold)' : 'var(--bubble)', color: mine ? 'var(--on-gold)' : 'var(--ivory)' };
+  if (expired) return <div className="voice-msg" style={{ ...style, opacity: 0.7 }}><span className="small">Voice note · expired</span></div>;
   return (
-    <div className="voice-msg" style={{ background: mine ? 'var(--gold)' : 'var(--bubble)', color: mine ? 'var(--on-gold)' : 'var(--ivory)' }}>
-      {url ? <audio controls preload="none" src={url} /> : <span className="small">Voice message</span>}
-      {seconds ? <span className="small" style={{ opacity: 0.8 }}>{seconds}s</span> : null}
+    <div className="stack" style={{ gap: 4, alignItems: mine ? 'flex-end' : 'flex-start', maxWidth: '78%' }}>
+      <div className="voice-msg" style={{ ...style, maxWidth: '100%' }}>
+        {url ? <audio controls preload="none" src={url} onEnded={() => { if (!mine && !heard) { setHeard(true); voiceListened(m.id).catch(() => null); } }} /> : <span className="small">Voice note</span>}
+        {m.audio_seconds ? <span className="small" style={{ opacity: 0.8 }}>{m.audio_seconds}s</span> : null}
+      </div>
+      <span className="small muted" style={{ fontSize: 11 }}>
+        {mine ? (m.audio_listened_at ? 'Listened · disappears within 24 hours' : 'Disappears 24 hours after it’s played') : heard ? 'Disappears within 24 hours' : 'Disappears 24 hours after you play it'}
+      </span>
     </div>
   );
 }
@@ -171,7 +181,7 @@ export default function Chat({ conversationId, meId, otherName, initial, canSend
           return (
             <div key={m.id} className="stack" style={{ gap: 6, alignItems: mine ? 'flex-end' : 'flex-start' }}>
               {m.audio_path
-                ? <Voice path={m.audio_path} mine={mine} seconds={m.audio_seconds} />
+                ? <Voice m={m} mine={mine} />
                 : m.image_path
                 ? <Photo path={m.image_path} mine={mine} />
                 : <div style={{ maxWidth: '78%', padding: '11px 14px', fontSize: 15, lineHeight: 1.4, borderRadius: mine ? '18px 18px 4px 18px' : '18px 18px 18px 4px', background: mine ? 'var(--gold)' : 'var(--bubble)', color: mine ? 'var(--on-gold)' : 'var(--ivory)', whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{m.body}</div>}
@@ -216,7 +226,7 @@ export default function Chat({ conversationId, meId, otherName, initial, canSend
             {openers.map((o) => <button key={o} type="button" data-haptic="light" onClick={() => { setText(o); setTimeout(() => inputRef.current?.focus(), 0); }}>{o}</button>)}
           </div>
         )}
-        {recOpen && canSend && <div style={{ margin: '0 4px 8px' }}><VoiceRecorder maxSeconds={60} onDone={sendRecording} onCancel={() => setRecOpen(false)} /></div>}
+        {recOpen && canSend && <div style={{ margin: '0 4px 8px' }}><VoiceRecorder maxSeconds={60} onDone={sendRecording} onCancel={() => setRecOpen(false)} note="Voice notes disappear from ScoreDate 24 hours after they’re played. Reported chats are kept for our safety team." /></div>}
         <div className="row" style={{ gap: 6 }}>
           <button type="button" className="btn ghost sm" style={{ minHeight: 44, width: 44, padding: 0 }} disabled={!canSend || busy} onClick={() => setRecOpen((v) => !v)} aria-label="Record a voice message">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" /></svg>

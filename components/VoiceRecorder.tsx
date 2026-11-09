@@ -11,8 +11,8 @@ function pickType(): { type: string; ext: string } {
 }
 
 /** Tap to record, tap to stop (auto-stops at maxSeconds), listen back, then send or redo. */
-export default function VoiceRecorder({ maxSeconds, onDone, onCancel, sendLabel = 'Send' }: {
-  maxSeconds: number; onDone: (r: Recording) => Promise<void> | void; onCancel?: () => void; sendLabel?: string;
+export default function VoiceRecorder({ maxSeconds, onDone, onCancel, sendLabel = 'Send', note }: {
+  maxSeconds: number; onDone: (r: Recording) => Promise<void> | void; onCancel?: () => void; sendLabel?: string; note?: string;
 }) {
   const [state, setState] = useState<'idle' | 'rec' | 'review' | 'busy'>('idle');
   const [secs, setSecs] = useState(0);
@@ -78,6 +78,7 @@ export default function VoiceRecorder({ maxSeconds, onDone, onCancel, sendLabel 
           </div>
         </div>
       )}
+      {note && <span className="small muted" style={{ fontSize: 11 }}>{note}</span>}
       {err && <div className="notice error">{err}</div>}
     </div>
   );

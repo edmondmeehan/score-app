@@ -121,7 +121,7 @@ export const DOCS: Record<string, Doc> = {
           'Answers you give in Hot or Financially Compatible rounds, and any $50 Date Challenge story you choose to submit.',
           'Event and date locations you enter, which are completed using Google Places.',
           'Optional profile details you choose to add, such as what you’re looking for, pets, religion and political views, your prompts and your “My NYC” places. Religion and politics are shown on your profile only if you pick them, and you can remove them any time.',
-          'Voice intros you record for your profile and voice messages you send in chat.',
+          'Voice intros you record for your profile, and voice notes you send in chat. Voice notes are deleted 24 hours after the other person first plays them, or after 7 days if never played; if either of you reports the other, voice notes between you are kept for up to 30 days so our safety team can review them. Someone could still record a voice note with another device.',
           'Answers to “Go deeper” questions in a chat (shown to the other person only after you’ve both answered), daily-question answers, “see them again?” answers and any private notes you write after a date (only you see these), and your monthly “how does dating feel?” check-in (used only in aggregate).',
           'Support requests and reports you file.',
         ] },
