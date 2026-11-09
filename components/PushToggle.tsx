@@ -2,7 +2,10 @@
 import { useEffect, useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 
-type State = 'loading' | 'unsupported' | 'ios-install' | 'denied' | 'off' | 'on' | 'working';
+type State = 'loading' | 'unsupported' | 'ios-install' | 'denied' | 'off' | 'on' | 'working' | 'native-on' | 'native-off' | 'native-denied';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const nativePush = (): any => { const C = typeof window !== 'undefined' ? (window as any).Capacitor : null; return C?.isNativePlatform?.() ? C.Plugins?.PushNotifications : null; };
 
 const b64ToBytes = (s: string) => {
   const pad = '='.repeat((4 - (s.length % 4)) % 4);
@@ -26,6 +29,11 @@ export default function PushToggle({ compact = false, onDone }: { compact?: bool
   const [err, setErr] = useState('');
 
   useEffect(() => {
+    const P = nativePush();
+    if (P) {
+      P.checkPermissions().then((r: { receive: string }) => setState(r.receive === 'granted' ? 'native-on' : r.receive === 'denied' ? 'native-denied' : 'native-off'), () => setState('unsupported'));
+      return;
+    }
     const s = detect();
     if (s !== 'off') { setState(s); return; }
     navigator.serviceWorker.register('/sw.js').then((reg) => reg.pushManager.getSubscription()).then((sub) => setState(sub ? 'on' : 'off'), () => setState('off'));
@@ -50,6 +58,24 @@ export default function PushToggle({ compact = false, onDone }: { compact?: bool
     } catch (e) { setErr(e instanceof Error ? e.message : 'Could not turn on notifications.'); setState('off'); }
   }
 
+  /** In the app: ask iOS, then register the device with ScoreDate. */
+  async function enableNative() {
+    const P = nativePush();
+    if (!P) return;
+    setErr(''); setState('working');
+    try {
+      const r = await P.requestPermissions();
+      if (r.receive !== 'granted') { setState(r.receive === 'denied' ? 'native-denied' : 'native-off'); return; }
+      const platform = (window as any).Capacitor.getPlatform?.() === 'android' ? 'android' : 'ios';
+      const h = await P.addListener('registration', (t: { value: string }) => {
+        sb().rpc('register_native_push', { p_token: t.value, p_platform: platform }).then(() => null, () => null);
+        h?.remove?.();
+      });
+      await P.register();
+      setState('native-on'); onDone?.();
+    } catch { setErr('Could not turn on notifications.'); setState('native-off'); }
+  }
+
   async function disable() {
     setErr(''); setState('working');
     try {
@@ -61,6 +87,9 @@ export default function PushToggle({ compact = false, onDone }: { compact?: bool
   }
 
   if (state === 'loading') return null;
+  if (state === 'native-on') return <span className="small muted">On for this iPhone. To turn them off, go to iPhone Settings → ScoreDate → Notifications. Choose which kinds you get below.</span>;
+  if (state === 'native-denied') return <span className="small muted">Notifications are off for ScoreDate. Turn them on in iPhone Settings → ScoreDate → Notifications.</span>;
+  if (state === 'native-off') return <button type="button" className={compact ? 'btn sm' : 'btn ghost sm'} onClick={enableNative}>Turn on notifications</button>;
   if (state === 'unsupported') return compact ? null : <span className="small muted">This browser doesn&apos;t support notifications.</span>;
   if (state === 'ios-install') return <span className="small muted">On iPhone, tap Share → <strong>Add to Home Screen</strong>, open ScoreDate from your home screen, then turn on notifications here.</span>;
   if (state === 'denied') return <span className="small muted">Notifications are blocked for ScoreDate. Turn them on in your browser or phone settings, then come back.</span>;

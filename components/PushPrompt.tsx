@@ -8,6 +8,8 @@ const KEY = 'score_push_prompt_dismissed';
 export default function PushPrompt() {
   const [show, setShow] = useState(false);
   useEffect(() => {
+    // Inside the iPhone/Android app, iOS asks for notification permission itself (see NativePush), so skip this web card.
+    if ((window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.()) return;
     let dismissed = false;
     try { dismissed = !!localStorage.getItem(KEY); } catch { /* private mode */ }
     if (dismissed || !('Notification' in window || /iPhone|iPad/.test(navigator.userAgent))) return;
