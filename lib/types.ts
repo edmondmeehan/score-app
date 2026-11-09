@@ -41,7 +41,7 @@ export type Profile = {
   created_at: string;
   prompts?: { q: string; a: string }[] | null; looking_for?: string | null; pets?: string | null; religion?: string | null; politics?: string | null;
   my_nyc?: { slot: string; name: string; place_id?: string | null; note?: string | null }[] | null;
-  flag_habit?: string | null; flag_splurge?: string | null; flag_save?: string | null; show_verified?: boolean; show_improving?: boolean; voice_path?: string | null; voice_seconds?: number | null; focus_mode?: boolean;
+  flag_habit?: string | null; flag_splurge?: string | null; flag_save?: string | null; show_verified?: boolean; show_improving?: boolean; voice_path?: string | null; voice_seconds?: number | null; focus_mode?: boolean; ai_ideas?: boolean;
 };
 
 export const BANDS: Record<Band, { label: string; range: string; color: string; fill: number }> = {

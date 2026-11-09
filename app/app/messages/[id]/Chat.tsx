@@ -1,4 +1,5 @@
 'use client';
+import OpenerIdeas from './OpenerIdeas';
 import { useEffect, useRef, useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { haptic } from '@/lib/haptics';
@@ -66,7 +67,7 @@ function Voice({ m, mine }: { m: Msg; mine: boolean }) {
   );
 }
 
-export default function Chat({ conversationId, meId, otherName, initial, canSend, initialReadAt, locked = 'Become a member to message', openers = [], open = true, startedAt, hasPlan = false, nudgePick = null }: { conversationId: string; meId: string; otherName: string; initial: Msg[]; canSend: boolean; initialReadAt: string | null; locked?: string; openers?: string[]; open?: boolean; startedAt?: string; hasPlan?: boolean; nudgePick?: Pick | null }) {
+export default function Chat({ conversationId, meId, otherName, initial, canSend, initialReadAt, locked = 'Become a member to message', openers = [], aiOn = false, open = true, startedAt, hasPlan = false, nudgePick = null }: { conversationId: string; meId: string; otherName: string; initial: Msg[]; canSend: boolean; initialReadAt: string | null; locked?: string; openers?: string[]; aiOn?: boolean; open?: boolean; startedAt?: string; hasPlan?: boolean; nudgePick?: Pick | null }) {
   const [msgs, setMsgs] = useState<Msg[]>(initial);
   const [text, setText] = useState('');
   const [err, setErr] = useState<string | null>(null);
@@ -221,10 +222,8 @@ export default function Chat({ conversationId, meId, otherName, initial, canSend
       )}
       <form onSubmit={send} className="composer">
         {yourTurn && !text && <div className="small" style={{ margin: '0 4px 6px', color: 'var(--gold-light)' }}>Your turn · {otherName} is waiting on you</div>}
-        {canSend && open && !sentAny && openers.length > 0 && !text && (
-          <div className="openers" aria-label="Opener ideas">
-            {openers.map((o) => <button key={o} type="button" data-haptic="light" onClick={() => { setText(o); setTimeout(() => inputRef.current?.focus(), 0); }}>{o}</button>)}
-          </div>
+        {canSend && open && !sentAny && !text && (openers.length > 0 || aiOn) && (
+          <OpenerIdeas conversationId={conversationId} otherName={otherName} fallback={openers} aiOn={aiOn} onPick={(o) => { setText(o); setTimeout(() => inputRef.current?.focus(), 0); }} />
         )}
         {recOpen && canSend && <div style={{ margin: '0 4px 8px' }}><VoiceRecorder maxSeconds={60} onDone={sendRecording} onCancel={() => setRecOpen(false)} note="Voice notes disappear from ScoreDate 24 hours after they’re played. Reported chats are kept for our safety team." /></div>}
         <div className="row" style={{ gap: 6 }}>

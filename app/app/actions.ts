@@ -87,6 +87,12 @@ export async function setFocusMode(form: FormData) {
   redirect('/app/settings?' + (error ? 'error=' + encodeURIComponent(error.message) : 'saved=1#focus'));
 }
 
+export async function setAiIdeas(form: FormData) {
+  const { supabase } = await ctx();
+  const { error } = await supabase.rpc('set_ai_ideas', { p_on: form.get('ai') === 'on' });
+  redirect('/app/settings?' + (error ? 'error=' + encodeURIComponent(error.message) : 'saved=1#ai'));
+}
+
 export async function saveWellbeing(form: FormData) {
   const { supabase } = await ctx();
   const score = Number(form.get('score'));

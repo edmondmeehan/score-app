@@ -132,7 +132,7 @@ export default async function Conversation({ params, searchParams }: { params: P
         justShared={Boolean(sp.shared)}
         picks={picks}
       />
-      <Chat conversationId={id} meId={me.id} otherName={o?.first_name || 'them'} initial={messages || []} canSend={canSend} initialReadAt={(readAt as string | null) || null} locked={conv.ended_at ? 'This conversation has ended' : 'Become a member to message'} openers={o ? openers(me, o) : []} open={!conv.ended_at} startedAt={conv.created_at} hasPlan={Boolean(plan)} nudgePick={picks[0] || null} />
+      <Chat conversationId={id} meId={me.id} otherName={o?.first_name || 'them'} initial={messages || []} canSend={canSend} initialReadAt={(readAt as string | null) || null} locked={conv.ended_at ? 'This conversation has ended' : 'Become a member to message'} openers={o ? openers(me, o) : []} aiOn={Boolean(me.ai_ideas)} open={!conv.ended_at} startedAt={conv.created_at} hasPlan={Boolean(plan)} nudgePick={picks[0] || null} />
     </div>
   );
 }

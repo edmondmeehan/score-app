@@ -7,7 +7,7 @@ import ThemeSwitch from '@/components/ThemeSwitch';
 import HapticsToggle from '@/components/HapticsToggle';
 import AppFooter from '@/components/AppFooter';
 import { signOut } from '../../signin/actions';
-import { changeEmail, deleteAccount, setFocusMode, setStatus } from '../actions';
+import { changeEmail, deleteAccount, setAiIdeas, setFocusMode, setStatus } from '../actions';
 import { saveEmailPrefs, saveMapPrivacy, saveNotifyPrefs, setShowOnline } from '../features';
 import PushToggle from '@/components/PushToggle';
 import FounderBadge from '@/components/FounderBadge';
@@ -59,6 +59,12 @@ export default async function Settings({ searchParams }: { searchParams: Promise
         <span className="label">Focus mode</span>
         <span className="small muted">Keep dating to a few people at a time. With it on, you can’t start new chats while 5 are open. People can still send you Notes.</span>
         <label className="row small" style={{ gap: 10 }}><input type="checkbox" name="focus" defaultChecked={Boolean(me.focus_mode)} style={{ width: 18, height: 18, accentColor: 'var(--gold)' }} />Focus mode</label>
+        <button className="btn ghost sm" style={{ alignSelf: 'flex-start' }}>Save</button>
+      </form>
+      <form action={setAiIdeas} className="card stack" id="ai">
+        <span className="label">AI conversation ideas</span>
+        <span className="small muted">Fresh opener ideas written for each chat. To write them, ScoreDate sends parts of both profiles (first names, prompts, NYC spots, song, job and neighborhood) to our AI provider, Anthropic. Never your credit band, messages, photos or contact details, and never used to train AI. Ideas only appear when both people have this on.</span>
+        <label className="row small" style={{ gap: 10 }}><input type="checkbox" name="ai" defaultChecked={Boolean(me.ai_ideas)} style={{ width: 18, height: 18, accentColor: 'var(--gold)' }} />Use AI conversation ideas</label>
         <button className="btn ghost sm" style={{ alignSelf: 'flex-start' }}>Save</button>
       </form>
       <div className="card stack" id="appearance">
