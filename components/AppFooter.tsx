@@ -13,12 +13,12 @@ export default async function AppFooter({ meta = false }: { meta?: boolean } = {
     <footer className="app-footer">
       {meta && <div className="stack" style={{ gap: 2, alignItems: 'center' }}>
         <NativeVersion />
-        <span className="mono small" style={{ color: 'var(--faint)', fontSize: 11, letterSpacing: '.06em' }}>{BUILD_LABEL}</span>
+        <span className="meta">{BUILD_LABEL}</span>
       </div>}
       <nav aria-label="About ScoreDate">
         {f.app_links.map((l) => (l.href.startsWith('mailto:') ? <a key={l.label + l.href} href={l.href}>{l.label}</a> : <NewWindowLink key={l.label + l.href} href={l.href}>{l.label}</NewWindowLink>))}
       </nav>
-      {meta && <span className="small" style={{ color: 'var(--faint)', fontSize: 12 }}>© {new Date().getFullYear()} ScoreDate, Inc. All Rights Reserved.</span>}
+      {meta && <span className="meta">© {new Date().getFullYear()} ScoreDate, Inc. All Rights Reserved.</span>}
     </footer>
   );
 }

@@ -11,5 +11,5 @@ export default function NativeVersion() {
     if (!C?.isNativePlatform?.() || !App?.getInfo) return;
     App.getInfo().then((i: { version: string; build: string }) => setLabel(`${C.getPlatform() === 'android' ? 'Android' : 'iPhone'} app ${i.version} (${i.build})`)).catch(() => null);
   }, []);
-  return label ? <span className="mono small" style={{ color: 'var(--faint)', fontSize: 11, letterSpacing: '.06em' }}>{label}</span> : null;
+  return label ? <span className="meta">{label}</span> : null;
 }

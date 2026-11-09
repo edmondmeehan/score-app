@@ -13,7 +13,7 @@ export default async function Join({ searchParams }: { searchParams: Promise<{ c
   const [{ data: { user } }, { data: heat }] = await Promise.all([supabase.auth.getUser(), supabase.rpc('public_area_heat')]);
   const spots = (heat as Spot[]) || [];
   return (
-    <div className="phone" style={{ justifyContent: 'center' }}>
+    <div className="phone" style={{ justifyContent: 'center', paddingBottom: 'calc(24px + env(safe-area-inset-bottom))' }}>
       <Logo />
       <span className="eyebrow">Invite only · New York</span>
       <h1 className="serif" style={{ fontSize: 44, lineHeight: 1.02 }}>Someone thinks you have your act together.</h1>
