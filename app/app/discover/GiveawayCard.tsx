@@ -8,6 +8,7 @@ async function enter(form: FormData) {
   const supabase = await supabaseServer();
   await supabase.rpc('enter_giveaway', { p_g: String(form.get('id')) });
   revalidatePath('/app/discover');
+  revalidatePath('/app/giveaways');
 }
 
 /** Free giveaway card in Discover. One tap to enter; entering never needs a purchase (Apple 5.3). */

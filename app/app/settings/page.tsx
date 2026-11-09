@@ -113,6 +113,7 @@ export default async function Settings({ searchParams }: { searchParams: Promise
         <Link href="/plans">Change plan</Link>
         <span className="small muted">On iPhone, subscriptions are managed in your App Store settings.</span>
       </div>
+      <Link href="/app/invites" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}><span className="grow">Invites <span className="small muted">· Invite friends and track who joined</span></span><span className="muted">›</span></Link>
       <Link href="/app/shop" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}><span className="grow">Add-ons <span className="small muted">· Spotlight, Extra connections, Notes</span></span><span className="muted">›</span></Link>
       <Link href="/help" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="grow">Help center</span><span className="muted">›</span>
