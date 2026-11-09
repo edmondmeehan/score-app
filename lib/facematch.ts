@@ -33,6 +33,13 @@ export async function compareFaces(selfie: Uint8Array, photo: Uint8Array): Promi
       return { status: 'review', similarity: null, reason: 'Could not read a face in one of the images' };
     }
     console.error('[facematch] AWS error:', err.name, err.message);
-    return { status: 'review', similarity: null, reason: `AWS error: ${err.name || 'unknown'}${err.message ? ` (${err.message.slice(0, 120)})` : ''}` };
+    const msg = err.message || '';
+    const why = /service control policy/i.test(msg) ? 'blocked by an AWS Organizations policy (SCP) on this account'
+      : /permissions boundary/i.test(msg) ? 'blocked by a permissions boundary on the IAM user'
+      : /explicit deny/i.test(msg) ? 'blocked by an explicit Deny policy'
+      : /no identity-based policy allows/i.test(msg) ? 'the IAM user has no policy allowing rekognition:CompareFaces'
+      : /security token|signature|InvalidClientTokenId/i.test(msg + err.name) ? 'the access key or secret is wrong'
+      : msg.slice(0, 140);
+    return { status: 'review', similarity: null, reason: `AWS error: ${err.name || 'unknown'} · ${why}` };
   }
 }
