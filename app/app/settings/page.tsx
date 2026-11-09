@@ -42,6 +42,10 @@ export default async function Settings({ searchParams }: { searchParams: Promise
         <span className="stack grow" style={{ gap: 2 }}><strong>Edit profile</strong><span className="small muted">Photos, prompt, song and Instagram</span></span>
         <span style={{ color: 'var(--gold)' }}>→</span>
       </Link>
+      <Link href="/app/pass" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="stack grow" style={{ gap: 2 }}><strong>Member pass</strong><span className="small muted">Your QR code for event check-in and partner perks</span></span>
+        <span style={{ color: 'var(--gold)' }}>→</span>
+      </Link>
       <Link href="/app/likes" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="grow">Likes &amp; profile views</span><span className="muted">›</span>
       </Link>

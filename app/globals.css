@@ -425,3 +425,25 @@ html.native .event-hero { margin-top: calc(-12px - env(safe-area-inset-top)); }
 .pick-badge { font: 600 10px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
 .pick-perk-line { color: var(--gold-light); }
 .pick-perk { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border-radius: 14px; border: 1px dashed var(--gold-edge); background: var(--gold-wash); }
+
+/* Member pass + scanner */
+.pass-card { display: flex; flex-direction: column; gap: 18px; padding: 22px; border-radius: 26px; border: 1px solid var(--gold-edge); background: radial-gradient(120% 120% at 0% 0%, var(--hero-glow), transparent 60%), linear-gradient(160deg, var(--gold-wash), var(--graphite) 65%); }
+.pass-photo { width: 64px; height: 64px; flex: none; border-radius: 18px; overflow: hidden; background: var(--track); display: grid; place-items: center; border: 1px solid var(--gold-edge); }
+.pass-photo img { width: 100%; height: 100%; object-fit: cover; }
+.pass-photo .serif { font-size: 30px; color: var(--gold-light); }
+.pass-event { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: 14px; background: var(--glass); border: 1px solid var(--line-soft); }
+.pass-qr-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.pass-qr { width: min(280px, 78vw); aspect-ratio: 1; padding: 14px; border-radius: 22px; background: #fff; box-shadow: 0 14px 40px var(--shadow); }
+.pass-qr svg, .pass-qr > div { width: 100%; height: 100%; display: block; }
+.pass-qr-empty { width: 100%; height: 100%; border-radius: 10px; background: linear-gradient(90deg, #eee, #f7f7f7, #eee); background-size: 200% 100%; animation: pass-shimmer 1.2s linear infinite; }
+@keyframes pass-shimmer { to { background-position: -200% 0; } }
+.pass-timer { display: flex; flex-direction: column; align-items: center; gap: 6px; width: min(280px, 78vw); }
+.pass-bar { width: 100%; height: 3px; border-radius: 3px; background: var(--track); overflow: hidden; }
+.pass-bar span { display: block; height: 100%; background: var(--gold); transition: width 1s linear; }
+.scan-box { position: relative; border-radius: 20px; overflow: hidden; background: var(--deep); border: 1px solid var(--line-soft); min-height: 220px; display: grid; place-items: center; }
+.scan-box video { width: 100%; max-height: 60vh; object-fit: cover; }
+.scan-frame { position: absolute; inset: 18% 22%; border: 3px solid var(--gold); border-radius: 18px; box-shadow: 0 0 0 999px rgba(0,0,0,.35); pointer-events: none; }
+.scan-result { padding: 16px; border-radius: 20px; border: 1px solid var(--line); }
+.scan-result.ok { border-color: var(--rise-line); background: rgba(127,194,155,.08); } .scan-result.ok .serif { color: var(--rise); }
+.scan-result.warn { border-color: var(--gold-edge); background: var(--gold-wash); } .scan-result.warn .serif { color: var(--gold-light); }
+.scan-result.bad { border-color: var(--danger-line); background: rgba(229,138,122,.08); } .scan-result.bad .serif { color: var(--alert); }

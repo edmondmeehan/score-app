@@ -124,6 +124,7 @@ export default async function EventPage({ params, searchParams }: { params: Prom
             <form action={rsvp} className="stack" style={{ gap: 8 }}>
               <input type="hidden" name="event_id" value={e.id} /><input type="hidden" name="going" value="no" />
               <div className="notice" style={{ margin: 0 }}>{status === 'going' ? 'You’re going. See you there.' : 'You’re on the waitlist. We’ll move you in if a spot opens.'}</div>
+              {status === 'going' && <Link href={`/app/pass?event=${e.id}`} className="btn block" data-haptic="medium">Show my pass for check-in</Link>}
               <button className="btn ghost block" data-haptic="medium">Cancel my RSVP</button>
             </form>
           ) : !member ? (

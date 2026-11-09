@@ -22,7 +22,7 @@ export default async function AdminEvents() {
             {events.map((e, i) => (
               <tr key={e.id}>
                 <td className="mono small">{when(e.starts_at)}</td>
-                <td><Link href={`/admin/events/${e.id}`}>{e.title}</Link></td>
+                <td><Link href={`/admin/events/${e.id}`}>{e.title}</Link>{e.status === 'published' && <> · <Link href={`/admin/scan?event=${e.id}`} className="small">Check in guests</Link></>}</td>
                 <td className="muted">{e.venue}</td>
                 <td style={{ color: e.status === 'published' ? 'var(--rise)' : e.status === 'cancelled' ? 'var(--alert)' : 'var(--muted)' }}>{e.status}</td>
                 <td className="mono">{counts[i]?.going ?? 0} / {e.capacity}</td>
