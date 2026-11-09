@@ -144,7 +144,10 @@ export default async function Settings({ searchParams }: { searchParams: Promise
         <label className="field">Type DELETE to confirm<input className="input" name="confirm" autoComplete="off" /></label>
         <button className="btn danger sm">Delete my account</button>
       </form>
-      <AppFooter />
+      <a href="https://www.instagram.com/scoredateapp/" target="_blank" rel="noopener noreferrer" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="grow">Follow us on Instagram <span className="small muted">· @scoredateapp</span></span><span className="muted">↗</span>
+      </a>
+      <AppFooter meta />
     </div>
   );
 }
