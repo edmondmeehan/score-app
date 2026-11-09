@@ -9,7 +9,7 @@ import { SITE_URL } from '@/lib/emails';
 import type { Profile } from '@/lib/types';
 import Chat from './Chat';
 import DatePanel, { type Pick, type Plan } from './DatePanel';
-import { openers, publicTrend } from '@/lib/engagement';
+import { nearestFirst, openers, publicTrend } from '@/lib/engagement';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,6 +33,13 @@ export default async function Conversation({ params, searchParams }: { params: P
   const paid = ['membership', 'premium', 'black', 'paused'].includes(me.plan);
   const canSend = !conv.ended_at && (paid || (Boolean(conv.note_from) && conv.note_from !== me.id));
   const { data: picksData } = await supabase.rpc('featured_spots_live');
+  type Geo = { lat: number | null; lng: number | null };
+  const [{ data: myGeo }, { data: theirGeo }] = await Promise.all([
+    me.zip ? supabase.rpc('zip_lookup', { p_zip: me.zip }) : Promise.resolve({ data: null }),
+    o?.zip ? supabase.rpc('zip_lookup', { p_zip: o.zip }) : Promise.resolve({ data: null }),
+  ]);
+  // Partners nearest to the two of you first (used by the "Plan it" nudge and the Suggest a date row).
+  const picks = nearestFirst((picksData as Pick[] | null) || [], myGeo as Geo | null, theirGeo as Geo | null);
   const [{ data: readAt }, { data: presence }, { data: sharedQ }] = await Promise.all([
     supabase.rpc('other_read_at', { p_conversation: id }),
     supabase.rpc('presence_of', { p_user: otherId }),
@@ -89,9 +96,9 @@ export default async function Conversation({ params, searchParams }: { params: P
         plan={plan}
         shareUrl={share && !share.revoked ? `${SITE_URL}/d/${share.token}` : null}
         justShared={Boolean(sp.shared)}
-        picks={(picksData as Pick[] | null) || []}
+        picks={picks}
       />
-      <Chat conversationId={id} meId={me.id} otherName={o?.first_name || 'them'} initial={messages || []} canSend={canSend} initialReadAt={(readAt as string | null) || null} locked={conv.ended_at ? 'This conversation has ended' : 'Become a member to message'} openers={o ? openers(me, o) : []} open={!conv.ended_at} startedAt={conv.created_at} />
+      <Chat conversationId={id} meId={me.id} otherName={o?.first_name || 'them'} initial={messages || []} canSend={canSend} initialReadAt={(readAt as string | null) || null} locked={conv.ended_at ? 'This conversation has ended' : 'Become a member to message'} openers={o ? openers(me, o) : []} open={!conv.ended_at} startedAt={conv.created_at} hasPlan={Boolean(plan)} nudgePick={picks[0] || null} />
     </div>
   );
 }

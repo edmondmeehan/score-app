@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { haptic } from '@/lib/haptics';
 import { kindClose, otherReadAt, sendMessage, sendPhoto } from '../../actions';
-import { KIND_CLOSES, QUIET_HOURS } from '@/lib/engagement';
+import { KIND_CLOSES, QUIET_HOURS, planItReady } from '@/lib/engagement';
+import type { Pick } from './DatePanel';
 
 type Msg = { id: string; sender_id: string; body: string; created_at: string; flag?: string | null; image_path?: string | null };
 
@@ -39,7 +40,7 @@ function Photo({ path, mine }: { path: string; mine: boolean }) {
   );
 }
 
-export default function Chat({ conversationId, meId, otherName, initial, canSend, initialReadAt, locked = 'Become a member to message', openers = [], open = true, startedAt }: { conversationId: string; meId: string; otherName: string; initial: Msg[]; canSend: boolean; initialReadAt: string | null; locked?: string; openers?: string[]; open?: boolean; startedAt?: string }) {
+export default function Chat({ conversationId, meId, otherName, initial, canSend, initialReadAt, locked = 'Become a member to message', openers = [], open = true, startedAt, hasPlan = false, nudgePick = null }: { conversationId: string; meId: string; otherName: string; initial: Msg[]; canSend: boolean; initialReadAt: string | null; locked?: string; openers?: string[]; open?: boolean; startedAt?: string; hasPlan?: boolean; nudgePick?: Pick | null }) {
   const [msgs, setMsgs] = useState<Msg[]>(initial);
   const [text, setText] = useState('');
   const [err, setErr] = useState<string | null>(null);
@@ -49,6 +50,8 @@ export default function Chat({ conversationId, meId, otherName, initial, canSend
   const [closed, setClosed] = useState(false);
   const [now, setNow] = useState<number | null>(null);
   useEffect(() => { setNow(Date.now()); const t = setInterval(() => setNow(Date.now()), 60000); return () => clearInterval(t); }, []);
+  const [nudgeOff, setNudgeOff] = useState<number | null>(null);
+  useEffect(() => { try { const v = localStorage.getItem(`sd:planit:${conversationId}`); if (v) setNudgeOff(Number(v)); } catch { /* storage blocked */ } }, [conversationId]);
   const end = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -108,6 +111,23 @@ export default function Chat({ conversationId, meId, otherName, initial, canSend
   const sentAny = Boolean(lastMine);
   const yourTurn = open && canSend && last && last.sender_id !== meId;
   const lastAt = new Date(last?.created_at || startedAt || Date.now()).getTime();
+  // "Plan it": after ~10 messages with both people engaged, and no date suggested yet.
+  const textMsgs = msgs.filter((m) => !m.image_path);
+  const showPlanIt = open && canSend && !hasPlan && planItReady(textMsgs.map((m) => m.sender_id), meId)
+    && (nudgeOff === null || msgs.length >= nudgeOff + 15);
+  const loggedView = useRef(false);
+  useEffect(() => {
+    if (showPlanIt && nudgePick && !loggedView.current) { loggedView.current = true; supabaseBrowser().rpc('log_featured', { p_spot: nudgePick.id, p_kind: 'view' }).then(() => null, () => null); }
+  }, [showPlanIt, nudgePick]);
+  function planIt() {
+    haptic('light');
+    if (nudgePick) supabaseBrowser().rpc('log_featured', { p_spot: nudgePick.id, p_kind: 'click' }).then(() => null, () => null);
+    window.dispatchEvent(new CustomEvent('sd:suggest-date', { detail: { pickId: nudgePick?.id } }));
+  }
+  function notYet() {
+    setNudgeOff(msgs.length);
+    try { localStorage.setItem(`sd:planit:${conversationId}`, String(msgs.length)); } catch { /* storage blocked */ }
+  }
   const quiet = open && !closed && now !== null && now - lastAt > QUIET_HOURS * 3600000;
   const seen = lastMine && readAt && new Date(readAt).getTime() >= new Date(lastMine.created_at).getTime();
 
@@ -128,6 +148,20 @@ export default function Chat({ conversationId, meId, otherName, initial, canSend
         })}
         <div ref={end} />
       </div>
+      {showPlanIt && !quiet && (
+        <div className="card gold stack plan-it" style={{ gap: 8, marginTop: 12 }}>
+          <span className="label">Plan it</span>
+          <span className="serif" style={{ fontSize: 22, lineHeight: 1.2 }}>You two have a good thing going. Take it offline?</span>
+          {nudgePick ? (
+            <span className="small">Try <strong>{nudgePick.name}</strong>{nudgePick.neighborhood ? ` in ${nudgePick.neighborhood}` : ''}{nudgePick.perk ? <span className="pick-perk-line"> · ★ {nudgePick.perk}</span> : null}</span>
+          ) : <span className="small muted">Most first dates are set within a day or two of a chat like this.</span>}
+          <div className="row" style={{ gap: 8 }}>
+            <button type="button" className="btn sm" onClick={planIt}>{nudgePick ? `Suggest ${nudgePick.name}` : 'Suggest a date'}</button>
+            <button type="button" className="btn ghost sm" onClick={notYet}>Not yet</button>
+          </div>
+          {nudgePick && <span className="small muted" style={{ fontSize: 11 }}>{nudgePick.badge} · ScoreDate Partners pay to be featured</span>}
+        </div>
+      )}
       {quiet && (
         <div className="card stack kind-close" style={{ gap: 8, marginTop: 12 }}>
           <span className="small"><strong>This chat’s been quiet for a couple of days.</strong> <span className="muted">Not feeling it? Send a kind goodbye and close it. {otherName} sees the message, nothing else.</span></span>

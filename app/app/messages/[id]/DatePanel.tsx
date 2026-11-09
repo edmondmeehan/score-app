@@ -38,6 +38,18 @@ export default function DatePanel({ conversationId, meId, otherName, plan, share
   const minLocal = new Date(Date.now() + 60 * 60000 - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
 
   const [showLink, setShowLink] = useState(false);
+  // The in-chat "Plan it" nudge opens this form with a Partner already picked.
+  useEffect(() => {
+    const onSuggest = (e: Event) => {
+      const id = (e as CustomEvent<{ pickId?: string }>).detail?.pickId;
+      const p = id ? picks.find((x) => x.id === id) || null : null;
+      if (p) { setPreset(p); setPickedPlace(p.place_id); }
+      setOpen(true);
+      setTimeout(() => document.getElementById('date-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+    };
+    window.addEventListener('sd:suggest-date', onSuggest);
+    return () => window.removeEventListener('sd:suggest-date', onSuggest);
+  }, [picks]);
   // Count each pick as seen once the suggest form is open.
   useEffect(() => { if (open && !plan) picks.forEach((p) => logPick(p.id, 'view')); }, [open, plan, picks]);
   const planPick = plan?.place_id ? picks.find((p) => p.place_id && p.place_id === plan.place_id) : null;
@@ -156,7 +168,7 @@ export default function DatePanel({ conversationId, meId, otherName, plan, share
   }
 
   return open ? (
-    <form action={proposeDate} className="card stack" style={{ gap: 10 }}>
+    <form id="date-panel" action={proposeDate} className="card stack" style={{ gap: 10 }}>
       <Hidden v={{ conversation_id: conversationId, tz_offset: tz }} />
       <span className="label">Suggest a date</span>
       {picks.length > 0 && (
@@ -185,6 +197,6 @@ export default function DatePanel({ conversationId, meId, otherName, plan, share
       <div className="row" style={{ gap: 8 }}><button className="btn grow">Send suggestion</button><button type="button" className="btn ghost" onClick={() => setOpen(false)}>Cancel</button></div>
     </form>
   ) : (
-    <button type="button" className="btn ghost block" onClick={() => setOpen(true)}>Suggest a date</button>
+    <button id="date-panel" type="button" className="btn ghost block" onClick={() => setOpen(true)}>Suggest a date</button>
   );
 }

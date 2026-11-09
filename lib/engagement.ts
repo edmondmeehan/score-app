@@ -60,3 +60,20 @@ export const QUIET_HOURS = 48;
 
 /** The ↑ trend is only shown to others when the member opted in to the Improving badge. */
 export const publicTrend = (p: { trend?: string | null; show_improving?: boolean | null }) => (p.show_improving ? p.trend ?? null : null);
+
+/** "Plan it" nudge: 10+ messages, and both people have sent at least 3 (a real back-and-forth, not one person talking). */
+export function planItReady(senders: string[], meId: string): boolean {
+  if (senders.length < 10) return false;
+  const mine = senders.filter((s) => s === meId).length;
+  return mine >= 3 && senders.length - mine >= 3;
+}
+
+type Geo = { lat: number | null; lng: number | null };
+/** Partners sorted nearest-first to the midpoint between two members (falls back to the original order). */
+export function nearestFirst<T extends Geo>(picks: T[], a: Geo | null, b: Geo | null): T[] {
+  const pts = [a, b].filter((p): p is { lat: number; lng: number } => p?.lat != null && p?.lng != null);
+  if (!pts.length) return picks;
+  const lat = pts.reduce((t, p) => t + Number(p.lat), 0) / pts.length, lng = pts.reduce((t, p) => t + Number(p.lng), 0) / pts.length;
+  const d = (p: Geo) => (p.lat == null || p.lng == null ? Infinity : (Number(p.lat) - lat) ** 2 + ((Number(p.lng) - lng) * Math.cos((lat * Math.PI) / 180)) ** 2);
+  return [...picks].sort((x, y) => d(x) - d(y));
+}
