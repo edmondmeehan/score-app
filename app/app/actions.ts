@@ -122,3 +122,15 @@ export async function replyToPrompt(form: FormData) {
   after(() => flushNotifications(user.id, 20));
   redirect(`/app/messages/${cid}`);
 }
+
+/** Come back from Paused / Taken. */
+export async function reactivate(form: FormData) {
+  const { supabase, user } = await ctx();
+  const plan = ['membership', 'premium', 'black'].includes(String(form.get('plan'))) ? String(form.get('plan')) : 'membership';
+  const { error } = await supabase.rpc('choose_plan', { p_plan: plan });
+  if (error) redirect('/app/paused?error=' + encodeURIComponent(error.message));
+  const { data: me } = await supabase.from('profiles').select('email, first_name').eq('id', user.id).single();
+  await sendEmail(me?.email || user.email, 'status_changed', { first_name: me?.first_name, status: 'active' });
+  revalidatePath('/app', 'layout');
+  redirect('/app');
+}

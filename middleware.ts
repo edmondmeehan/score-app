@@ -4,7 +4,10 @@ import { ATTR_COOKIE, attrFromParams } from '@/lib/adsShared';
 import { SESSION_COOKIE, SESSION_MINUTES, VISITOR_COOKIE, isBot, parseUA, sendEvent, trafficSource } from '@/lib/analytics';
 
 export async function middleware(request: NextRequest, event: NextFetchEvent) {
-  let response = NextResponse.next({ request });
+  // Pass the path to server components (used to gate the app while a member is paused).
+  const fwd = new Headers(request.headers);
+  fwd.set('x-sd-path', request.nextUrl.pathname);
+  let response = NextResponse.next({ request: { headers: fwd } });
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -12,8 +15,9 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
       cookies: {
         getAll: () => request.cookies.getAll(),
         setAll: (list) => {
-          list.forEach(({ name, value }) => request.cookies.set(name, value));
-          response = NextResponse.next({ request });
+          list.forEach(({ name, value }) => { request.cookies.set(name, value); });
+          fwd.set('cookie', request.headers.get('cookie') || '');
+          response = NextResponse.next({ request: { headers: fwd } });
           list.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
         },
       },

@@ -1,3 +1,4 @@
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabase/server';
 import type { Profile } from '@/lib/types';
@@ -28,6 +29,12 @@ export async function requireMember() {
   if (!ctx.user || !ctx.me) redirect('/signin');
   const step = nextStep(ctx.me);
   if (step !== '/app' && !['paused', 'taken'].includes(ctx.me.status)) redirect(step);
+  // Paused or Taken: you can sign in and manage your account, but everything else waits until you reactivate.
+  if (['paused', 'taken'].includes(ctx.me.status)) {
+    const path = (await headers()).get('x-sd-path') || '';
+    const open = ['/app/paused', '/app/settings', '/app/support'].some((p) => path === p || path.startsWith(p + '/'));
+    if (!open) redirect('/app/paused');
+  }
   return ctx as { supabase: typeof ctx.supabase; user: NonNullable<typeof ctx.user>; me: Profile };
 }
 
