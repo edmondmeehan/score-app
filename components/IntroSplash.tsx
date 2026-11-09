@@ -4,7 +4,7 @@
  * Plain HTML + CSS so it shows on the very first paint. Plays once per app launch (and on any page with ?intro=1
  * for previewing). Skipped on the website, and shortened for people who turn on Reduce Motion.
  */
-export const INTRO_SCRIPT = `(function(){try{var q=location.search.indexOf('intro=1')>-1;var app=/ScoreDateApp/.test(navigator.userAgent);if(q||(app&&!sessionStorage.getItem('sd_intro'))){document.documentElement.classList.add('sd-intro');try{sessionStorage.setItem('sd_intro','1')}catch(e){}setTimeout(function(){document.documentElement.classList.remove('sd-intro')},3200)}}catch(e){}})();`;
+export const INTRO_SCRIPT = `(function(){try{var q=location.search.indexOf('intro=1')>-1;var app=/ScoreDateApp/.test(navigator.userAgent);if(app)document.documentElement.classList.add('native');if(q||(app&&!sessionStorage.getItem('sd_intro'))){document.documentElement.classList.add('sd-intro');try{sessionStorage.setItem('sd_intro','1')}catch(e){}setTimeout(function(){document.documentElement.classList.remove('sd-intro')},3200)}}catch(e){}})();`;
 
 const CSS = `
 #sd-intro{display:none}
