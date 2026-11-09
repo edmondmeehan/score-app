@@ -7,7 +7,8 @@ import { ATTR_COOKIE, ADS_OPTOUT_COOKIE } from '@/lib/adsShared';
 async function optedOut() {
   const jar = await cookies();
   const h = await headers();
-  return jar.get(ADS_OPTOUT_COOKIE)?.value === 'off' || h.get('sec-gpc') === '1';
+  // The iPhone/Android app never sends ad conversions (Apple requires ATT for that).
+  return jar.get(ADS_OPTOUT_COOKIE)?.value === 'off' || h.get('sec-gpc') === '1' || /ScoreDateApp/.test(h.get('user-agent') || '');
 }
 
 /** Save the first-touch campaign (from the score_attr cookie) onto a new waitlist signup. First-party only. */

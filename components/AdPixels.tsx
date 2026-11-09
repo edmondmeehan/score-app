@@ -13,6 +13,8 @@ const GADS_LEAD = process.env.NEXT_PUBLIC_GOOGLE_ADS_LEAD_LABEL; // conversion l
 /** Ads may run for this visitor: not opted out, no Global Privacy Control, not a private page. */
 export function adsAllowed(path = typeof location !== 'undefined' ? location.pathname : '/') {
   if (typeof window === 'undefined') return false;
+  // Never inside the ScoreDate iPhone/Android app: Apple requires tracking permission (ATT) for ad pixels.
+  if (/ScoreDateApp/.test(navigator.userAgent)) return false;
   if ((navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl) return false;
   if (document.cookie.split('; ').includes(`${ADS_OPTOUT_COOKIE}=off`)) return false;
   return !NO_PIXEL_PATHS.test(path);
