@@ -3,7 +3,7 @@ import './globals.css';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import AdminBar from '@/components/AdminBar';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import SeasonLayer from '@/components/SeasonLayer';
 import AdPixels from '@/components/AdPixels';
 import { getSeasonConfig } from '@/lib/seasonsServer';
@@ -33,11 +33,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const previewKey = (await cookies()).get('score_season_preview')?.value as SeasonKey | undefined;
   const season = (previewKey && seasonsWith(cfg).find((s) => s.key === previewKey)) || activeSeason(cfg);
   const seasonVars = season ? ({ '--gold': season.accent, '--gold-light': season.accentLight, '--hero-glow': season.glow } as React.CSSProperties) : undefined;
+  // Shown.io metrics: homepage and /meet only (the public waitlist pages), never in the iPhone app.
+  const h = await headers();
+  const path = h.get('x-sd-path') || '';
+  const shown = (path === '/' || path === '/meet') && !/ScoreDateApp/.test(h.get('user-agent') || '');
   return (
     <html lang="en" data-theme="dark" data-season={season?.key} style={seasonVars} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: INTRO_SCRIPT }} />
+        {shown && <script defer src="https://shown.io/metrics/V40zqXKR9r" type="text/javascript"></script>}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
       </head>
