@@ -19,6 +19,8 @@ export const metadata: Metadata = {
   appleWebApp: { capable: true, title: 'ScoreDate', statusBarStyle: 'black-translucent' },
   formatDetection: { telephone: false },
 };
+import IntroSplash, { INTRO_SCRIPT } from '@/components/IntroSplash';
+
 export const viewport: Viewport = { themeColor: '#0B0B0C', width: 'device-width', initialScale: 1, viewportFit: 'cover' };
 
 // Runs before first paint so there's no flash of the wrong theme.
@@ -34,10 +36,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" data-theme="dark" data-season={season?.key} style={seasonVars} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: INTRO_SCRIPT }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
       </head>
-      <body><AdminBar />{children}{season && <SeasonLayer seasonKey={season.key} name={season.name} banner={season.banner} effect={season.effect} preview={Boolean(previewKey)} />}<Analytics /><SpeedInsights /><AdPixels /></body>
+      <body><IntroSplash /><AdminBar />{children}{season && <SeasonLayer seasonKey={season.key} name={season.name} banner={season.banner} effect={season.effect} preview={Boolean(previewKey)} />}<Analytics /><SpeedInsights /><AdPixels /></body>
     </html>
   );
 }
