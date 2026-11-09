@@ -12,7 +12,7 @@ export function parseUA(ua: string) {
   const os = /iPhone|iPad|iPod/.test(ua) ? 'iOS' : /Android/.test(ua) ? 'Android' : /CrOS/.test(ua) ? 'ChromeOS'
     : /Mac OS X|Macintosh/.test(ua) ? 'macOS' : /Windows/.test(ua) ? 'Windows' : /Linux/.test(ua) ? 'Linux' : 'Other';
   const device = /iPad|Tablet/.test(ua) || (/Android/.test(ua) && !/Mobile/.test(ua)) ? 'Tablet' : /Mobi|iPhone|Android/.test(ua) ? 'Mobile' : 'Desktop';
-  const browser = /Instagram/.test(ua) ? 'Instagram app' : /FBAN|FBAV|FB_IAB/.test(ua) ? 'Facebook app' : /TikTok|BytedanceWebview/.test(ua) ? 'TikTok app'
+  const browser = /ScoreDateApp/.test(ua) ? 'ScoreDate iPhone app' : /Instagram/.test(ua) ? 'Instagram app' : /FBAN|FBAV|FB_IAB/.test(ua) ? 'Facebook app' : /TikTok|BytedanceWebview/.test(ua) ? 'TikTok app'
     : /LinkedInApp/.test(ua) ? 'LinkedIn app' : /Edg\//.test(ua) ? 'Edge' : /SamsungBrowser/.test(ua) ? 'Samsung Internet' : /OPR\//.test(ua) ? 'Opera'
     : /Firefox|FxiOS/.test(ua) ? 'Firefox' : /CriOS|Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : 'Other';
   return { os, device, browser };

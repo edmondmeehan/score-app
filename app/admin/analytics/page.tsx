@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { supabaseServer } from '@/lib/supabase/server';
 import { BANDS, type Band } from '@/lib/types';
+import LiveNow, { type Live } from './LiveNow';
 
 type KV = { k: string; n: number };
 type A = {
@@ -40,7 +41,10 @@ export default async function Analytics({ searchParams }: { searchParams: Promis
   const sp = await searchParams;
   const days = RANGES.includes(Number(sp.d)) ? Number(sp.d) : 30;
   const supabase = await supabaseServer();
-  const { data, error } = await supabase.rpc('staff_analytics', { p_days: days });
+  const [{ data, error }, { data: liveData }] = await Promise.all([
+    supabase.rpc('staff_analytics', { p_days: days }),
+    supabase.rpc('staff_live_now'),
+  ]);
   if (error) return <div className="notice error">Analytics isn&apos;t set up yet: run migration 0004 in Supabase. ({error.message})</div>;
   const a = data as A;
   const maxDay = Math.max(1, ...a.daily.map((d) => d.visitors));
@@ -57,6 +61,8 @@ export default async function Analytics({ searchParams }: { searchParams: Promis
         <div className="stack" style={{ gap: 4 }}><span className="label">Last {days} days · staff visits excluded</span><h1 className="serif" style={{ fontSize: 44 }}>Analytics</h1></div>
         <div className="row" style={{ gap: 8 }}>{RANGES.map((r) => <Link key={r} href={`/admin/analytics?d=${r}`} className={r === days ? 'btn sm' : 'btn ghost sm'}>{r} days</Link>)}</div>
       </div>
+
+      <LiveNow initial={(liveData as Live) || null} />
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 14 }}>
         {kpis.map(([l, v]) => <div key={l} className="card stack" style={{ gap: 8 }}><span className="small muted">{l}</span><span className="serif" style={{ fontSize: 34 }}>{v}</span></div>)}

@@ -473,3 +473,5 @@ html.native .event-hero { margin-top: calc(-12px - env(safe-area-inset-top)); }
 .money-talk button.q { display: block; width: 100%; text-align: left; font-size: 13px; padding: 9px 12px; border-radius: 12px; border: 1px solid var(--line-soft); background: transparent; color: var(--ivory); cursor: pointer; }
 .score-row { display: flex; gap: 6px; }
 .score-row button { flex: 1; min-height: 44px; }
+.live-dot { width: 10px; height: 10px; border-radius: 999px; background: var(--rise); box-shadow: 0 0 0 0 var(--rise); animation: livepulse 2s infinite; }
+@keyframes livepulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--rise) 60%, transparent); } 70% { box-shadow: 0 0 0 10px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
