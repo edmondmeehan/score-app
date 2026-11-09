@@ -17,6 +17,7 @@ export async function sendEmail<K extends TemplateName>(
   to: string | null | undefined,
   name: K,
   data: Parameters<typeof build<K>>[1],
+  attachments?: { filename: string; content: string; content_type?: string }[],
 ): Promise<{ ok: boolean; id?: string; error?: string }> {
   if (!to) return { ok: false, error: 'no recipient' };
   if (isTestAddress(to)) return { ok: true, id: 'skipped-test-address' };
@@ -40,6 +41,7 @@ export async function sendEmail<K extends TemplateName>(
           text,
           reply_to: email.config.reply_to || undefined,
           tags: [{ name: 'template', value: name }],
+          ...(attachments?.length ? { attachments } : {}),
         }),
       });
       const body = await res.json().catch(() => ({}));

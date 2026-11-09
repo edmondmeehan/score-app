@@ -120,7 +120,7 @@ export default function DatePanel({ conversationId, meId, otherName, plan, share
               <a className="btn ghost sm" href={`/app/dates/${plan.id}/ics`}>Add to my calendar</a>
               <a className="btn ghost sm" target="_blank" rel="noopener noreferrer" href={gcal(plan)}>Google Calendar ↗</a>
             </div>
-            <span className="small muted">Only adds it to your calendar. {otherName} can add it to theirs from here too.</span>
+            <span className="small muted">We also emailed you both a calendar invite when the date was confirmed.</span>
           </div>
         )}
 

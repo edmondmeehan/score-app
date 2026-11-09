@@ -319,6 +319,20 @@ export const templates = {
     ],
   }) satisfies Email,
 
+  date_confirmed: (d: { first_name?: string | null; other_name: string; place: string; address?: string | null; when: string; conversation_id: string }) => ({
+    subject: `It’s a date: ${d.other_name}, ${d.when}`,
+    preheader: `${d.place}${d.address ? `, ${d.address}` : ''}. The calendar invite is attached.`,
+    eyebrow: 'Date confirmed',
+    heading: `You and ${d.other_name} have a date.`,
+    kind: 'transactional',
+    blocks: [
+      { p: `${hi(d.first_name)} it’s on: ${d.place}${d.address ? `, ${d.address}` : ''}, ${d.when}.` },
+      { p: 'We attached a calendar invite. Open it to add the date to Apple Calendar, Google Calendar or Outlook, with a reminder two hours before.' },
+      { button: { label: 'Open the chat', url: `${SITE_URL}/app/messages/${d.conversation_id}` } },
+      { note: 'Meet in public, tell a friend where you’ll be (Share my plan in the chat does this), and get yourself home. In an emergency, call 911.' },
+    ],
+  }) satisfies Email,
+
   event_announce: (d: { first_name?: string | null; title: string; when: string; venue: string; event_id: string; black_only?: boolean }) => ({
     subject: d.black_only ? `Reserve members first: ${d.title}` : `New ScoreDate event: ${d.title}`,
     preheader: `${d.when} · ${d.venue}`,
@@ -483,6 +497,7 @@ export const SAMPLES: { [K in TemplateName]: Parameters<(typeof templates)[K]>[0
   waitlist_joined: { first_name: 'Nadia', place: 'Williamsburg & Greenpoint', open: true, share_url: `${SITE_URL}/w/KH2KVJ`, position: 214, founder: true },
   notify_area: { first_name: 'Nadia', zip: '07030' },
   invite: { first_name: 'Nadia', code: 'SCR-7KQ2-M9', days: 14, inviter: null },
+  date_confirmed: { first_name: 'Nadia', other_name: 'Owen', place: 'Bar Pisellino', address: '52 Grove St, New York, NY 10014', when: 'Thu, Nov 12, 7:30 PM', conversation_id: '00000000-0000-0000-0000-000000000000' },
   magic_link: { url: `${SITE_URL}/auth/callback?code=example` },
   auth_confirm: { url: `${SITE_URL}/auth/callback?code=example` },
   auth_invite: { url: `${SITE_URL}/auth/callback?code=example` },
@@ -514,6 +529,7 @@ export const TEMPLATE_INFO: Record<TemplateName, { label: string; when: string; 
   waitlist_joined: { label: 'Waitlist confirmation', when: 'Someone joins the waitlist (open area or opening soon wording by zip)', live: true },
   notify_area: { label: 'Notify me (legacy)', when: 'Not used now: everyone goes on the waitlist', live: false },
   invite: { label: 'Invite', when: 'Staff emails an invite from the waitlist', live: true },
+  date_confirmed: { label: 'Date confirmed + calendar invite', when: 'Both people, when a date is confirmed (with a .ics calendar file attached)', live: true },
   magic_link: { label: 'Sign-in link', when: 'Supabase · Magic Link template', live: false },
   auth_confirm: { label: 'Confirm email (first sign-in)', when: 'Supabase · Confirm signup template', live: false },
   auth_invite: { label: 'Staff invite', when: 'Supabase · Invite user template', live: false },
