@@ -24,6 +24,7 @@ export default async function Member({ params, searchParams }: { params: Promise
   const photos = (await photoUrls(supabase, [p.id]))[p.id] || [];
   const { data: social } = await supabase.from('profile_socials').select('instagram').eq('user_id', p.id).maybeSingle();
   const { data: inviter } = p.invited_by ? await supabase.from('profiles').select('first_name').eq('id', p.invited_by).maybeSingle() : { data: null };
+  const { data: voiceSigned } = p.voice_path ? await supabase.storage.from('voices').createSignedUrl(p.voice_path, 3600) : { data: null };
   const { data: vouch } = await supabase.from('vouches').select('body, voucher_id').eq('member_id', p.id).eq('status', 'approved').maybeSingle();
   const b = p.band ? BANDS[p.band] : null;
   const prompts = (p.prompts && p.prompts.length ? p.prompts : p.prompt_a ? [{ q: p.prompt_q || '', a: p.prompt_a }] : []).filter((x) => x?.a);
@@ -56,6 +57,12 @@ export default async function Member({ params, searchParams }: { params: Promise
       )}
       {detailChips(p).length > 0 && (
         <div className="row" style={{ flexWrap: 'wrap', gap: 8 }}>{detailChips(p).map((c) => <span key={c} className="chip">{c}</span>)}</div>
+      )}
+      {voiceSigned?.signedUrl && (
+        <div className="card stack" style={{ gap: 8 }}>
+          <span className="label">{p.id === me.id ? 'My voice' : `Hear ${p.first_name}`}</span>
+          <audio controls preload="none" src={voiceSigned.signedUrl} style={{ width: '100%' }} />
+        </div>
       )}
       {vouch && (
         <div className="card gold stack" style={{ gap: 6 }}>

@@ -161,3 +161,13 @@ export async function answerVouch(form: FormData) {
   const { error } = await supabase.rpc('answer_vouch', { p_show: form.get('show') === 'yes' });
   back(error ? 'error=' + encodeURIComponent(error.message) : 'saved=vouch');
 }
+
+export async function setVoiceIntro(path: string, seconds: number) {
+  const { supabase, user } = await ctx();
+  if (path && !path.startsWith(`${user.id}/`)) return { ok: false, error: 'Upload failed' };
+  const { data: old } = await supabase.from('profiles').select('voice_path').eq('id', user.id).single();
+  const { error } = await supabase.rpc('set_voice', { p_path: path, p_seconds: seconds });
+  if (!error && old?.voice_path && old.voice_path !== path) await supabase.storage.from('voices').remove([old.voice_path]);
+  revalidatePath('/app/profile');
+  return { ok: !error, error: error?.message };
+}

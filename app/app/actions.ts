@@ -40,6 +40,45 @@ export async function sendPhoto(conversationId: string, path: string) {
   return { ok: !error, error: error?.message };
 }
 
+export async function sendVoice(conversationId: string, path: string, seconds: number) {
+  const { supabase, user } = await ctx();
+  if (!path.startsWith(`${conversationId}/${user.id}/`)) return { ok: false, error: 'Upload failed' };
+  const { error } = await supabase.from('messages').insert({ conversation_id: conversationId, sender_id: user.id, body: 'Voice message', audio_path: path, audio_seconds: Math.max(1, Math.min(120, Math.round(seconds))) });
+  if (!error) after(() => flushNotifications(user.id, 20));
+  return { ok: !error, error: error?.message };
+}
+
+export async function answerDeeper(conversationId: string, questionId: number, answer: string) {
+  const { supabase, user } = await ctx();
+  const { error } = await supabase.rpc('answer_deeper', { p_conversation: conversationId, p_question: questionId, p_answer: answer });
+  if (error) return { ok: false, error: error.message, state: null };
+  after(() => flushNotifications(user.id, 20));
+  const { data } = await supabase.rpc('deeper_state', { p_conversation: conversationId });
+  return { ok: true, error: null, state: data };
+}
+
+export async function markTogether(form: FormData) {
+  const { supabase, user } = await ctx();
+  const id = String(form.get('id'));
+  const { data, error } = await supabase.rpc('mark_together', { p_conversation: id, p_on: form.get('on') !== 'no' });
+  if (error) redirect(`/app/messages/${id}?error=` + encodeURIComponent(error.message));
+  if (data === 'mutual') after(() => flushNotifications(user.id, 20));
+  redirect(`/app/messages/${id}${data === 'mutual' ? '?together=1' : ''}`);
+}
+
+export async function setFocusMode(form: FormData) {
+  const { supabase, user } = await ctx();
+  const { error } = await supabase.from('profiles').update({ focus_mode: form.get('focus') === 'on' }).eq('id', user.id);
+  redirect('/app/settings?' + (error ? 'error=' + encodeURIComponent(error.message) : 'saved=1#focus'));
+}
+
+export async function saveWellbeing(form: FormData) {
+  const { supabase } = await ctx();
+  const score = Number(form.get('score'));
+  await supabase.rpc('save_wellbeing', { p_score: score });
+  redirect('/app?ok=' + encodeURIComponent(score <= 2 ? 'Thanks for telling us. Dating can be a lot. Taking a break is always allowed.' : 'Thanks. That helps us make ScoreDate better.'));
+}
+
 export async function unmatchConversation(form: FormData) {
   const { supabase } = await ctx();
   const id = String(form.get('id'));

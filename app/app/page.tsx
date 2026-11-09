@@ -5,6 +5,8 @@ import { BandPill, age } from '@/components/ui';
 import { photoUrls } from '@/lib/photos';
 import type { Profile } from '@/lib/types';
 import { answerDaily, checkIn, dateAgain, useExtraDrop, useSpotlight } from './features';
+import { saveWellbeing } from './actions';
+import DismissibleCard from '@/components/DismissibleCard';
 import PushPrompt from '@/components/PushPrompt';
 import FounderBadge from '@/components/FounderBadge';
 import { getCreditMode } from '@/lib/creditMode';
@@ -34,6 +36,9 @@ export default async function Drop({ searchParams }: { searchParams: Promise<{ o
     supabase.rpc('get_drop'), supabase.rpc('my_addons'), supabase.rpc('pending_checkins'), supabase.rpc('unread_notifications'),
     supabase.rpc('pending_again'), supabase.rpc('todays_question'), supabase.rpc('get_wildcard'),
   ]);
+  const { data: wbData } = await supabase.rpc('wellbeing_state');
+  const wb = (wbData as { open_chats: number; closed_on_me: number; checkin_due: boolean } | null) || { open_chats: 0, closed_on_me: 0, checkin_due: false };
+  const weekKey = new Date().toISOString().slice(0, 10).slice(0, 8) + String(Math.ceil(new Date().getUTCDate() / 7));
   const again = (againData as Again[] | null) || [];
   const daily = (dailyData as Daily) || null;
   const bell = Number(unread) || 0;
@@ -93,17 +98,40 @@ export default async function Drop({ searchParams }: { searchParams: Promise<{ o
           </div>
       ))}
       {again.map((a) => (
-        <div key={a.plan_id} className="card gold stack" style={{ gap: 10 }}>
+        <form key={a.plan_id} action={dateAgain} className="card gold stack" style={{ gap: 10 }}>
+          <input type="hidden" name="plan_id" value={a.plan_id} /><input type="hidden" name="conversation_id" value={a.conversation_id} />
           <span className="label">One more question</span>
           <span className="serif" style={{ fontSize: 24 }}>Would you see {a.match} again?</span>
           <span className="small muted">Private. {a.match} only hears about it if you both say yes.</span>
+          <label className="field small">A note to yourself (optional)
+            <textarea className="input" name="note" rows={2} maxLength={500} placeholder="What did you notice you liked, or didn’t? Only you see this." />
+          </label>
           <div className="row" style={{ flexWrap: 'wrap', gap: 8 }}>
-            {([['yes', 'Yes'], ['maybe', 'Maybe'], ['no', 'No']] as const).map(([v, l]) => (
-              <form key={v} action={dateAgain}><input type="hidden" name="plan_id" value={a.plan_id} /><input type="hidden" name="conversation_id" value={a.conversation_id} /><input type="hidden" name="again" value={v} /><button className={v === 'yes' ? 'btn sm' : 'btn ghost sm'} data-haptic={v === 'yes' ? 'success' : undefined}>{l}</button></form>
-            ))}
+            <button className="btn sm" name="again" value="yes" data-haptic="success">Yes</button>
+            <button className="btn ghost sm" name="again" value="maybe">Maybe</button>
+            <button className="btn ghost sm" name="again" value="no">No</button>
           </div>
-        </div>
+        </form>
       ))}
+      {me.focus_mode && wb.open_chats >= 5 && (
+        <div className="notice">Focus mode: you have {wb.open_chats} open chats, so new hellos are paused. Close one kindly, or turn focus mode off in <Link href="/app/settings#focus">Me</Link>.</div>
+      )}
+      {wb.closed_on_me >= 3 && (
+        <DismissibleCard storageKey={`sd:rough:${weekKey}`}>
+          <span className="label">A rough stretch</span>
+          <span className="small">A few chats closed this week. That happens to everyone, and it says more about fit than about you.</span>
+          <span className="small muted">Want a breather? You can pause and keep your chats, or turn on focus mode to keep things to a few people at a time.</span>
+          <div className="row" style={{ gap: 8, flexWrap: 'wrap' }}><Link href="/app/settings#status" className="btn ghost sm">Take a break</Link><Link href="/app/settings#focus" className="btn ghost sm">Focus mode</Link></div>
+        </DismissibleCard>
+      )}
+      {wb.checkin_due && (
+        <form action={saveWellbeing} className="card stack" style={{ gap: 8 }}>
+          <span className="label">Monthly check-in</span>
+          <span className="small">How does dating feel for you this month?</span>
+          <div className="score-row">{[['1', 'Draining'], ['2', 'Meh'], ['3', 'Okay'], ['4', 'Good'], ['5', 'Great']].map(([v, l]) => <button key={v} className="btn ghost sm" name="score" value={v}>{l}</button>)}</div>
+          <span className="small muted">Anonymous in our reports. It helps us make ScoreDate better.</span>
+        </form>
+      )}
       {daily && (
         <div id="daily" className="card stack daily-q" style={{ gap: 10 }}>
           <span className="label">Today’s question</span>

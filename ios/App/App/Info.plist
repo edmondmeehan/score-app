@@ -65,7 +65,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>ScoreDate uses your camera to scan your ID, take a live selfie for verification, and add profile photos.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>The ID check may record a short selfie video to confirm you’re a real person.</string>
+	<string>ScoreDate uses the microphone to record voice messages and your voice intro, and for the short selfie video in the ID check.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Choose photos from your library for your ScoreDate profile and chats.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>

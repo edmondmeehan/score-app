@@ -5,6 +5,7 @@ import { faceMatchConfigured } from '@/lib/facematch';
 import { TestBanner } from '@/components/ui';
 import PhotoUploader from '../../onboarding/photos/PhotoUploader';
 import SongPicker from './SongPicker';
+import VoiceIntro from './VoiceIntro';
 import { PROMPTS } from '@/lib/prompts';
 import { answerVouch, clearSong, movePhoto, removePhoto, saveAbout, saveDetails, saveFlags, saveImproving, saveInstagram, saveNycSpot, savePrompts } from './actions';
 import { profileStrength } from '@/lib/profileStrength';
@@ -30,6 +31,7 @@ export default async function EditProfile({ searchParams }: { searchParams: Prom
   ]);
   const list = photos || [];
   const strength = profileStrength(me, list.filter((p) => p.match_status !== 'rejected').length);
+  const { data: voiceSigned } = me.voice_path ? await supabase.storage.from('voices').createSignedUrl(me.voice_path, 3600) : { data: null };
   const { data: voucherName } = vouch ? await supabase.rpc('first_name_of', { p: vouch.voucher_id }) : { data: null };
   const { data: signed } = list.length ? await supabase.storage.from('photos').createSignedUrls(list.map((p) => p.path), 3600) : { data: [] };
   const room = 6 - list.length;
@@ -188,6 +190,8 @@ export default async function EditProfile({ searchParams }: { searchParams: Prom
         {sp.saved === 'flags' && <div className="notice">Saved.</div>}
         <button className="btn ghost sm" style={{ alignSelf: 'flex-start' }}>Save</button>
       </form>
+
+      <VoiceIntro userId={user.id} url={voiceSigned?.signedUrl || null} seconds={me.voice_seconds ?? null} />
 
       {/* Song */}
       <section id="song" className="card stack">

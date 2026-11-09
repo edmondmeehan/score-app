@@ -464,3 +464,12 @@ html.native .event-hero { margin-top: calc(-12px - env(safe-area-inset-top)); }
 .wildcard { border-style: dashed; border-color: var(--gold-edge); }
 .event-recap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .event-recap img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; }
+/* Batch 4 */
+.rec-dot { width: 10px; height: 10px; border-radius: 999px; background: var(--alert); animation: recpulse 1s infinite; }
+@keyframes recpulse { 50% { opacity: .3; } }
+.voice-msg { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 16px; max-width: 78%; }
+.voice-msg audio { height: 36px; max-width: 220px; }
+.deeper-a { padding: 10px 12px; border-radius: 12px; background: var(--graphite); font-size: 14px; line-height: 1.4; white-space: pre-wrap; }
+.money-talk button.q { display: block; width: 100%; text-align: left; font-size: 13px; padding: 9px 12px; border-radius: 12px; border: 1px solid var(--line-soft); background: transparent; color: var(--ivory); cursor: pointer; }
+.score-row { display: flex; gap: 6px; }
+.score-row button { flex: 1; min-height: 44px; }

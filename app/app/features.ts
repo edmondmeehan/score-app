@@ -218,7 +218,7 @@ export async function submitDateChallenge(form: FormData) {
 // ---------- How did it go / daily question / vouches ----------
 export async function dateAgain(form: FormData) {
   const { supabase } = await ctx();
-  const { data, error } = await supabase.rpc('date_again', { p_plan: String(form.get('plan_id')), p_answer: String(form.get('again')) });
+  const { data, error } = await supabase.rpc('date_again', { p_plan: String(form.get('plan_id')), p_answer: String(form.get('again')), p_note: String(form.get('note') || '') });
   if (error) back('/app', 'error', error.message);
   if (data === 'mutual') { after(() => flushNotifications(null, 20)); redirect(`/app/messages/${String(form.get('conversation_id'))}?second=1`); }
   back('/app', 'ok', 'Got it. That stays private to you.');

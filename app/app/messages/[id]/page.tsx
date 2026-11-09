@@ -1,6 +1,8 @@
 import ScreenshotContext from '@/components/ScreenshotContext';
 import HapticOnMount from '@/components/HapticOnMount';
-import { unmatchConversation } from '../../actions';
+import { markTogether, unmatchConversation } from '../../actions';
+import DeeperCard, { type DeeperState } from './DeeperCard';
+import MoneyTalk from './MoneyTalk';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireMember } from '@/lib/session';
@@ -13,7 +15,7 @@ import { nearestFirst, openers, publicTrend } from '@/lib/engagement';
 
 export const dynamic = 'force-dynamic';
 
-export default async function Conversation({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string; shared?: string; ok?: string; match?: string; second?: string }> }) {
+export default async function Conversation({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string; shared?: string; ok?: string; match?: string; second?: string; together?: string }> }) {
   const { id } = await params;
   const sp = await searchParams;
   const { supabase, me } = await requireMember();
@@ -45,6 +47,13 @@ export default async function Conversation({ params, searchParams }: { params: P
     supabase.rpc('presence_of', { p_user: otherId }),
     supabase.rpc('shared_answers', { p_other: otherId }),
   ]);
+  const [{ data: deeper }, { count: pastDates }, { data: marks }] = await Promise.all([
+    supabase.rpc('deeper_state', { p_conversation: id }),
+    supabase.from('date_plans').select('id', { count: 'exact', head: true }).eq('conversation_id', id).eq('status', 'accepted').lt('starts_at', new Date().toISOString()),
+    supabase.from('together_marks').select('user_id').eq('conversation_id', id),
+  ]);
+  const iMarked = (marks || []).some((m) => m.user_id === me.id);
+  const together = iMarked && (marks || []).some((m) => m.user_id === otherId);
   const sameAnswers = (sharedQ as { q: string; a: string }[] | null) || [];
   const fromNote = conv.note_from && conv.note_from !== me.id;
   return (
@@ -57,6 +66,13 @@ export default async function Conversation({ params, searchParams }: { params: P
           <summary className="small muted" aria-label="More">More</summary>
           <div className="chat-menu-list">
             <Link href={`/app/report/${otherId}`}>Report</Link>
+            {!conv.ended_at && !iMarked && (
+              <form action={markTogether}>
+                <input type="hidden" name="id" value={id} />
+                <button type="submit">We’re together</button>
+                <span className="small muted">Private until {o?.first_name || 'they'} taps it too.</span>
+              </form>
+            )}
             {!conv.ended_at && (
               <form action={unmatchConversation}>
                 <input type="hidden" name="id" value={id} />
@@ -80,6 +96,25 @@ export default async function Conversation({ params, searchParams }: { params: P
           <span className="small muted">Suggest a spot below while it’s fresh. The ScoreDate Partners row has member perks.</span>
         </div>
       )}
+      {together && !conv.ended_at && (
+        <div className="card gold stack" style={{ gap: 8 }}>
+          {sp.together && <HapticOnMount kind="success" />}
+          <span className="label">It’s official</span>
+          <span className="serif" style={{ fontSize: 24 }}>You and {o?.first_name} are together.</span>
+          <span className="small muted">Congratulations. When you’re ready, you can set your status to Taken to step out of the Drop, and share your story if you both want to.</span>
+          <div className="row" style={{ gap: 8, flexWrap: 'wrap' }}>
+            <Link href="/app/settings#status" className="btn sm">Set status</Link>
+            <Link href="/app/discover/stories" className="btn ghost sm">Share our story</Link>
+          </div>
+        </div>
+      )}
+      {iMarked && !together && !conv.ended_at && (
+        <form action={markTogether} className="notice row" style={{ justifyContent: 'space-between', gap: 8 }}>
+          <input type="hidden" name="id" value={id} /><input type="hidden" name="on" value="no" />
+          <span>You tapped “We’re together.” {o?.first_name} only sees it if they tap it too.</span>
+          <button className="btn ghost sm">Undo</button>
+        </form>
+      )}
       {(shared.length > 0 || sameAnswers.length > 0) && (
         <div className="card stack" style={{ gap: 8 }}>
           <span className="small muted">You both said</span>
@@ -89,6 +124,8 @@ export default async function Conversation({ params, searchParams }: { params: P
           </div>
         </div>
       )}
+      {!conv.ended_at && <DeeperCard conversationId={id} otherName={o?.first_name || 'them'} initial={(deeper as DeeperState) || null} />}
+      {!conv.ended_at && (pastDates || 0) >= 2 && <MoneyTalk otherName={o?.first_name || 'them'} />}
       <DatePanel
         conversationId={id}
         meId={me.id}

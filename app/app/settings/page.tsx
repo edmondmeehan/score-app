@@ -7,7 +7,7 @@ import ThemeSwitch from '@/components/ThemeSwitch';
 import HapticsToggle from '@/components/HapticsToggle';
 import AppFooter from '@/components/AppFooter';
 import { signOut } from '../../signin/actions';
-import { deleteAccount, setStatus } from '../actions';
+import { deleteAccount, setFocusMode, setStatus } from '../actions';
 import { saveEmailPrefs, saveMapPrivacy, saveNotifyPrefs, setShowOnline } from '../features';
 import PushToggle from '@/components/PushToggle';
 import FounderBadge from '@/components/FounderBadge';
@@ -55,6 +55,12 @@ export default async function Settings({ searchParams }: { searchParams: Promise
       <Link href="/app/week" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="grow">Your week</span><span className="muted">›</span>
       </Link>
+      <form action={setFocusMode} className="card stack" id="focus">
+        <span className="label">Focus mode</span>
+        <span className="small muted">Keep dating to a few people at a time. With it on, you can’t start new chats while 5 are open. People can still send you Notes.</span>
+        <label className="row small" style={{ gap: 10 }}><input type="checkbox" name="focus" defaultChecked={Boolean(me.focus_mode)} style={{ width: 18, height: 18, accentColor: 'var(--gold)' }} />Focus mode</label>
+        <button className="btn ghost sm" style={{ alignSelf: 'flex-start' }}>Save</button>
+      </form>
       <div className="card stack" id="appearance">
         <span className="label">Appearance</span>
         <ThemeSwitch />

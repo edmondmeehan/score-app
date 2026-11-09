@@ -2,11 +2,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { haptic } from '@/lib/haptics';
-import { kindClose, otherReadAt, sendMessage, sendPhoto } from '../../actions';
+import { kindClose, otherReadAt, sendMessage, sendPhoto, sendVoice } from '../../actions';
+import VoiceRecorder, { type Recording } from '@/components/VoiceRecorder';
 import { KIND_CLOSES, QUIET_HOURS, planItReady } from '@/lib/engagement';
 import type { Pick } from './DatePanel';
 
-type Msg = { id: string; sender_id: string; body: string; created_at: string; flag?: string | null; image_path?: string | null };
+type Msg = { id: string; sender_id: string; body: string; created_at: string; flag?: string | null; image_path?: string | null; audio_path?: string | null; audio_seconds?: number | null };
 
 const WARN: Record<string, string> = {
   money: 'Be careful: never send money, gift cards or crypto to someone you haven’t met, and don’t share bank details. If this feels off, tap More → Report.',
@@ -40,6 +41,21 @@ function Photo({ path, mine }: { path: string; mine: boolean }) {
   );
 }
 
+function Voice({ path, mine, seconds }: { path: string; mine: boolean; seconds?: number | null }) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    let live = true;
+    supabaseBrowser().storage.from('chat').createSignedUrl(path, 3600).then(({ data }) => { if (live) setUrl(data?.signedUrl || null); });
+    return () => { live = false; };
+  }, [path]);
+  return (
+    <div className="voice-msg" style={{ background: mine ? 'var(--gold)' : 'var(--bubble)', color: mine ? 'var(--on-gold)' : 'var(--ivory)' }}>
+      {url ? <audio controls preload="none" src={url} /> : <span className="small">Voice message</span>}
+      {seconds ? <span className="small" style={{ opacity: 0.8 }}>{seconds}s</span> : null}
+    </div>
+  );
+}
+
 export default function Chat({ conversationId, meId, otherName, initial, canSend, initialReadAt, locked = 'Become a member to message', openers = [], open = true, startedAt, hasPlan = false, nudgePick = null }: { conversationId: string; meId: string; otherName: string; initial: Msg[]; canSend: boolean; initialReadAt: string | null; locked?: string; openers?: string[]; open?: boolean; startedAt?: string; hasPlan?: boolean; nudgePick?: Pick | null }) {
   const [msgs, setMsgs] = useState<Msg[]>(initial);
   const [text, setText] = useState('');
@@ -50,6 +66,13 @@ export default function Chat({ conversationId, meId, otherName, initial, canSend
   const [closed, setClosed] = useState(false);
   const [now, setNow] = useState<number | null>(null);
   useEffect(() => { setNow(Date.now()); const t = setInterval(() => setNow(Date.now()), 60000); return () => clearInterval(t); }, []);
+  const [recOpen, setRecOpen] = useState(false);
+  // Other panels (Money talk) can drop a question into the composer.
+  useEffect(() => {
+    const onCompose = (e: Event) => { const t = (e as CustomEvent<{ text?: string }>).detail?.text; if (t) { setText(t); setTimeout(() => inputRef.current?.focus(), 0); } };
+    window.addEventListener('sd:compose', onCompose);
+    return () => window.removeEventListener('sd:compose', onCompose);
+  }, []);
   const [nudgeOff, setNudgeOff] = useState<number | null>(null);
   useEffect(() => { try { const v = localStorage.getItem(`sd:planit:${conversationId}`); if (v) setNudgeOff(Number(v)); } catch { /* storage blocked */ } }, [conversationId]);
   const end = useRef<HTMLDivElement>(null);
@@ -76,6 +99,15 @@ export default function Chat({ conversationId, meId, otherName, initial, canSend
     setText('');
     const r = await sendMessage(conversationId, body);
     if (!r.ok) { setErr(r.error || 'Could not send'); setText(body); }
+  }
+
+  async function sendRecording(r: Recording) {
+    const path = `${conversationId}/${meId}/${crypto.randomUUID()}.${r.ext}`;
+    const { error } = await supabaseBrowser().storage.from('chat').upload(path, r.blob, { contentType: r.type || 'audio/mp4' });
+    if (error) throw new Error(error.message);
+    const res = await sendVoice(conversationId, path, r.seconds);
+    if (!res.ok) throw new Error(res.error || 'Could not send');
+    setRecOpen(false);
   }
 
   async function pickPhoto(e: React.ChangeEvent<HTMLInputElement>) {
@@ -112,7 +144,7 @@ export default function Chat({ conversationId, meId, otherName, initial, canSend
   const yourTurn = open && canSend && last && last.sender_id !== meId;
   const lastAt = new Date(last?.created_at || startedAt || Date.now()).getTime();
   // "Plan it": after ~10 messages with both people engaged, and no date suggested yet.
-  const textMsgs = msgs.filter((m) => !m.image_path);
+  const textMsgs = msgs.filter((m) => !m.image_path && !m.audio_path);
   const showPlanIt = open && canSend && !hasPlan && planItReady(textMsgs.map((m) => m.sender_id), meId)
     && (nudgeOff === null || msgs.length >= nudgeOff + 15);
   const loggedView = useRef(false);
@@ -138,7 +170,9 @@ export default function Chat({ conversationId, meId, otherName, initial, canSend
           const mine = m.sender_id === meId;
           return (
             <div key={m.id} className="stack" style={{ gap: 6, alignItems: mine ? 'flex-end' : 'flex-start' }}>
-              {m.image_path
+              {m.audio_path
+                ? <Voice path={m.audio_path} mine={mine} seconds={m.audio_seconds} />
+                : m.image_path
                 ? <Photo path={m.image_path} mine={mine} />
                 : <div style={{ maxWidth: '78%', padding: '11px 14px', fontSize: 15, lineHeight: 1.4, borderRadius: mine ? '18px 18px 4px 18px' : '18px 18px 18px 4px', background: mine ? 'var(--gold)' : 'var(--bubble)', color: mine ? 'var(--on-gold)' : 'var(--ivory)', whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{m.body}</div>}
               {!mine && m.flag && WARN[m.flag] && <div className="msg-warning" role="note">{WARN[m.flag]}</div>}
@@ -182,7 +216,11 @@ export default function Chat({ conversationId, meId, otherName, initial, canSend
             {openers.map((o) => <button key={o} type="button" data-haptic="light" onClick={() => { setText(o); setTimeout(() => inputRef.current?.focus(), 0); }}>{o}</button>)}
           </div>
         )}
+        {recOpen && canSend && <div style={{ margin: '0 4px 8px' }}><VoiceRecorder maxSeconds={60} onDone={sendRecording} onCancel={() => setRecOpen(false)} /></div>}
         <div className="row" style={{ gap: 6 }}>
+          <button type="button" className="btn ghost sm" style={{ minHeight: 44, width: 44, padding: 0 }} disabled={!canSend || busy} onClick={() => setRecOpen((v) => !v)} aria-label="Record a voice message">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" /></svg>
+          </button>
           <input ref={fileRef} type="file" accept="image/*" hidden onChange={pickPhoto} />
           <button type="button" className="btn ghost sm" style={{ minHeight: 44, width: 44, padding: 0 }} disabled={!canSend || busy} onClick={() => fileRef.current?.click()} aria-label="Send a photo">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden><rect x="3" y="5" width="18" height="14" rx="3" /><circle cx="12" cy="12" r="3.2" /></svg>

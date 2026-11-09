@@ -8,10 +8,12 @@ type Week = { views: number; likes: number; chats: number; dates: number; best_p
 
 export default async function WeekRecap() {
   const { supabase, me } = await requireMember();
-  const [{ data }, { count: photoCount }] = await Promise.all([
+  const [{ data }, { count: photoCount }, { data: notesData }] = await Promise.all([
     supabase.rpc('my_week'),
     supabase.from('photos').select('id', { count: 'exact', head: true }).eq('user_id', me.id).neq('match_status', 'rejected'),
+    supabase.rpc('my_date_notes'),
   ]);
+  const notes = (notesData as { note: string; place: string; at: string }[] | null) || [];
   const w = (data as Week) || { views: 0, likes: 0, chats: 0, dates: 0, best_prompt: null };
   const s = profileStrength(me, photoCount || 0);
   const tiles: [string, number][] = [['Profile views', w.views], ['New likes', w.likes], ['New chats', w.chats], ['Dates set', w.dates]];
@@ -31,6 +33,13 @@ export default async function WeekRecap() {
           <span className="label">Your best prompt</span>
           <span className="serif" style={{ fontSize: 22 }}>{w.best_prompt.q}</span>
           <span className="small muted">{w.best_prompt.replies} {w.best_prompt.replies === 1 ? 'reply' : 'replies'} this month</span>
+        </div>
+      )}
+      {notes.length > 0 && (
+        <div className="card stack" style={{ gap: 8 }}>
+          <span className="label">What you’ve noticed</span>
+          <span className="small muted">Your private notes after dates. Patterns here say a lot about what you’re really looking for.</span>
+          {notes.map((n, i) => <div key={i} className="stack" style={{ gap: 2 }}><span className="small muted">{n.place} · {new Date(n.at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span><span>{n.note}</span></div>)}
         </div>
       )}
       <div className="card gold stack" style={{ gap: 6 }}>
