@@ -34,41 +34,16 @@ export default async function Settings({ searchParams }: { searchParams: Promise
           <span style={{ color: 'var(--gold)' }}>→</span>
         </Link>
       )}
-      <Link href="/app/shop" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}><span className="grow">Add-ons <span className="small muted">· Spotlight, Extra connections, Notes</span></span><span className="muted">›</span></Link>
 
-      {['membership', 'premium', 'black', 'paused'].includes(me.plan) && (
-        <form action={setStatus} className="card stack">
-          <span className="label">Status</span>
-          {[['active', 'Active', 'In the Daily Drop, matching and messaging.'], ['paused', 'Paused · $4.99/mo', 'Hidden from matching. Keep chats and friends.'], ['taken', 'Taken · $4.99/mo', 'You met someone. Friends see Matched on ScoreDate.']].map(([v, l, d]) => (
-            <label key={v} className="choice" style={{ alignItems: 'flex-start' }}><input type="radio" name="status" value={v} defaultChecked={current === v} style={{ accentColor: 'var(--gold)', marginTop: 4 }} /><span className="stack" style={{ gap: 2 }}><strong>{l}</strong><span className="small muted">{d}</span></span></label>
-          ))}
-          <input type="hidden" name="plan" value="membership" />
-          <button className="btn ghost sm">Save status</button>
-        </form>
-      )}
+
+
 
       <Link href="/app/profile" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="stack grow" style={{ gap: 2 }}><strong>Edit profile</strong><span className="small muted">Photos, prompt, song and Instagram</span></span>
         <span style={{ color: 'var(--gold)' }}>→</span>
       </Link>
-
-      <div className="card stack">
-        <span className="label">Membership</span>
-        <Link href="/plans">Change plan</Link>
-        <span className="small muted">On iPhone, subscriptions are managed in your App Store settings.</span>
-      </div>
-
       <Link href="/app/likes" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="grow">Likes &amp; profile views</span><span className="muted">›</span>
-      </Link>
-      <Link href="/help" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <span className="grow">Help center</span><span className="muted">›</span>
-      </Link>
-      <Link href="/app/support" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <span className="grow">Contact support</span><span className="muted">›</span>
-      </Link>
-      <Link href="/signin/new-password?from=settings" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <span className="grow">Set or change password</span><span className="muted">›</span>
       </Link>
       <div className="card stack" id="appearance">
         <span className="label">Appearance</span>
@@ -96,8 +71,6 @@ export default async function Settings({ searchParams }: { searchParams: Promise
         <span className="small muted">Account and security emails (sign-in, password, verification results) always come through.</span>
         <button className="btn ghost sm">Save email settings</button>
       </form>
-      <form action={signOut}><button className="btn ghost block">Sign out</button></form>
-
       <form action={saveMapPrivacy} className="card stack" id="privacy">
         <span className="label">Privacy</span>
         <label className="choice" style={{ alignItems: 'flex-start' }}><input type="checkbox" name="map_opt_out" defaultChecked={Boolean(me.map_opt_out)} style={{ accentColor: 'var(--gold)', marginTop: 4, width: 18, height: 18 }} /><span className="stack" style={{ gap: 2 }}><strong>Leave me off the member map</strong><span className="small muted">The map only shows neighborhoods with 25+ members, never individuals. Turn this on to be left out of the count entirely.</span></span></label>
@@ -108,6 +81,34 @@ export default async function Settings({ searchParams }: { searchParams: Promise
         <label className="choice" style={{ alignItems: 'flex-start' }}><input type="checkbox" name="show_online" defaultChecked={Boolean((me as { show_online?: boolean }).show_online)} style={{ accentColor: 'var(--gold)', marginTop: 4, width: 18, height: 18 }} /><span className="stack" style={{ gap: 2 }}><strong>Show when I’m active</strong><span className="small muted">Your matches see “Active now” or “Active in the last hour” in your chat. It’s off by default, and you only see others’ status while yours is on. Turning it off clears your last active time.</span></span></label>
         <button className="btn ghost sm">Save</button>
       </form>
+      <span className="label" style={{ marginTop: 8 }}>Membership &amp; add-ons</span>
+      {['membership', 'premium', 'black', 'paused'].includes(me.plan) && (
+        <form action={setStatus} className="card stack">
+          <span className="label">Status</span>
+          {[['active', 'Active', 'In the Daily Drop, matching and messaging.'], ['paused', 'Paused · $4.99/mo', 'Hidden from matching. Keep chats and friends.'], ['taken', 'Taken · $4.99/mo', 'You met someone. Friends see Matched on ScoreDate.']].map(([v, l, d]) => (
+            <label key={v} className="choice" style={{ alignItems: 'flex-start' }}><input type="radio" name="status" value={v} defaultChecked={current === v} style={{ accentColor: 'var(--gold)', marginTop: 4 }} /><span className="stack" style={{ gap: 2 }}><strong>{l}</strong><span className="small muted">{d}</span></span></label>
+          ))}
+          <input type="hidden" name="plan" value="membership" />
+          <button className="btn ghost sm">Save status</button>
+        </form>
+      )}
+      <div className="card stack">
+        <span className="label">Membership</span>
+        <Link href="/plans">Change plan</Link>
+        <span className="small muted">On iPhone, subscriptions are managed in your App Store settings.</span>
+      </div>
+      <Link href="/app/shop" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}><span className="grow">Add-ons <span className="small muted">· Spotlight, Extra connections, Notes</span></span><span className="muted">›</span></Link>
+      <Link href="/help" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="grow">Help center</span><span className="muted">›</span>
+      </Link>
+      <Link href="/app/support" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="grow">Contact support</span><span className="muted">›</span>
+      </Link>
+      <Link href="/signin/new-password?from=settings" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="grow">Set or change password</span><span className="muted">›</span>
+      </Link>
+      <form action={signOut}><button className="btn ghost block">Sign out</button></form>
+
       <div className="card stack">
         <span className="label">Your data</span>
         <span className="small muted">Download a copy of your profile, messages you sent, matches, plans and settings. ScoreDate never stores your exact credit score or report.</span>
