@@ -13,27 +13,27 @@
 }
 /* Light theme: chosen in Settings → Appearance, or "System" on a light-mode phone. */
 :root[data-theme="light"] {
-  --onyx: #F6F3EC; --graphite: #FFFFFF; --line: #DDD7CA; --line-soft: #E8E3D8;
+  --onyx: #E4E4E1; --graphite: #EFEFEC; --line: #CFCFCA; --line-soft: #D9D9D4;
   --ivory: #1A1916; --stone: #6B675E; --muted: #4F4B44; --faint: #807B71;
-  --gold: #A07F2E; --gold-light: #7E631F; --gold-wash: #F4ECD9; --gold-edge: #D9C79A;
+  --gold: #9A7A2C; --gold-light: #7A601E; --gold-wash: #E9E3D3; --gold-edge: #CDBE95;
   --rise: #2E8556; --alert: #B9472F; --on-gold: #FFFFFF;
-  --deep: #FFFFFF; --input-line: #D6D0C2; --chip-line: #CFC8B8; --notice-bg: #FBF9F4; --row-line: #ECE7DC;
-  --track: #E6E0D2; --placeholder: #A39E92; --bubble: #ECE7DC; --admin-nav: #EFEBE2; --danger-line: #E8B9AE; --rise-line: #A9D3BC;
-  --glass: rgba(255,255,255,.78); --glass-strong: rgba(255,255,255,.88); --glass-line: rgba(0,0,0,.08); --glass-hi: rgba(255,255,255,.6);
-  --shadow: rgba(60,50,30,.16); --appbar: rgba(246,243,236,.85); --appbar-line: rgba(0,0,0,.06); --tab-on: rgba(160,127,46,.12); --dot-ring: #FFFFFF;
+  --deep: #EAEAE7; --input-line: #C9C9C3; --chip-line: #C3C3BC; --notice-bg: #EBEBE8; --row-line: #DCDCD7;
+  --track: #D6D6D0; --placeholder: #8F8E88; --bubble: #DCDCD7; --admin-nav: #DDDDD9; --danger-line: #E8B9AE; --rise-line: #A9D3BC;
+  --glass: rgba(239,239,236,.8); --glass-strong: rgba(239,239,236,.9); --glass-line: rgba(0,0,0,.07); --glass-hi: rgba(255,255,255,.35);
+  --shadow: rgba(30,30,25,.14); --appbar: rgba(228,228,225,.86); --appbar-line: rgba(0,0,0,.06); --tab-on: rgba(154,122,44,.13); --dot-ring: #EFEFEC;
   --band-elite: #2F3140; --band-strong: #A07F2E; --band-solid: #6E727D; --band-building: #A55E33; --hero-glow: rgba(196,160,80,.22);
   color-scheme: light;
 }
 @media (prefers-color-scheme: light) {
   :root[data-theme="system"] {
-  --onyx: #F6F3EC; --graphite: #FFFFFF; --line: #DDD7CA; --line-soft: #E8E3D8;
+  --onyx: #E4E4E1; --graphite: #EFEFEC; --line: #CFCFCA; --line-soft: #D9D9D4;
   --ivory: #1A1916; --stone: #6B675E; --muted: #4F4B44; --faint: #807B71;
-  --gold: #A07F2E; --gold-light: #7E631F; --gold-wash: #F4ECD9; --gold-edge: #D9C79A;
+  --gold: #9A7A2C; --gold-light: #7A601E; --gold-wash: #E9E3D3; --gold-edge: #CDBE95;
   --rise: #2E8556; --alert: #B9472F; --on-gold: #FFFFFF;
-  --deep: #FFFFFF; --input-line: #D6D0C2; --chip-line: #CFC8B8; --notice-bg: #FBF9F4; --row-line: #ECE7DC;
-  --track: #E6E0D2; --placeholder: #A39E92; --bubble: #ECE7DC; --admin-nav: #EFEBE2; --danger-line: #E8B9AE; --rise-line: #A9D3BC;
-  --glass: rgba(255,255,255,.78); --glass-strong: rgba(255,255,255,.88); --glass-line: rgba(0,0,0,.08); --glass-hi: rgba(255,255,255,.6);
-  --shadow: rgba(60,50,30,.16); --appbar: rgba(246,243,236,.85); --appbar-line: rgba(0,0,0,.06); --tab-on: rgba(160,127,46,.12); --dot-ring: #FFFFFF;
+  --deep: #EAEAE7; --input-line: #C9C9C3; --chip-line: #C3C3BC; --notice-bg: #EBEBE8; --row-line: #DCDCD7;
+  --track: #D6D6D0; --placeholder: #8F8E88; --bubble: #DCDCD7; --admin-nav: #DDDDD9; --danger-line: #E8B9AE; --rise-line: #A9D3BC;
+  --glass: rgba(239,239,236,.8); --glass-strong: rgba(239,239,236,.9); --glass-line: rgba(0,0,0,.07); --glass-hi: rgba(255,255,255,.35);
+  --shadow: rgba(30,30,25,.14); --appbar: rgba(228,228,225,.86); --appbar-line: rgba(0,0,0,.06); --tab-on: rgba(154,122,44,.13); --dot-ring: #EFEFEC;
   --band-elite: #2F3140; --band-strong: #A07F2E; --band-solid: #6E727D; --band-building: #A55E33; --hero-glow: rgba(196,160,80,.22);
     color-scheme: light;
   }
