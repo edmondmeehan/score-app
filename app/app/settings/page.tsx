@@ -1,3 +1,4 @@
+import { profileStrength } from '@/lib/profileStrength';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getMe } from '@/lib/session';
@@ -21,6 +22,8 @@ export default async function Settings({ searchParams }: { searchParams: Promise
   const { data: nRow } = await supabase.from('notify_prefs').select('*').eq('user_id', me.id).maybeSingle();
   const np = { push_interactions: true, push_reminders: true, push_milestones: true, push_nudges: true, email_milestones: false, email_nudges: true, quiet_hours: true, ...(nRow || {}) };
   const sp = await searchParams;
+  const { count: photoCount } = await supabase.from('photos').select('id', { count: 'exact', head: true }).eq('user_id', me.id).neq('match_status', 'rejected');
+  const strength = profileStrength(me, photoCount || 0);
   const current = me.status === 'taken' ? 'taken' : me.status === 'paused' ? 'paused' : 'active';
   return (
     <div className="phone">
@@ -39,7 +42,7 @@ export default async function Settings({ searchParams }: { searchParams: Promise
 
 
       <Link href="/app/profile" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <span className="stack grow" style={{ gap: 2 }}><strong>Edit profile</strong><span className="small muted">Photos, prompt, song and Instagram</span></span>
+        <span className="stack grow" style={{ gap: 2 }}><strong>Edit profile</strong><span className="small muted">Profile strength {strength.pct}%{strength.next ? ` · Next: ${strength.next.label}` : ''}</span></span>
         <span style={{ color: 'var(--gold)' }}>→</span>
       </Link>
       <Link href="/app/pass" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
@@ -48,6 +51,9 @@ export default async function Settings({ searchParams }: { searchParams: Promise
       </Link>
       <Link href="/app/likes" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="grow">Likes &amp; profile views</span><span className="muted">›</span>
+      </Link>
+      <Link href="/app/week" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="grow">Your week</span><span className="muted">›</span>
       </Link>
       <div className="card stack" id="appearance">
         <span className="label">Appearance</span>

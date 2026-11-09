@@ -71,3 +71,26 @@ export async function announceEvent(form: FormData) {
   })));
   redirect(`/admin/events/${id}?sent=` + encodeURIComponent(`${r.sent} sent${blackOnly ? ' to Reserve members' : ''}${r.failed ? `, ${r.failed} failed (${r.error})` : ''}`));
 }
+
+/** Photo recap after an event: up to 12 photos (8 MB per upload batch), plus a short note. */
+export async function saveRecap(form: FormData) {
+  const supabase = await supabaseServer();
+  const id = String(form.get('id'));
+  const back = `/admin/events/${id}`;
+  const { data: e } = await supabase.from('events').select('recap_photos').eq('id', id).single();
+  const remove = new Set(form.getAll('remove').map(String));
+  const photos: string[] = ((e?.recap_photos as string[] | null) || []).filter((p) => !remove.has(p));
+  for (const f of form.getAll('photos')) {
+    if (!(f instanceof File) || !f.size) continue;
+    if (!/^image\/(jpeg|png|webp)$/.test(f.type)) redirect(`${back}?error=` + encodeURIComponent('Recap photos must be JPG, PNG or WebP.'));
+    if (photos.length >= 12) break;
+    const path = `${id}/recap/${crypto.randomUUID()}.${f.type.split('/')[1].replace('jpeg', 'jpg')}`;
+    const up = await supabase.storage.from('events').upload(path, new Uint8Array(await f.arrayBuffer()), { contentType: f.type, cacheControl: '31536000' });
+    if (up.error) redirect(`${back}?error=` + encodeURIComponent('A photo didn’t upload: ' + up.error.message));
+    photos.push(path);
+  }
+  const { error } = await supabase.rpc('staff_set_event_recap', { p_id: id, p_photos: photos, p_note: String(form.get('note') || '') });
+  if (error) redirect(`${back}?error=` + encodeURIComponent(error.message));
+  revalidatePath('/app/events');
+  redirect(`${back}?saved=1`);
+}

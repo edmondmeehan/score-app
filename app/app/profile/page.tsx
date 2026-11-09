@@ -6,7 +6,9 @@ import { TestBanner } from '@/components/ui';
 import PhotoUploader from '../../onboarding/photos/PhotoUploader';
 import SongPicker from './SongPicker';
 import { PROMPTS } from '@/lib/prompts';
-import { clearSong, movePhoto, removePhoto, saveAbout, saveDetails, saveFlags, saveInstagram, saveNycSpot, savePrompts } from './actions';
+import { answerVouch, clearSong, movePhoto, removePhoto, saveAbout, saveDetails, saveFlags, saveImproving, saveInstagram, saveNycSpot, savePrompts } from './actions';
+import { profileStrength } from '@/lib/profileStrength';
+import { BANDS } from '@/lib/types';
 import PlaceFields from '@/components/PlaceFields';
 import { DRINKING, EDUCATION, EXERCISE, HAS_KIDS, HEIGHTS, LOOKING_FOR, NYC_SLOTS, PETS, POLITICS, RELIGION, SMOKING, WANTS_KIDS } from '@/lib/profileDetails';
 
@@ -19,13 +21,16 @@ const STATUS: Record<string, [string, string]> = {
 export default async function EditProfile({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string; add?: string }> }) {
   const sp = await searchParams;
   const { supabase, user, me } = await requireMember();
-  const [{ data: photos }, { data: social }, searchable, faceOn] = await Promise.all([
+  const [{ data: photos }, { data: social }, searchable, faceOn, { data: vouch }] = await Promise.all([
     supabase.from('photos').select('id, path, position, match_status').eq('user_id', user.id).order('position'),
     supabase.from('profile_socials').select('instagram, instagram_public').eq('user_id', user.id).maybeSingle(),
     spotifyConfigured(),
     faceMatchConfigured(),
+    supabase.from('vouches').select('body, status, voucher_id').eq('member_id', user.id).maybeSingle(),
   ]);
   const list = photos || [];
+  const strength = profileStrength(me, list.filter((p) => p.match_status !== 'rejected').length);
+  const { data: voucherName } = vouch ? await supabase.rpc('first_name_of', { p: vouch.voucher_id }) : { data: null };
   const { data: signed } = list.length ? await supabase.storage.from('photos').createSignedUrls(list.map((p) => p.path), 3600) : { data: [] };
   const room = 6 - list.length;
 
@@ -38,6 +43,31 @@ export default async function EditProfile({ searchParams }: { searchParams: Prom
       <h1 className="serif" style={{ fontSize: 38 }}>Your profile</h1>
       {sp.error && <div className="notice error">{sp.error}</div>}
       {sp.saved && <div className="notice">Saved.</div>}
+
+      {/* Profile strength */}
+      <section className="card stack strength" style={{ gap: 8 }}>
+        <div className="row" style={{ justifyContent: 'space-between' }}><span className="label">Profile strength</span><span className="mono" style={{ color: 'var(--gold-light)' }}>{strength.pct}%</span></div>
+        <div className="strength-bar"><span style={{ width: `${strength.pct}%` }} /></div>
+        {strength.next ? <Link href={strength.next.href} className="small">Next: {strength.next.label} →</Link> : <span className="small muted">Your profile is complete. Nice.</span>}
+      </section>
+
+      {vouch && vouch.status !== 'hidden' && (
+        <section id="vouch" className="card gold stack" style={{ gap: 8 }}>
+          <span className="label">{voucherName || 'Your inviter'} vouched for you</span>
+          <span className="serif" style={{ fontSize: 20, lineHeight: 1.3 }}>“{vouch.body}”</span>
+          {vouch.status === 'pending' ? (
+            <>
+              <span className="small muted">Nobody sees this unless you choose to show it.</span>
+              <div className="row" style={{ gap: 8 }}>
+                <form action={answerVouch}><input type="hidden" name="show" value="yes" /><button className="btn sm" data-haptic="success">Show on my profile</button></form>
+                <form action={answerVouch}><input type="hidden" name="show" value="no" /><button className="btn ghost sm">Keep private</button></form>
+              </div>
+            </>
+          ) : (
+            <form action={answerVouch}><input type="hidden" name="show" value="no" /><span className="small muted">Showing on your profile. </span><button className="btn ghost sm">Hide it</button></form>
+          )}
+        </section>
+      )}
 
       {/* Photos */}
       <section className="card stack">
@@ -99,7 +129,7 @@ export default async function EditProfile({ searchParams }: { searchParams: Prom
       </form>
 
       {/* About */}
-      <form action={saveAbout} className="card stack">
+      <form id="about" action={saveAbout} className="card stack">
         <span className="label">About you</span>
         <label className="field">What you do<input className="input" name="job" maxLength={80} defaultValue={me.job || ''} /></label>
         <label className="field">Neighborhood<input className="input" name="neighborhood" maxLength={80} defaultValue={me.neighborhood || ''} /></label>
@@ -160,7 +190,7 @@ export default async function EditProfile({ searchParams }: { searchParams: Prom
       </form>
 
       {/* Song */}
-      <section className="card stack">
+      <section id="song" className="card stack">
         <span className="label">Your song</span>
         {me.song_id ? (
           <div className="stack" style={{ gap: 8 }}>
@@ -171,6 +201,16 @@ export default async function EditProfile({ searchParams }: { searchParams: Prom
         ) : <span className="small muted">Add a song that says something about you. It plays on your profile.</span>}
         <SongPicker searchable={searchable} />
       </section>
+
+      {/* Band level-ups: the public ↑ is opt-in */}
+      {me.band && (
+        <form id="improving" action={saveImproving} className="card stack">
+          <span className="label">Improving badge</span>
+          <span className="small muted">When your band is trending up, show a small ↑ next to {BANDS[me.band].label} so matches can see it. Off by default. Your trend is never shown unless you turn this on.</span>
+          <label className="row small" style={{ gap: 10 }}><input type="checkbox" name="show" defaultChecked={Boolean(me.show_improving)} style={{ width: 18, height: 18, accentColor: 'var(--gold)' }} />Show my Improving badge</label>
+          <button className="btn ghost sm">Save</button>
+        </form>
+      )}
 
       {/* Instagram */}
       <form action={saveInstagram} className="card stack">

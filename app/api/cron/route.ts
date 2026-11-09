@@ -13,7 +13,8 @@ type Row = { user_id: string; email: string | null; first_name: string | null } 
 /**
  * Scheduled emails. Vercel Cron calls this (see vercel.json) with "Authorization: Bearer <CRON_SECRET>".
  * ?job=frequent → new-message digests, Preview reminders, re-verify reminders, housekeeping
- * ?job=daily    → Daily Drop email
+ * ?job=drop     → Daily Drop push + email, right after the 00:00 UTC flip
+ * ?job=daily    → Sunday recap, staff daily report
  * Each job claims recipients in the database first, so overlapping runs never double-send.
  */
 export async function GET(request: NextRequest) {
@@ -32,11 +33,18 @@ export async function GET(request: NextRequest) {
   const out: Record<string, unknown> = { job };
 
   try {
-    if (job === 'daily') {
+    if (job === 'drop') {
+      // Right after the Drop flips (00:00 UTC = 7pm ET winter / 8pm summer): build Drops + push, then the email.
+      const dropReady = await sb.rpc('queue_drop_ready', { p_secret: secret });
+      out.drop_ready = dropReady.data ?? dropReady.error?.message;
       const rows = await claim('daily_drop');
       out.daily_drop = await sendBatch('daily_drop', rows.map((r) => ({
         to: r.email!, data: { first_name: r.first_name, count: Number(r.count) || 5 }, unsubUrl: unsubUrl(r.user_id, 'daily_drop'),
       })));
+    } else if (job === 'daily') {
+      // Sunday recap (no-op other days; only goes to people with good news).
+      const weekly = await sb.rpc('queue_weekly', { p_secret: secret });
+      out.weekly = weekly.data ?? weekly.error?.message;
       // Staff daily report (each person once per day, only the sections they picked).
       const rep = await sb.rpc('cron_daily_report', { p_secret: secret });
       if (rep.error) out.admin_daily = rep.error.message;
@@ -81,7 +89,7 @@ export async function GET(request: NextRequest) {
       })));
     }
     // Activity notifications: queue reminders, milestones and nudges, then deliver everything pending.
-    const queued = await sb.rpc('queue_scheduled_notifications', { p_secret: secret, p_job: job === 'daily' ? 'daily' : 'frequent' });
+    const queued = await sb.rpc('queue_scheduled_notifications', { p_secret: secret, p_job: job === 'daily' ? 'daily' : job === 'drop' ? 'drop' : 'frequent' });
     out.notifications_queued = queued.data ?? queued.error?.message;
     out.notifications = await flushNotifications(null, 500);
   } catch (e) {

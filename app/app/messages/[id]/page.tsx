@@ -9,11 +9,11 @@ import { SITE_URL } from '@/lib/emails';
 import type { Profile } from '@/lib/types';
 import Chat from './Chat';
 import DatePanel, { type Pick, type Plan } from './DatePanel';
-import { openers } from '@/lib/engagement';
+import { openers, publicTrend } from '@/lib/engagement';
 
 export const dynamic = 'force-dynamic';
 
-export default async function Conversation({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string; shared?: string; ok?: string; match?: string }> }) {
+export default async function Conversation({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string; shared?: string; ok?: string; match?: string; second?: string }> }) {
   const { id } = await params;
   const sp = await searchParams;
   const { supabase, me } = await requireMember();
@@ -33,17 +33,19 @@ export default async function Conversation({ params, searchParams }: { params: P
   const paid = ['membership', 'premium', 'black', 'paused'].includes(me.plan);
   const canSend = !conv.ended_at && (paid || (Boolean(conv.note_from) && conv.note_from !== me.id));
   const { data: picksData } = await supabase.rpc('featured_spots_live');
-  const [{ data: readAt }, { data: presence }] = await Promise.all([
+  const [{ data: readAt }, { data: presence }, { data: sharedQ }] = await Promise.all([
     supabase.rpc('other_read_at', { p_conversation: id }),
     supabase.rpc('presence_of', { p_user: otherId }),
+    supabase.rpc('shared_answers', { p_other: otherId }),
   ]);
+  const sameAnswers = (sharedQ as { q: string; a: string }[] | null) || [];
   const fromNote = conv.note_from && conv.note_from !== me.id;
   return (
     <div className="phone" style={{ paddingBottom: 'calc(110px + env(safe-area-inset-bottom))' }}>
       <ScreenshotContext context="chat" target={otherId} />
       <div className="row appbar">
         <Link href="/app/messages" aria-label="Back" className="btn ghost sm" style={{ width: 44, padding: 0 }}>‹</Link>
-        <Link href={`/app/u/${otherId}`} className="stack grow" style={{ gap: 4, textDecoration: 'none', color: 'inherit' }}><strong>{o?.first_name || 'Member'}</strong>{presence === 'now' ? <span className="small" style={{ color: 'var(--rise)' }}><span className="presence-dot" />Active now</span> : presence === 'hour' ? <span className="small muted"><span className="presence-dot hour" />Active in the last hour</span> : null}{o && <BandPill band={o.band} trend={o.trend} verified={Boolean(o.credit_verified_at)} />}</Link>
+        <Link href={`/app/u/${otherId}`} className="stack grow" style={{ gap: 4, textDecoration: 'none', color: 'inherit' }}><strong>{o?.first_name || 'Member'}</strong>{presence === 'now' ? <span className="small" style={{ color: 'var(--rise)' }}><span className="presence-dot" />Active now</span> : presence === 'hour' ? <span className="small muted"><span className="presence-dot hour" />Active in the last hour</span> : null}{o && <BandPill band={o.band} trend={publicTrend(o)} verified={Boolean(o.credit_verified_at)} />}</Link>
         <details className="chat-menu">
           <summary className="small muted" aria-label="More">More</summary>
           <div className="chat-menu-list">
@@ -63,7 +65,23 @@ export default async function Conversation({ params, searchParams }: { params: P
       {sp.ok && <div className="notice">{sp.ok}</div>}
       {sp.match && <HapticOnMount kind="success" />}
       {conv.ended_at && <div className="notice">{conv.ended_by === me.id ? 'You unmatched.' : 'This conversation has ended.'} Messages can’t be sent anymore.</div>}
-      {shared.length > 0 && <div className="card stack" style={{ gap: 8 }}><span className="small muted">You both said</span><div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>{shared.map((v) => <span key={v} className="chip">{v}</span>)}</div></div>}
+      {sp.second && !conv.ended_at && (
+        <div className="card gold stack" style={{ gap: 6 }}>
+          <HapticOnMount kind="success" />
+          <span className="label">Second date</span>
+          <span className="serif" style={{ fontSize: 22 }}>You both said yes.</span>
+          <span className="small muted">Suggest a spot below while it’s fresh. The ScoreDate Partners row has member perks.</span>
+        </div>
+      )}
+      {(shared.length > 0 || sameAnswers.length > 0) && (
+        <div className="card stack" style={{ gap: 8 }}>
+          <span className="small muted">You both said</span>
+          <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
+            {shared.map((v) => <span key={v} className="chip">{v}</span>)}
+            {sameAnswers.map((x) => <span key={x.q} className="chip" title={x.q}>{x.q} {x.a}</span>)}
+          </div>
+        </div>
+      )}
       <DatePanel
         conversationId={id}
         meId={me.id}

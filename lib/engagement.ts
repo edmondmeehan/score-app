@@ -57,3 +57,6 @@ export const KIND_CLOSES = [
 ] as const;
 
 export const QUIET_HOURS = 48;
+
+/** The ↑ trend is only shown to others when the member opted in to the Improving badge. */
+export const publicTrend = (p: { trend?: string | null; show_improving?: boolean | null }) => (p.show_improving ? p.trend ?? null : null);

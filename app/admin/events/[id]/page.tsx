@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabase/server';
 import { BANDS } from '@/lib/types';
 import type { EventRow } from '@/lib/events';
-import { announceEvent, saveEvent } from '../actions';
+import { announceEvent, saveEvent, saveRecap } from '../actions';
 import { eventImage } from '@/lib/events';
 
 export const dynamic = 'force-dynamic';
@@ -93,6 +93,19 @@ export default async function EditEvent({ params, searchParams }: { params: Prom
               <span className="small muted">Emails members who have event emails on. During the Reserve-first window it goes to Reserve members only; send again after it ends to reach everyone.</span>
               <input type="hidden" name="id" value={e.id} />
               <button className="btn ghost sm" disabled={e.status !== 'published'}>Send announcement</button>
+            </form>
+            <form action={saveRecap} className="card stack">
+              <h2 style={{ margin: 0, fontSize: 16 }}>Photo recap</h2>
+              <span className="small muted">After the night, add up to 12 photos. Members see them on the event and under Recent nights. Only post photos guests agreed to be in.</span>
+              <input type="hidden" name="id" value={e.id} />
+              {(e.recap_photos || []).length > 0 && (
+                <div className="event-recap">
+                  {(e.recap_photos || []).map((ph) => <label key={ph} className="stack small" style={{ gap: 4 }}><img src={eventImage(ph) || ''} alt="" /><span><input type="checkbox" name="remove" value={ph} /> Remove</span></label>)}
+                </div>
+              )}
+              <input type="file" name="photos" multiple accept="image/jpeg,image/png,image/webp" style={{ fontSize: 14 }} />
+              <label className="field">Note (optional)<input className="input" name="note" maxLength={400} defaultValue={e.recap_note || ''} placeholder="Thanks for a great night at…" /></label>
+              <button className="btn ghost sm">Save recap</button>
             </form>
             <div className="card stack">
               <h2 style={{ margin: 0, fontSize: 16 }}>RSVPs · {going} / {e.capacity}</h2>

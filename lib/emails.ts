@@ -295,12 +295,12 @@ export const templates = {
 
   daily_drop: (d: { first_name?: string | null; count: number; top_match?: string | null }) => ({
     subject: `Your Daily Drop: ${d.count} new ${d.count === 1 ? 'person' : 'people'}`,
-    preheader: d.top_match ? `Including ${d.top_match}.` : 'Picked for you today.',
-    eyebrow: "Today's Drop",
+    preheader: d.top_match ? `Including ${d.top_match}.` : 'Picked for you tonight.',
+    eyebrow: "Tonight's Drop",
     heading: `${d.count} people, picked for you.`,
     kind: 'notification',
     blocks: [
-      { p: `${hi(d.first_name)} today's Drop is ready${d.top_match ? `, led by ${d.top_match}` : ''}. Everyone in it is ID-verified and picked for your money values and preferences.` },
+      { p: `${hi(d.first_name)} tonight's Drop is ready${d.top_match ? `, led by ${d.top_match}` : ''}. Everyone in it is ID-verified and picked for your money values and preferences.` },
       { button: { label: 'Open the Drop', url: `${SITE_URL}/app` } },
       { note: 'A new Drop arrives every day around noon.' },
     ],
@@ -525,7 +525,7 @@ export const TEMPLATE_INFO: Record<TemplateName, { label: string; when: string; 
   id_needs_attention: { label: 'ID retry', when: 'Persona declines the ID check', live: true },
   photos_review: { label: 'Photo review result', when: 'Staff approves or rejects photos in review', live: true },
   verification_feedback: { label: 'Verification feedback', when: 'Staff asks a member to redo their ID or photos, with a written note', live: true },
-  daily_drop: { label: 'Daily Drop', when: 'Daily around noon (automatic)', live: true },
+  daily_drop: { label: 'Daily Drop', when: 'Nightly at 7pm ET, 8pm in summer (automatic)', live: true },
   new_message: { label: 'New message', when: 'Unread for 10+ min, at most every 3 hours (automatic)', live: true },
   event_announce: { label: 'Event announcement', when: 'Staff announces an event (Reserve first during priority window)', live: true },
   preview_ending: { label: 'Preview ending', when: '3 days before a Preview ends (automatic)', live: true },

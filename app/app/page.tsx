@@ -4,16 +4,18 @@ import { requireMember } from '@/lib/session';
 import { BandPill, age } from '@/components/ui';
 import { photoUrls } from '@/lib/photos';
 import type { Profile } from '@/lib/types';
-import { checkIn, useExtraDrop, useSpotlight } from './features';
+import { answerDaily, checkIn, dateAgain, useExtraDrop, useSpotlight } from './features';
 import PushPrompt from '@/components/PushPrompt';
 import FounderBadge from '@/components/FounderBadge';
 import { getCreditMode } from '@/lib/creditMode';
 import DropCountdown from '@/components/DropCountdown';
-import { dropReason, dropTimeLabel, nextDropAt } from '@/lib/engagement';
+import { dropReason, dropTimeLabel, nextDropAt, publicTrend } from '@/lib/engagement';
 
 export const dynamic = 'force-dynamic';
 
 type Checkin = { plan_id: string; place: string; starts_at: string; conversation_id: string; match: string; other_id: string };
+type Again = { plan_id: string; place: string; conversation_id: string; match: string };
+type Daily = { id: number; q: string; options: string[]; mine: string | null } | null;
 type Mine = { included: boolean; extra_drop: number; spotlight: number; note: number; spotlight_until: string | null };
 
 export default async function Drop({ searchParams }: { searchParams: Promise<{ ok?: string; error?: string }> }) {
@@ -28,15 +30,20 @@ export default async function Drop({ searchParams }: { searchParams: Promise<{ o
       </div>
     );
   }
-  const [{ data: drop }, { data: mineData }, { data: checkinData }, { data: unread }] = await Promise.all([
+  const [{ data: drop }, { data: mineData }, { data: checkinData }, { data: unread }, { data: againData }, { data: dailyData }, { data: wildId }] = await Promise.all([
     supabase.rpc('get_drop'), supabase.rpc('my_addons'), supabase.rpc('pending_checkins'), supabase.rpc('unread_notifications'),
+    supabase.rpc('pending_again'), supabase.rpc('todays_question'), supabase.rpc('get_wildcard'),
   ]);
+  const again = (againData as Again[] | null) || [];
+  const daily = (dailyData as Daily) || null;
   const bell = Number(unread) || 0;
   const mine = (mineData as Mine) || { included: false, extra_drop: 0, spotlight: 0, note: 0, spotlight_until: null };
   const checkins = (checkinData as Checkin[]) || [];
   const spotlightUntil = mine.spotlight_until ? new Date(mine.spotlight_until) : null;
   const now = Date.now();
-  const ids = (drop || []).map((d: { match_id: string }) => d.match_id);
+  const dropIds = (drop || []).map((d: { match_id: string }) => d.match_id);
+  const wild = typeof wildId === 'string' && !dropIds.includes(wildId) ? wildId : null;
+  const ids = wild ? [...dropIds, wild] : dropIds;
   const { data: people } = ids.length ? await supabase.from('profiles').select('*').in('id', ids) : { data: [] };
   const byId = Object.fromEntries((people || []).map((p: Profile) => [p.id, p]));
   const photos = await photoUrls(supabase, ids);
@@ -85,6 +92,30 @@ export default async function Drop({ searchParams }: { searchParams: Promise<{ o
             <span className="small muted">In danger right now? Call 911.</span>
           </div>
       ))}
+      {again.map((a) => (
+        <div key={a.plan_id} className="card gold stack" style={{ gap: 10 }}>
+          <span className="label">One more question</span>
+          <span className="serif" style={{ fontSize: 24 }}>Would you see {a.match} again?</span>
+          <span className="small muted">Private. {a.match} only hears about it if you both say yes.</span>
+          <div className="row" style={{ flexWrap: 'wrap', gap: 8 }}>
+            {([['yes', 'Yes'], ['maybe', 'Maybe'], ['no', 'No']] as const).map(([v, l]) => (
+              <form key={v} action={dateAgain}><input type="hidden" name="plan_id" value={a.plan_id} /><input type="hidden" name="conversation_id" value={a.conversation_id} /><input type="hidden" name="again" value={v} /><button className={v === 'yes' ? 'btn sm' : 'btn ghost sm'} data-haptic={v === 'yes' ? 'success' : undefined}>{l}</button></form>
+            ))}
+          </div>
+        </div>
+      ))}
+      {daily && (
+        <div id="daily" className="card stack daily-q" style={{ gap: 10 }}>
+          <span className="label">Today’s question</span>
+          <span className="serif" style={{ fontSize: 24, lineHeight: 1.15 }}>{daily.q}</span>
+          <div className="row" style={{ flexWrap: 'wrap', gap: 8 }}>
+            {daily.options.map((o) => (
+              <form key={o} action={answerDaily}><input type="hidden" name="question_id" value={daily.id} /><input type="hidden" name="answer" value={o} /><button className={daily.mine === o ? 'btn sm' : 'btn ghost sm'} aria-pressed={daily.mine === o}>{o}</button></form>
+            ))}
+          </div>
+          <span className="small muted">{daily.mine ? 'Saved. Matches who picked the same see it in your chat.' : 'Matches who pick the same answer see it in your chat.'}</span>
+        </div>
+      )}
       <div className="row" style={{ gap: 8, flexWrap: 'wrap' }}>
         <form action={useExtraDrop}><input type="hidden" name="return" value="/app" /><button className="btn ghost sm" disabled={!mine.included && mine.extra_drop < 1} title="Add 5 more people to today's Drop">+5 more today{!mine.included ? ` (${mine.extra_drop})` : ''}</button></form>
         <form action={useSpotlight}><input type="hidden" name="return" value="/app" /><button className="btn ghost sm" disabled={Boolean(spotlightUntil) || (!mine.included && mine.spotlight < 1)}>{spotlightUntil ? `Spotlight on until ${spotlightUntil.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' })}` : `Spotlight${!mine.included ? ` (${mine.spotlight})` : ''}`}</button></form>
@@ -114,13 +145,28 @@ export default async function Drop({ searchParams }: { searchParams: Promise<{ o
               <div className="stack grow" style={{ gap: 6, minWidth: 0 }}>
                 <span><strong style={{ fontSize: 17 }}>{p.first_name}</strong> <span className="muted">{age(p.birth_year)}</span>{p.spotlight_until && new Date(p.spotlight_until).getTime() > now && <span className="chip" style={{ marginLeft: 8, fontSize: 11, padding: '2px 8px', color: 'var(--gold-light)' }}>Featured</span>}{p.is_founder && <span style={{ marginLeft: 8 }}><FounderBadge /></span>}{isVerified(p) && <span style={{ marginLeft: 6 }}><VerifiedBadge credit={Boolean(p.credit_verified_at)} /></span>}</span>
                 <span className="small muted" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{[p.job, p.neighborhood].filter(Boolean).join(' · ')}</span>
-                <BandPill band={p.band} trend={p.trend} verified={Boolean(p.credit_verified_at)} />
+                <BandPill band={p.band} trend={publicTrend(p)} verified={Boolean(p.credit_verified_at)} />
                 {why && <span className="drop-reason">{why}</span>}
               </div>
               <div className="stack" style={{ alignItems: 'flex-end', gap: 0 }}><span className="serif" style={{ fontSize: 30, color: 'var(--gold-light)' }}>{d.compat}%</span><span className="small muted">match</span></div>
             </Link>
           );
         })}
+        {wild && byId[wild] && (() => {
+          const p = byId[wild] as Profile;
+          return (
+            <Link href={`/app/u/${p.id}`} className="card row wildcard" style={{ textDecoration: 'none', color: 'var(--ivory)', padding: 12 }}>
+              <div className="photo" style={{ width: 76, flex: 'none' }}>{photos[p.id]?.[0] ? <img src={photos[p.id][0]} alt="" /> : <span className="serif">{p.first_name?.[0]}</span>}</div>
+              <div className="stack grow" style={{ gap: 6, minWidth: 0 }}>
+                <span className="label" style={{ color: 'var(--gold-light)' }}>Today’s Wildcard</span>
+                <span><strong style={{ fontSize: 17 }}>{p.first_name}</strong> <span className="muted">{age(p.birth_year)}</span></span>
+                <span className="small muted" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{[p.job, p.neighborhood].filter(Boolean).join(' · ') || 'Outside your usual band'}</span>
+                <BandPill band={p.band} trend={publicTrend(p)} verified={Boolean(p.credit_verified_at)} />
+              </div>
+              <span className="small muted" style={{ alignSelf: 'flex-start' }}>Outside your<br />usual picks</span>
+            </Link>
+          );
+        })()}
       </div>
       {preview && <Link className="btn block" href="/plans">Become a member · $24.99/mo</Link>}
     </div>

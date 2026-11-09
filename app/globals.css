@@ -458,3 +458,9 @@ html.native .event-hero { margin-top: calc(-12px - env(safe-area-inset-top)); }
 .openers button { flex: none; max-width: 260px; text-align: left; font-size: 13px; line-height: 1.35; padding: 9px 12px; border-radius: 14px; border: 1px solid var(--gold-edge); background: var(--graphite); color: var(--ivory); cursor: pointer; white-space: normal; }
 .kind-close { border: 1px dashed var(--line-soft); }
 .kind-close button.choice-msg { display: block; width: 100%; text-align: left; font-size: 13px; line-height: 1.4; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line-soft); background: transparent; color: var(--ivory); cursor: pointer; }
+.strength-bar { height: 6px; border-radius: 999px; background: var(--track); overflow: hidden; }
+.strength-bar span { display: block; height: 100%; background: var(--gold); border-radius: 999px; }
+.week-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.wildcard { border-style: dashed; border-color: var(--gold-edge); }
+.event-recap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.event-recap img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; }

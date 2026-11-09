@@ -7,11 +7,15 @@ export const dynamic = 'force-dynamic';
 
 export default async function Events() {
   const { supabase, me } = await requireMember();
-  const [{ data: events }, { data: mine }, { data: countData }] = await Promise.all([
+  const [{ data: events }, { data: mine }, { data: countData }, { data: matchData }, { data: pastData }] = await Promise.all([
     supabase.from('events').select('*').in('status', ['published', 'cancelled']).gte('starts_at', new Date(Date.now() - 6 * 3600000).toISOString()).order('starts_at'),
     supabase.from('event_rsvps').select('event_id, status').eq('user_id', me.id),
     supabase.rpc('event_going_counts'),
+    supabase.rpc('events_matches_going'),
+    supabase.from('events').select('id, title, venue, starts_at, image_path, recap_photos').eq('status', 'published').lt('starts_at', new Date(Date.now() - 6 * 3600000).toISOString()).gt('starts_at', new Date(Date.now() - 60 * 86400000).toISOString()).order('starts_at', { ascending: false }).limit(6),
   ]);
+  const matchGoing = (matchData as Record<string, number>) || {};
+  const past = ((pastData as EventRow[]) || []).filter((e) => (e.recap_photos || []).length > 0);
   const reserve = me.plan === 'black' || (await getReserveVisible(supabase));
   const rsvp = Object.fromEntries((mine || []).map((r) => [r.event_id, r.status]));
   const counts = (countData as Record<string, number>) || {};
@@ -50,6 +54,7 @@ export default async function Events() {
               <span className="serif" style={{ fontSize: 32, lineHeight: 1.02 }}>{next.title}</span>
               <span className="small" style={{ opacity: 0.85 }}>{dayParts(next.starts_at).weekday} {dayParts(next.starts_at).month} {dayParts(next.starts_at).day} · {timeOnly(next.starts_at)} · {next.venue}</span>
               <span className="small" style={{ opacity: 0.85 }}>{n} going · {left > 0 ? `${left} spots left` : 'Waitlist open'}</span>
+              {matchGoing[next.id] > 0 && <span className="small" style={{ color: 'var(--gold-light)' }}>♥ {matchGoing[next.id]} of your matches {matchGoing[next.id] === 1 ? 'is' : 'are'} going</span>}
             </div>
           </Link>
         );
@@ -68,11 +73,20 @@ export default async function Events() {
                 <span className="row" style={{ justifyContent: 'space-between', gap: 8 }}><span className="mono small" style={{ color: 'var(--gold-light)' }}>{d.weekday} · {timeOnly(e.starts_at)}</span>{badge(e)}</span>
                 <span className="serif" style={{ fontSize: 22, lineHeight: 1.1 }}>{e.title}</span>
                 <span className="small muted" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.venue} · {n} going{e.price_note ? ` · ${e.price_note}` : ''}</span>
+                {matchGoing[e.id] > 0 && <span className="small" style={{ color: 'var(--gold-light)' }}>♥ {matchGoing[e.id]} of your matches going</span>}
               </div>
             </Link>
           );
         })}
       </div>
+
+      {past.length > 0 && <span className="eyebrow" style={{ marginTop: 6 }}>Recent nights</span>}
+      {past.map((e) => (
+        <Link key={e.id} href={`/app/events/${e.id}`} className="card stack" style={{ gap: 8, textDecoration: 'none', color: 'inherit' }}>
+          <span className="row" style={{ justifyContent: 'space-between' }}><strong>{e.title}</strong><span className="small muted">{dayParts(e.starts_at).month} {dayParts(e.starts_at).day}</span></span>
+          <div className="event-recap">{(e.recap_photos || []).slice(0, 3).map((ph) => <img key={ph} src={eventImage(ph) || ''} alt="" loading="lazy" />)}</div>
+        </Link>
+      ))}
     </div>
   );
 }

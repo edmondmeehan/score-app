@@ -149,3 +149,15 @@ export async function saveNycSpot(form: FormData) {
   revalidatePath('/app/profile');
   back(error ? 'error=' + encodeURIComponent(/column|schema/.test(error.message) ? 'My NYC is almost ready. Please try again later.' : error.message) : 'saved=nyc#nyc');
 }
+
+export async function saveImproving(form: FormData) {
+  const { supabase, user } = await ctx();
+  const { error } = await supabase.from('profiles').update({ show_improving: form.get('show') === 'on' }).eq('id', user.id);
+  back(error ? 'error=' + encodeURIComponent(/column|schema/.test(error.message) ? 'Almost ready. Please try again later.' : error.message) : 'saved=improving#improving');
+}
+
+export async function answerVouch(form: FormData) {
+  const { supabase } = await ctx();
+  const { error } = await supabase.rpc('answer_vouch', { p_show: form.get('show') === 'yes' });
+  back(error ? 'error=' + encodeURIComponent(error.message) : 'saved=vouch');
+}

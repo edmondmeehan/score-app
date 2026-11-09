@@ -4,6 +4,7 @@ export type EventRow = {
   status: 'draft' | 'published' | 'cancelled'; published_at: string | null;
   place_id?: string | null; lat?: number | null; lng?: number | null;
   image_path?: string | null; host?: string | null; dress_code?: string | null;
+  recap_photos?: string[] | null; recap_note?: string | null;
 };
 
 export const when = (iso: string) =>

@@ -177,7 +177,8 @@ export async function checkIn(form: FormData) {
   const { error } = await supabase.rpc('date_checkin', { p_plan: plan, p_status: status });
   if (error) back('/app', 'error', error.message);
   if (status === 'report') redirect(`/app/report/${String(form.get('other_id'))}`);
-  back('/app', 'ok', status === 'safe' ? 'Glad it went well. Thanks for checking in.' : 'Thanks for telling us. You can report or block them any time from their profile.');
+  if (status === 'safe') redirect('/app');   // the "see them again?" card shows next
+  back('/app', 'ok', 'Thanks for telling us. You can report or block them any time from their profile.');
 }
 
 // ---------- Events ----------
@@ -212,4 +213,29 @@ export async function submitDateChallenge(form: FormData) {
   });
   if (error) back(`/app/messages/${conv}`, 'error', /spent/.test(error.message) ? 'Keep it at $50 or under.' : error.message);
   redirect(`/app/messages/${conv}?ok=` + encodeURIComponent('Thanks for sharing your $50 date.'));
+}
+
+// ---------- How did it go / daily question / vouches ----------
+export async function dateAgain(form: FormData) {
+  const { supabase } = await ctx();
+  const { data, error } = await supabase.rpc('date_again', { p_plan: String(form.get('plan_id')), p_answer: String(form.get('again')) });
+  if (error) back('/app', 'error', error.message);
+  if (data === 'mutual') { after(() => flushNotifications(null, 20)); redirect(`/app/messages/${String(form.get('conversation_id'))}?second=1`); }
+  back('/app', 'ok', 'Got it. That stays private to you.');
+}
+
+export async function answerDaily(form: FormData) {
+  const { supabase } = await ctx();
+  const { error } = await supabase.rpc('answer_daily', { p_question: Number(form.get('question_id')), p_answer: String(form.get('answer')) });
+  if (error) back('/app', 'error', error.message);
+  revalidatePath('/app');
+  redirect('/app#daily');
+}
+
+export async function writeVouch(form: FormData) {
+  const { supabase, user } = await ctx();
+  const { error } = await supabase.rpc('write_vouch', { p_member: String(form.get('member_id')), p_body: String(form.get('body') || '') });
+  if (error) back('/app/invites', 'error', error.message);
+  after(() => flushNotifications(user.id, 20));
+  back('/app/invites', 'ok', 'Sent. They’ll choose whether it shows on their profile.');
 }

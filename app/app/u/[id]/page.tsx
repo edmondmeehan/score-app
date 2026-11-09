@@ -24,6 +24,7 @@ export default async function Member({ params, searchParams }: { params: Promise
   const photos = (await photoUrls(supabase, [p.id]))[p.id] || [];
   const { data: social } = await supabase.from('profile_socials').select('instagram').eq('user_id', p.id).maybeSingle();
   const { data: inviter } = p.invited_by ? await supabase.from('profiles').select('first_name').eq('id', p.invited_by).maybeSingle() : { data: null };
+  const { data: vouch } = await supabase.from('vouches').select('body, voucher_id').eq('member_id', p.id).eq('status', 'approved').maybeSingle();
   const b = p.band ? BANDS[p.band] : null;
   const prompts = (p.prompts && p.prompts.length ? p.prompts : p.prompt_a ? [{ q: p.prompt_q || '', a: p.prompt_a }] : []).filter((x) => x?.a);
   const nyc = (p.my_nyc || []).filter((s) => s?.name);
@@ -50,11 +51,17 @@ export default async function Member({ params, searchParams }: { params: Promise
             <span className="serif" style={{ fontSize: 32, color: b.color }}>{b.label}</span>
             <span className="small muted">{p.credit_verified_at ? `Verified ${new Date(p.credit_verified_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}` : 'Self-reported'}{inviter?.first_name ? ` · Invited by ${inviter.first_name}` : ''}</span>
           </div>
-          {p.trend === 'up' && <span className="small" style={{ color: 'var(--rise)', fontWeight: 600 }}>↑ Up</span>}
+          {p.trend === 'up' && p.show_improving && <span className="small" style={{ color: 'var(--rise)', fontWeight: 600 }}>↑ Improving</span>}
         </div>
       )}
       {detailChips(p).length > 0 && (
         <div className="row" style={{ flexWrap: 'wrap', gap: 8 }}>{detailChips(p).map((c) => <span key={c} className="chip">{c}</span>)}</div>
+      )}
+      {vouch && (
+        <div className="card gold stack" style={{ gap: 6 }}>
+          <span className="label">Vouched for by {inviter?.first_name || 'a member'}</span>
+          <span className="serif" style={{ fontSize: 20, lineHeight: 1.3 }}>“{vouch.body}”</span>
+        </div>
       )}
       {p.money_values?.length > 0 && <MoneyStyleCard name={p.first_name || 'Their'} theirs={p.money_values} mine={me.money_values || []} isMe={p.id === me.id} />}
       {(p.flag_habit || (p.flag_splurge && p.flag_save)) && (

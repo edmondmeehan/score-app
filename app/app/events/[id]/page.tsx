@@ -96,6 +96,13 @@ export default async function EventPage({ params, searchParams }: { params: Prom
         )}
       </section>
 
+      {(e.recap_photos || []).length > 0 && (
+        <div className="card stack" style={{ gap: 8 }}>
+          <span className="label">The night in photos</span>
+          {e.recap_note && <span className="small muted">{e.recap_note}</span>}
+          <div className="event-recap">{(e.recap_photos || []).map((ph) => <a key={ph} href={eventImage(ph) || '#'} target="_blank" rel="noreferrer"><img src={eventImage(ph) || ''} alt="" loading="lazy" /></a>)}</div>
+        </div>
+      )}
       {e.description && <p style={{ whiteSpace: 'pre-wrap', margin: 0, lineHeight: 1.6 }}>{e.description}</p>}
 
       <section className="stack" style={{ gap: 8 }}>
