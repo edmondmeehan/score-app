@@ -98,6 +98,9 @@ export async function GET(request: NextRequest) {
         to: r.email!, data: { first_name: r.first_name, due: String(r.due || 'soon') }, unsubUrl: unsubUrl(r.user_id, 'reminders'),
       })));
     }
+    // Scheduled member messages whose time has come.
+    const camp = await sb.rpc('cron_send_member_campaigns', { p_secret: secret });
+    out.member_messages = camp.data ?? camp.error?.message;
     // Activity notifications: queue reminders, milestones and nudges, then deliver everything pending.
     const queued = await sb.rpc('queue_scheduled_notifications', { p_secret: secret, p_job: job === 'daily' ? 'daily' : job === 'drop' ? 'drop' : 'frequent' });
     out.notifications_queued = queued.data ?? queued.error?.message;

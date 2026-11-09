@@ -27,11 +27,14 @@ export function nextStep(me: Profile): string {
 type Sb = Awaited<ReturnType<typeof supabaseServer>>;
 /** ScoreDate is invite only: true once this person redeemed an invite (staff always pass). */
 export async function hasInvite(supabase: Sb, userId: string): Promise<boolean> {
-  const [{ data: isStaff }, { count }] = await Promise.all([
+  const [{ data: isStaff }, { count }, { data: prof }] = await Promise.all([
     supabase.rpc('is_staff'),
     supabase.from('invites').select('code', { count: 'exact', head: true }).eq('redeemed_by', userId),
+    supabase.from('profiles').select('status').eq('id', userId).maybeSingle(),
   ]);
-  return Boolean(isStaff) || Boolean(count);
+  // Anyone who is already a member (or was) is in, invite or not: founders, test accounts, people added by staff.
+  const member = ['active', 'preview', 'paused', 'taken'].includes(String(prof?.status || ''));
+  return Boolean(isStaff) || Boolean(count) || member;
 }
 
 /**
