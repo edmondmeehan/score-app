@@ -10,6 +10,8 @@ const build = `${String(d.getUTCFullYear()).slice(2)}${p(d.getUTCMonth() + 1)}${
 const nextConfig = {
   experimental: { serverActions: { bodySizeLimit: '8mb' } },
   images: { unoptimized: true },
+  // Marketing creative is served to staff by a route handler, so ship the files with it.
+  outputFileTracingIncludes: { '/api/admin/asset/[...path]': ['./assets/creative/**/*'] },
   env: {
     NEXT_PUBLIC_APP_VERSION: pkg.version,
     NEXT_PUBLIC_BUILD_NUMBER: build,

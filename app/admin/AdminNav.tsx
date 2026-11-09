@@ -16,7 +16,7 @@ export default function AdminNav({ counts, email }: { counts: { rep: number; ver
   }, [open]);
   const groups: { title: string; items: [string, string, number][] }[] = [
     { title: 'Dashboard', items: [['/admin', 'Overview', 0], ['/admin/analytics', 'Analytics', 0], ['/admin/health', 'Site health', 0], ['/admin/reports', 'Daily report', 0], ['/admin/map', 'Map', 0]] },
-    { title: 'Growth', items: [['/admin/waitlist', 'Waitlist & invites', 0], ['/admin/campaigns', 'Campaigns', 0], ['/admin/featured', 'Featured spots', 0], ['/admin/investors', 'Investors', 0]] },
+    { title: 'Growth', items: [['/admin/waitlist', 'Waitlist & invites', 0], ['/admin/campaigns', 'Campaigns', 0], ['/admin/assets', 'Brand assets', 0], ['/admin/featured', 'Featured spots', 0], ['/admin/investors', 'Investors', 0]] },
     { title: 'Members', items: [['/admin/members', 'Members', 0], ['/admin/wellbeing', 'Wellbeing', 0], ['/admin/reserve', 'Reserve', 0], ['/admin/verification', 'Verification', counts.ver], ['/admin/support', 'Support', counts.sup], ['/admin/deletions', 'Deletions', counts.del]] },
     { title: 'Trust & safety', items: [['/admin/moderation', 'Moderation', counts.rep], ['/admin/flags', 'Flagged messages', 0], ['/admin/screenshots', 'Screenshots', 0], ['/admin/security', 'Security', 0], ['/admin/audit', 'Audit log', 0]] },
     { title: 'Content', items: [['/admin/content', 'Content', 0], ['/admin/events', 'Events', 0], ['/admin/scan', 'Scan members', 0], ['/admin/date-challenge', '$50 Date Challenge', 0], ['/admin/emails', 'Emails', 0], ['/admin/footer', 'Footer', 0], ['/admin/policies', 'Policies', 0], ['/admin/themes', 'Seasonal themes', 0]] },
