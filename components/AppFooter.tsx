@@ -18,7 +18,7 @@ export default async function AppFooter({ meta = false }: { meta?: boolean } = {
       <nav aria-label="About ScoreDate">
         {f.app_links.map((l) => (l.href.startsWith('mailto:') ? <a key={l.label + l.href} href={l.href}>{l.label}</a> : <NewWindowLink key={l.label + l.href} href={l.href}>{l.label}</NewWindowLink>))}
       </nav>
-      {meta && <span className="meta">© {new Date().getFullYear()} ScoreDate, Inc. All Rights Reserved.</span>}
+      {meta && <span className="meta">© {new Date().getFullYear()} ScoreDate, LLC. All Rights Reserved.</span>}
     </footer>
   );
 }

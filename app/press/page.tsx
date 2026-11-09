@@ -11,7 +11,7 @@ const FACTS: [string, string][] = [
   ['Who it’s for', 'Adults 25 and older who want to date someone with their act together.'],
   ['How bands work', 'BANDS_HOW'],
   ['Every band is welcome', 'ScoreDate isn’t about having a perfect score. It’s about honesty around money, which is one of the biggest sources of friction in relationships.'],
-  ['Company', 'ScoreDate, Inc. is based in New York.'],
+  ['Company', 'ScoreDate, LLC is based in New York.'],
 ];
 
 export default async function Press() {

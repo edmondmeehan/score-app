@@ -32,7 +32,7 @@ export default function Contact() {
       </div>
       <section style={{ marginTop: 36 }}>
         <h2>Mailing address</h2>
-        <p>ScoreDate, Inc.<br />1133 Broadway, Suite 1301<br />New York, NY 10010</p>
+        <p>ScoreDate, LLC<br />1133 Broadway, Suite 1301<br />New York, NY 10010</p>
         <p>We usually reply within one business day.</p>
       </section>
     </DocLayout>
