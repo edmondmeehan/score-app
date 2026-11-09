@@ -1,5 +1,6 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { supabaseBrowser } from '@/lib/supabase/client';
 import { proposeDate, respondDate, revokeShare, setReservation, shareDate, submitDateChallenge } from '../../features';
 import PlaceFields from '@/components/PlaceFields';
 import PlaceDetails from '@/components/PlaceDetails';
@@ -21,9 +22,14 @@ function Hidden({ v }: { v: Record<string, string> }) {
   return <>{Object.entries(v).map(([k, val]) => <input key={k} type="hidden" name={k} value={val} />)}</>;
 }
 
-export default function DatePanel({ conversationId, meId, otherName, plan, shareUrl, justShared }: {
-  conversationId: string; meId: string; otherName: string; plan: Plan | null; shareUrl: string | null; justShared: boolean;
+/** A featured venue ("ScoreDate pick") that pays to appear first in Suggest a date. */
+export type Pick = { id: string; name: string; place_id: string | null; address: string | null; lat: number | null; lng: number | null; neighborhood: string | null; blurb: string | null; perk: string | null; badge: string };
+const logPick = (id: string, kind: 'view' | 'click' | 'reserve') => { supabaseBrowser().rpc('log_featured', { p_spot: id, p_kind: kind }).then(() => null, () => null); };
+
+export default function DatePanel({ conversationId, meId, otherName, plan, shareUrl, justShared, picks = [] }: {
+  conversationId: string; meId: string; otherName: string; plan: Plan | null; shareUrl: string | null; justShared: boolean; picks?: Pick[];
 }) {
+  const [preset, setPreset] = useState<Pick | null>(null);
   const [open, setOpen] = useState(false);
   const [pickedPlace, setPickedPlace] = useState<string | null>(null);
   const [booking, setBooking] = useState(false);
@@ -32,6 +38,9 @@ export default function DatePanel({ conversationId, meId, otherName, plan, share
   const minLocal = new Date(Date.now() + 60 * 60000 - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
 
   const [showLink, setShowLink] = useState(false);
+  // Count each pick as seen once the suggest form is open.
+  useEffect(() => { if (open && !plan) picks.forEach((p) => logPick(p.id, 'view')); }, [open, plan, picks]);
+  const planPick = plan?.place_id ? picks.find((p) => p.place_id && p.place_id === plan.place_id) : null;
   async function shareLink() {
     if (!shareUrl) return;
     const text = `I'm on a date. Here are the details, just in case: ${shareUrl}`;
@@ -52,7 +61,12 @@ export default function DatePanel({ conversationId, meId, otherName, plan, share
         <span className="serif" style={{ fontSize: 24 }}>{plan.place}</span>
         {plan.budget_challenge && <span className="chip small" style={{ alignSelf: 'flex-start', color: 'var(--rise)', borderColor: 'var(--rise-line)' }}>$50 Date Challenge</span>}
         <span className="small">{fmt(plan.starts_at)}{plan.address ? ` · ${plan.address}` : ''}</span>
-        {plan.place_id && <PlaceDetails placeId={plan.place_id} on={plan.starts_at} />}
+        {planPick && <div className="pick-perk"><span className="pick-badge">{planPick.badge}</span>{planPick.perk ? <span className="small">ScoreDate perk: {planPick.perk}. Show this screen when you arrive.</span> : <span className="small">A ScoreDate favorite for dates.</span>}</div>}
+        {plan.place_id && (
+          <div onClickCapture={(e) => { if (planPick && (e.target as HTMLElement).closest('a')) logPick(planPick.id, 'reserve'); }}>
+            <PlaceDetails placeId={plan.place_id} on={plan.starts_at} />
+          </div>
+        )}
         {plan.note && <span className="small muted">“{plan.note}”</span>}
 
         {plan.status === 'proposed' && !mine && (
@@ -145,7 +159,24 @@ export default function DatePanel({ conversationId, meId, otherName, plan, share
     <form action={proposeDate} className="card stack" style={{ gap: 10 }}>
       <Hidden v={{ conversation_id: conversationId, tz_offset: tz }} />
       <span className="label">Suggest a date</span>
-      <PlaceFields compact nameField="place" nameLabel="Where" namePlaceholder="Search restaurants, bars, places" addressLabel="Address (optional)" addressPlaceholder="52 Grove St" onPick={setPickedPlace} />
+      {picks.length > 0 && (
+        <div className="stack" style={{ gap: 8 }}>
+          <span className="small muted">ScoreDate picks</span>
+          <div className="picks-row">
+            {picks.map((p) => (
+              <button key={p.id} type="button" className={`pick-card${preset?.id === p.id ? ' on' : ''}`} data-haptic="selection"
+                onClick={() => { setPreset(p); setPickedPlace(p.place_id); logPick(p.id, 'click'); }}>
+                <span className="pick-badge">{p.badge}</span>
+                <strong>{p.name}</strong>
+                {p.neighborhood && <span className="small muted">{p.neighborhood}</span>}
+                {p.perk && <span className="small pick-perk-line">★ {p.perk}</span>}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      <PlaceFields key={preset?.id || 'search'} compact nameField="place" nameLabel="Where" namePlaceholder="Search restaurants, bars, places" addressLabel="Address (optional)" addressPlaceholder="52 Grove St" onPick={setPickedPlace}
+        defaults={preset ? { name: preset.name, address: preset.address || '', place_id: preset.place_id || '', lat: preset.lat, lng: preset.lng } : undefined} />
       {pickedPlace && <PlaceDetails placeId={pickedPlace} compact />}
       <label className="field">When<input className="input" type="datetime-local" name="starts_at" required min={minLocal} /></label>
       <label className="field">Note (optional)<input className="input" name="note" maxLength={300} placeholder="Drinks after work?" /></label>

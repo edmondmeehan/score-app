@@ -8,7 +8,7 @@ import { BandPill } from '@/components/ui';
 import { SITE_URL } from '@/lib/emails';
 import type { Profile } from '@/lib/types';
 import Chat from './Chat';
-import DatePanel, { type Plan } from './DatePanel';
+import DatePanel, { type Pick, type Plan } from './DatePanel';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,6 +31,7 @@ export default async function Conversation({ params, searchParams }: { params: P
   const shared = (o?.money_values || []).filter((v) => me.money_values?.includes(v));
   const paid = ['membership', 'premium', 'black', 'paused'].includes(me.plan);
   const canSend = !conv.ended_at && (paid || (Boolean(conv.note_from) && conv.note_from !== me.id));
+  const { data: picksData } = await supabase.rpc('featured_spots_live');
   const [{ data: readAt }, { data: presence }] = await Promise.all([
     supabase.rpc('other_read_at', { p_conversation: id }),
     supabase.rpc('presence_of', { p_user: otherId }),
@@ -69,6 +70,7 @@ export default async function Conversation({ params, searchParams }: { params: P
         plan={plan}
         shareUrl={share && !share.revoked ? `${SITE_URL}/d/${share.token}` : null}
         justShared={Boolean(sp.shared)}
+        picks={(picksData as Pick[] | null) || []}
       />
       <Chat conversationId={id} meId={me.id} otherName={o?.first_name || 'them'} initial={messages || []} canSend={canSend} initialReadAt={(readAt as string | null) || null} locked={conv.ended_at ? 'This conversation has ended' : 'Become a member to message'} />
     </div>
