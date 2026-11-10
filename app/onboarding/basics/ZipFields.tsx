@@ -31,7 +31,7 @@ export default function ZipFields({ zip: zip0, neighborhood: hood0, current }: {
           {looking ? 'Looking up your neighborhood…'
             : nomad ? (current && !changed
               ? 'You’re a Nomad: this zip is outside the areas ScoreDate has opened. We’ll let you know when we open there.'
-              : 'That zip is outside the areas ScoreDate has opened (NYC for now). You’ll be a Nomad: you keep your account and chats, but get no new Drops until we open there.')
+              : 'That zip is outside the areas ScoreDate has opened (New York City and nearby commuter towns for now). You’ll be a Nomad: you keep your account and chats, but get no new Drops until we open there.')
             : 'Used to match you with people nearby.'}
         </span>
       </label>

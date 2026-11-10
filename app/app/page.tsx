@@ -1,11 +1,12 @@
 import Link from 'next/link';
+import { awayLabel, dayLabel, isAway, isVisiting, tripEnded } from '@/lib/away';
 import VerifiedBadge, { isVerified } from '@/components/VerifiedBadge';
 import { requireMember } from '@/lib/session';
 import { BandPill, age } from '@/components/ui';
 import { photoUrls } from '@/lib/photos';
 import type { Profile } from '@/lib/types';
 import { answerDaily, checkIn, dateAgain, useExtraDrop, useSpotlight } from './features';
-import { saveWellbeing } from './actions';
+import { endTraveling, saveWellbeing } from './actions';
 import DismissibleCard from '@/components/DismissibleCard';
 import PushPrompt from '@/components/PushPrompt';
 import FounderBadge from '@/components/FounderBadge';
@@ -82,11 +83,29 @@ export default async function Drop({ searchParams }: { searchParams: Promise<{ o
       <span className="muted small">{preview ? 'Look all you want. Members can say hello, or send a Note.' : `New people every night at ${dropTimeLabel()} ET`}</span>
       {!preview && <DropCountdown at={nextDropAt().toISOString()} label={`${dropTimeLabel()} ET`} />}
       {sp.ok && <div className="notice">{sp.ok}</div>}
-      {me.nomad && (
-        <div className="card gold stack" style={{ gap: 8 }}>
+      {me.nomad && isVisiting(me) && <div className="notice">Visiting NYC until {dayLabel(me.visit_until)}. Your Drops are on while you’re here.</div>}
+      {me.nomad && !isVisiting(me) && (
+        <div className="card gold stack" style={{ gap: 10 }}>
           <span className="label">You’re a Nomad</span>
-          <span className="small">Your home zip ({me.zip}) is outside the areas ScoreDate has opened, so new Drops are on hold. Your chats and matches are all still here, and we’ll let you know as soon as we open near you.</span>
-          <span className="small muted">Back in NYC? <Link href="/app/profile#about">Update your zip</Link>. Away for a while? You can <Link href="/app/settings">pause your membership</Link> for $4.99 a month.</span>
+          <span className="small">Your home zip ({me.zip}) is outside the areas ScoreDate has opened, so new Drops are on hold. Your chats and matches are all still here. You’ll be among the first in when we open near you, and we’ll tell you the day it happens.</span>
+          <div className="stack" style={{ gap: 6 }}>
+            <Link href="/app/settings#travel" className="small">Back in NYC for a few days? Turn on Visiting →</Link>
+            <Link href="/app/settings#status" className="small">Pause your membership for $4.99 a month →</Link>
+            <Link href="/app/invites" className="small">Invite friends where you live. It helps us open there sooner →</Link>
+            <Link href="/app/profile#about" className="small">Moved back? Update your zip →</Link>
+          </div>
+        </div>
+      )}
+      {isAway(me) && <div className="notice">{awayLabel(me, true)}. {me.away_pause ? 'Your Drops are paused until you’re back.' : 'Your Drops keep coming.'} <Link href="/app/settings#travel">Change</Link></div>}
+      {tripEnded(me) && (
+        <div className="card gold stack" style={{ gap: 10 }}>
+          <span className="label">Welcome back?</span>
+          <span className="small">Your trip ended {dayLabel(me.away_until)}.</span>
+          <div className="row" style={{ gap: 8, flexWrap: 'wrap' }}>
+            <form action={endTraveling}><input type="hidden" name="back" value="app" /><button className="btn sm">I’m back</button></form>
+            <Link href="/app/settings#travel" className="btn ghost sm">Still away</Link>
+            <Link href="/app/profile#about" className="btn ghost sm">I moved</Link>
+          </div>
         </div>
       )}
       <PushPrompt />
@@ -179,7 +198,7 @@ export default async function Drop({ searchParams }: { searchParams: Promise<{ o
               <div className="photo" style={{ width: 76, flex: 'none' }}>{photos[p.id]?.[0] ? <img src={photos[p.id][0]} alt="" /> : <span className="serif">{p.first_name?.[0]}</span>}</div>
               <div className="stack grow" style={{ gap: 6, minWidth: 0 }}>
                 <span><strong style={{ fontSize: 17 }}>{p.first_name}</strong> <span className="muted">{age(p.birth_year)}</span>{p.spotlight_until && new Date(p.spotlight_until).getTime() > now && <span className="chip" style={{ marginLeft: 8, fontSize: 11, padding: '2px 8px', color: 'var(--gold-light)' }}>Featured</span>}{p.is_founder && <span style={{ marginLeft: 8 }}><FounderBadge /></span>}{isVerified(p) && <span style={{ marginLeft: 6 }}><VerifiedBadge credit={Boolean(p.credit_verified_at)} /></span>}</span>
-                <span className="small muted" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{[p.job, p.neighborhood].filter(Boolean).join(' · ')}</span>
+                <span className="small muted" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{[awayLabel(p), p.job, p.neighborhood].filter(Boolean).join(' · ')}</span>
                 <BandPill band={p.band} trend={publicTrend(p)} verified={Boolean(p.credit_verified_at)} />
                 {why && <span className="drop-reason">{why}</span>}
               </div>

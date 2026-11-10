@@ -203,3 +203,35 @@ export async function reactivate(form: FormData) {
   revalidatePath('/app', 'layout');
   redirect('/app');
 }
+
+// ---------- Traveling and visiting ----------
+export async function setTraveling(form: FormData) {
+  const { supabase } = await ctx();
+  const { error } = await supabase.rpc('set_traveling', {
+    p_until: String(form.get('until') || '') || null, p_where: String(form.get('where') || ''), p_pause: form.get('pause') === 'on',
+  });
+  revalidatePath('/app', 'layout');
+  redirect('/app/settings?' + (error ? 'error=' + encodeURIComponent(error.message) : 'saved=1') + '#travel');
+}
+
+export async function endTraveling(form: FormData) {
+  const { supabase } = await ctx();
+  await supabase.rpc('end_traveling');
+  revalidatePath('/app', 'layout');
+  redirect(String(form.get('back') || '') === 'app' ? '/app?ok=' + encodeURIComponent('Welcome back.') : '/app/settings?saved=1#travel');
+}
+
+export async function setVisit(form: FormData) {
+  const { supabase } = await ctx();
+  const { error } = await supabase.rpc('set_visit', { p_until: String(form.get('until') || '') || null });
+  revalidatePath('/app', 'layout');
+  const to = String(form.get('back') || '') === 'app' ? '/app' : '/app/settings';
+  redirect(to + '?' + (error ? 'error=' + encodeURIComponent(error.message) : 'ok=' + encodeURIComponent('Visiting is on. Your Drops start tonight.')) + (to === '/app/settings' ? '#travel' : ''));
+}
+
+export async function endVisit() {
+  const { supabase } = await ctx();
+  await supabase.rpc('end_visit');
+  revalidatePath('/app', 'layout');
+  redirect('/app/settings?saved=1#travel');
+}

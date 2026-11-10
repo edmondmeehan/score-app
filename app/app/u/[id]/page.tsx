@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { awayLabel } from '@/lib/away';
 import FounderBadge from '@/components/FounderBadge';
 import { notFound } from 'next/navigation';
 import { requireMember } from '@/lib/session';
@@ -45,7 +46,7 @@ export default async function Member({ params, searchParams }: { params: Promise
     <div className="phone" style={{ paddingTop: 0 }}>
       <ScreenshotContext context="profile" target={p.id === me.id ? null : p.id} />
       <div className="photo" style={{ margin: '0 -20px', borderRadius: 0, aspectRatio: '4/5' }}>{photos[0] ? <img src={photos[0]} alt={`${p.first_name}`} /> : <span className="serif" style={{ fontSize: 64 }}>{p.first_name?.[0]}</span>}</div>
-      <div><span className="serif" style={{ fontSize: 40 }}>{p.first_name}</span> <span className="muted" style={{ fontSize: 20 }}>{age(p.birth_year)}</span>{p.is_founder && <span style={{ marginLeft: 10, verticalAlign: 'middle' }}><FounderBadge /></span>}{isVerified(p) && <span style={{ marginLeft: 8 }}><VerifiedBadge credit={Boolean(p.credit_verified_at)} /></span>}<div className="muted small">{[p.job, p.neighborhood].filter(Boolean).join(' · ')}</div>{p.looking_for && <div style={{ marginTop: 10 }}><span className="looking-for">Looking for · {label(LOOKING_FOR, p.looking_for)}</span></div>}</div>
+      <div><span className="serif" style={{ fontSize: 40 }}>{p.first_name}</span> <span className="muted" style={{ fontSize: 20 }}>{age(p.birth_year)}</span>{p.is_founder && <span style={{ marginLeft: 10, verticalAlign: 'middle' }}><FounderBadge /></span>}{isVerified(p) && <span style={{ marginLeft: 8 }}><VerifiedBadge credit={Boolean(p.credit_verified_at)} /></span>}<div className="muted small">{[p.job, p.neighborhood].filter(Boolean).join(' · ')}</div>{awayLabel(p) && <div className="small" style={{ color: 'var(--gold-light)', marginTop: 4 }}>{awayLabel(p)}</div>}{p.looking_for && <div style={{ marginTop: 10 }}><span className="looking-for">Looking for · {label(LOOKING_FOR, p.looking_for)}</span></div>}</div>
       {b && (
         <div className="card gold row">
           <Gauge fill={b.fill} color={b.color} size={56} />

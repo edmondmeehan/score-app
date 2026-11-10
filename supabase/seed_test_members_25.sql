@@ -75,6 +75,7 @@ loop
   where id = uid;
 
   insert into photos(user_id, path, position, match_status, match_similarity) values (uid, r.photo, 0, 'approved', 99);
+  update photos set match_status = 'approved', match_similarity = 99 where user_id = uid;  -- inserts are forced to pending
   if r.insta is not null then
     insert into profile_socials(user_id, instagram, instagram_public) values (uid, r.insta, true) on conflict (user_id) do nothing;
   end if;

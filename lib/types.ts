@@ -14,6 +14,11 @@ export type Profile = {
   area?: string | null;
   nomad?: boolean;
   nomad_since?: string | null;
+  away_until?: string | null;
+  away_where?: string | null;
+  away_pause?: boolean;
+  visit_until?: string | null;
+  visit_area?: string | null;
   prompt_q: string | null;
   prompt_a: string | null;
   song_id: string | null;
