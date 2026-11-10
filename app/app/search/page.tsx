@@ -56,7 +56,7 @@ export default async function Search({ searchParams }: { searchParams: Promise<S
   return (
     <div className="phone">
       <div className="row" style={{ justifyContent: 'space-between' }}>
-        <Link href="/app" className="small">← Daily Drop</Link>
+        <Link href="/app" className="pill-link">← Daily Drop</Link>
         {!unlimited && remaining !== null && <span className="small muted">{remaining} {remaining === 1 ? 'search' : 'searches'} left today</span>}
       </div>
       <h1 className="serif" style={{ fontSize: 38 }}>Search &amp; directory</h1>

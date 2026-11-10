@@ -42,8 +42,8 @@ export default async function EditProfile({ searchParams }: { searchParams: Prom
   return (
     <div className="phone">
       <div className="row" style={{ justifyContent: 'space-between' }}>
-        <Link href="/app/settings" className="small">← Settings</Link>
-        <Link href={`/app/u/${user.id}`} className="small">Preview my profile</Link>
+        <Link href="/app/settings" className="pill-link">← Settings</Link>
+        <Link href={`/app/u/${user.id}`} className="pill-link">Preview my profile</Link>
       </div>
       <h1 className="serif" style={{ fontSize: 38 }}>Your profile</h1>
       {sp.error && <div className="notice error">{sp.error}</div>}

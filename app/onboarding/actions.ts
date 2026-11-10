@@ -8,6 +8,7 @@ import { sendEmail } from '@/lib/mailer';
 import { trackEvent } from '@/lib/track';
 import { recordSignal } from '@/lib/signals';
 import { cookies } from 'next/headers';
+import sharp from 'sharp';
 import { supabaseAnon } from '@/lib/supabase/server';
 import { findUser, pullBand, spinwheelConfigured, startConnect, toE164, verifyCode } from '@/lib/spinwheel';
 
@@ -109,6 +110,11 @@ async function checkPhotos(supabase: Awaited<ReturnType<typeof supabaseServer>>,
   for (const file of photos.slice(0, room)) {
     if (!file.type.startsWith('image/')) continue;
     const bytes = new Uint8Array(await file.arrayBuffer());
+    const meta = await sharp(bytes).metadata().catch(() => null);
+    if (meta?.width && meta?.height && Math.min(meta.width, meta.height) < 600) {
+      results.push({ name: file.name, status: 'error', similarity: null, reason: 'Too low-resolution. Use an original photo, not a screenshot.' });
+      continue;
+    }
     const path = `${user.id}/${crypto.randomUUID()}.${file.type.split('/')[1] || 'jpg'}`;
     const up = await supabase.storage.from('photos').upload(path, bytes, { contentType: file.type });
     if (up.error) { results.push({ name: file.name, status: 'error', similarity: null, reason: up.error.message }); continue; }

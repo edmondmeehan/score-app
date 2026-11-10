@@ -22,7 +22,7 @@ export default async function WeekRecap() {
     : 'Answer today’s question. Shared answers show up in your chats and make easy openers.';
   return (
     <div className="phone">
-      <Link href="/app/settings" className="small">← Me</Link>
+      <Link href="/app/settings" className="pill-link" style={{ alignSelf: 'flex-start' }}>← Me</Link>
       <span className="eyebrow">Last 7 days</span>
       <h1 className="serif" style={{ fontSize: 38 }}>Your week</h1>
       <div className="week-grid">

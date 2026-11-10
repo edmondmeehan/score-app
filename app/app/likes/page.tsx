@@ -21,7 +21,7 @@ export default async function Likes({ searchParams }: { searchParams: Promise<{ 
     <div className="phone">
       <div className="row" style={{ justifyContent: 'space-between' }}>
         <div className="row"><Link href="/app" aria-label="Back" className="btn ghost sm" style={{ width: 44, padding: 0 }}>‹</Link><span className="eyebrow">Likes</span></div>
-        <Link href="/app/views" className="small">Who viewed me →</Link>
+        <Link href="/app/views" className="pill-link">Who viewed me →</Link>
       </div>
       <h1 className="serif" style={{ fontSize: 38 }}>{r.count ? `${r.count} ${r.count === 1 ? 'person likes' : 'people like'} you` : 'No new likes yet'}</h1>
       {sp.error && <div className="notice error">{sp.error}</div>}
