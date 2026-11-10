@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useRef, useState, useTransition } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import GaugeHeart from '@/components/GaugeHeart';
 import { haptic } from '@/lib/haptics';
 
@@ -9,21 +9,25 @@ const MAX = 120;
 // Pages that scroll on their own or use drag gestures.
 const SKIP = [/^\/app\/messages\/[^/]+/, /^\/app\/map/, /^\/app\/matchmaker/];
 
-/** Pull down at the top of any app page to refresh it. The gauge-heart loop plays while it reloads. */
+const FLAG = 'sd_ptr_done';
+
+/** Pull down at the top of any app page to reload it. A haptic click when it's ready, the gauge-heart loop while it reloads, then "Updated". */
 export default function PullToRefresh() {
-  const router = useRouter();
   const path = usePathname();
   const [pull, setPull] = useState(0);
-  const [pending, start] = useTransition();
+  const [pending, setPending] = useState(false);
   const startY = useRef<number | null>(null);
   const armed = useRef(false);
   const [done, setDone] = useState(false);
-  const was = useRef(false);
-  // When a refresh finishes, show "Updated" for a moment so it's clear the page reloaded.
+  // After the reload, show "Updated" for a moment so it's clear the page refreshed.
   useEffect(() => {
-    if (was.current && !pending) { setDone(true); const t = setTimeout(() => setDone(false), 1400); was.current = false; return () => clearTimeout(t); }
-    if (pending) was.current = true;
-  }, [pending]);
+    let flagged = false;
+    try { flagged = sessionStorage.getItem(FLAG) === '1'; sessionStorage.removeItem(FLAG); } catch { /* ignore */ }
+    if (!flagged) return;
+    setDone(true);
+    const t = setTimeout(() => setDone(false), 1400);
+    return () => clearTimeout(t);
+  }, []);
 
   useEffect(() => {
     if (SKIP.some((r) => r.test(path))) return;
@@ -34,13 +38,19 @@ export default function PullToRefresh() {
       if (dy <= 0 || window.scrollY > 0) { setPull(0); return; }
       const p = Math.min(MAX, dy * 0.5);
       setPull(p);
-      if (p >= PULL && !armed.current) { armed.current = true; haptic('light'); }
+      if (p >= PULL && !armed.current) { armed.current = true; haptic('medium'); }
       if (p < PULL) armed.current = false;
     };
     const up = () => {
       if (startY.current === null) return;
       startY.current = null;
-      if (armed.current) start(() => router.refresh());
+      if (armed.current) {
+        haptic('medium'); // the "click" on release (iPhone Safari only allows it here, inside the touch)
+        setPending(true);
+        try { sessionStorage.setItem(FLAG, '1'); } catch { /* ignore */ }
+        // Full reload so everything on the page (drops, chats, counts) is fresh. Short pause lets the heart start.
+        setTimeout(() => window.location.reload(), 350);
+      }
       setPull(0);
     };
     window.addEventListener('touchstart', down, { passive: true });
@@ -48,7 +58,7 @@ export default function PullToRefresh() {
     window.addEventListener('touchend', up);
     window.addEventListener('touchcancel', up);
     return () => { window.removeEventListener('touchstart', down); window.removeEventListener('touchmove', move); window.removeEventListener('touchend', up); window.removeEventListener('touchcancel', up); };
-  }, [path, router]);
+  }, [path]);
 
   const show = pending || done || pull > 8;
   const y = pending || done ? 24 : Math.max(0, pull - 28);
