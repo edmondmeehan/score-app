@@ -131,7 +131,7 @@ export async function respondDate(form: FormData) {
   const { error } = await supabase.rpc('respond_date', { p_plan: String(form.get('plan_id')), p_status: String(form.get('status')) });
   if (error) back(`/app/messages/${conv}`, 'error', error.message);
   const st = String(form.get('status'));
-  if (st === 'accepted') after(() => sendDateInvites(String(form.get('plan_id'))));
+  if (st === 'accepted') await sendDateInvites(supabase, String(form.get('plan_id')));
   const line = st === 'accepted' ? 'Confirmed our date. See you there.' : st === 'declined' ? 'Can’t make that one. Maybe another time?' : st === 'cancelled' ? 'Cancelled our date plan.' : '';
   if (line) await supabase.from('messages').insert({ conversation_id: conv, sender_id: user.id, body: line });
   after(() => flushNotifications(user.id));
@@ -260,19 +260,19 @@ export async function eventHere(eventId: string) {
 }
 
 /** When a date is confirmed, email both people a calendar invite (.ics) for it. Test accounts are skipped by the mailer. */
-async function sendDateInvites(planId: string) {
+async function sendDateInvites(supabase: Awaited<ReturnType<typeof supabaseServer>>, planId: string) {
   try {
-    const supabase = await supabaseServer();
     const { data: p } = await supabase.from('date_plans').select('*').eq('id', planId).maybeSingle();
-    if (!p || p.status !== 'accepted') return;
+    if (!p || p.status !== 'accepted') { console.error('[date-invite] plan not found or not accepted', planId, p?.status); return; }
     const { data: conv } = await supabase.from('conversations').select('user_a, user_b').eq('id', p.conversation_id).maybeSingle();
-    if (!conv) return;
+    if (!conv) { console.error('[date-invite] conversation not found', p.conversation_id); return; }
     const site = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.scoredate.app').replace(/\/$/, '');
     const [a, b] = await Promise.all([contactFor(conv.user_a), contactFor(conv.user_b)]);
     const when = new Date(p.reservation_at || p.starts_at).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' });
     const pairs: [string, typeof a, typeof b][] = [[conv.user_a, a, b], [conv.user_b, b, a]];
-    await Promise.all(pairs.map(([uid, me, other]) => me.email ? sendEmail(me.email, 'date_confirmed', {
+    const results = await Promise.all(pairs.map(([uid, me, other]) => me.email ? sendEmail(me.email, 'date_confirmed', {
       first_name: me.first_name, other_name: other.first_name || 'your match', place: p.place, address: p.address, when, conversation_id: p.conversation_id,
-    }, [{ filename: 'scoredate-date.ics', content: Buffer.from(dateIcs(p, uid, other.first_name, site)).toString('base64'), content_type: 'text/calendar; method=PUBLISH' }]) : null));
-  } catch { /* the in-app calendar buttons still work */ }
+    }, [{ filename: 'scoredate-date.ics', content: Buffer.from(dateIcs(p, uid, other.first_name, site)).toString('base64'), content_type: 'text/calendar; method=PUBLISH' }]) : Promise.resolve({ ok: false, error: 'no email on file' })));
+    results.forEach((r, i) => { if (!r.ok) console.error('[date-invite] send failed', pairs[i][0], r.error); });
+  } catch (e) { console.error('[date-invite] failed', e); /* the in-app calendar buttons still work */ }
 }
