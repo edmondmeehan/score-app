@@ -22,6 +22,10 @@ export function SiteFooterView({ f }: { f: FooterConfig }) {
                 </address>
               )}
               {f.email && <a href={`mailto:${f.email}`} className="small" style={{ color: 'var(--gold)' }}>{f.email}</a>}
+              <a href="https://www.instagram.com/scoredateapp/" target="_blank" rel="noopener noreferrer" aria-label="ScoreDate on Instagram" className="row small" style={{ gap: 8, color: 'inherit', textDecoration: 'none' }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg>
+                @scoredateapp
+              </a>
             </div>
             {f.columns.map(({ title, links }) => (
               <nav key={title} className="stack" style={{ gap: 10 }} aria-label={title}>
