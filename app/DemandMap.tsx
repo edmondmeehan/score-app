@@ -1,12 +1,19 @@
+import { unstable_cache } from 'next/cache';
 import { supabaseAnon } from '@/lib/supabase/server';
 import { getBasemap } from '@/lib/basemap';
 import HeatMap, { Legend, type Spot } from '@/components/HeatMap';
 
 type Row = { name: string; kind: Spot['kind']; lat: number; lng: number; live: boolean; members?: number | null; waiting: number | null; level: Spot['level'] };
 
+// Public counts change slowly; cache them for a minute so a burst of visitors (or bots) doesn't hit the database each time.
+const demandData = unstable_cache(async () => {
+  const [{ data }, { data: heat }] = await Promise.all([supabaseAnon().rpc('public_demand_map'), supabaseAnon().rpc('public_area_heat')]);
+  return { data, heat };
+}, ['public-demand-map'], { revalidate: 60, tags: ['demand-map'] });
+
 /** Real demand only: waitlist counts by neighborhood (rounded, hidden when small), "Live" once members pass the minimum. */
 export default async function DemandMap() {
-  const [{ data }, { data: heat }, tiles] = await Promise.all([supabaseAnon().rpc('public_demand_map'), supabaseAnon().rpc('public_area_heat'), getBasemap()]);
+  const [{ data, heat }, tiles] = await Promise.all([demandData(), getBasemap()]);
   // Real people only. If the database still includes sample data (before migration 0018), show nothing from it.
   const demo = Boolean((data as { demo?: boolean } | null)?.demo);
   const rows = demo ? [] : ((data as { spots?: Row[] } | null)?.spots) || [];

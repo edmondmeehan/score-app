@@ -23,7 +23,9 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
       },
     },
   );
-  const { data: { user } } = await supabase.auth.getUser();
+  // Only ask Supabase who this is when the browser actually has a sign-in cookie. Visitors and bots skip the round trip.
+  const hasSession = request.cookies.getAll().some((c) => c.name.startsWith('sb-') && c.name.includes('auth-token'));
+  const { data: { user } } = hasSession ? await supabase.auth.getUser() : { data: { user: null } };
   const path = request.nextUrl.pathname;
 
   // Maintenance mode (Admin → Maintenance). Staff, sign-in, legal pages and webhooks keep working.
