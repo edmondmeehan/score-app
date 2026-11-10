@@ -1,16 +1,18 @@
+import { cache } from 'react';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabase/server';
 import type { Profile } from '@/lib/types';
 import { canOpen } from '@/lib/staffAccess';
 
-export async function getMe() {
+/** Who's signed in plus their profile. Cached per request, so the layout and the page share one lookup. */
+export const getMe = cache(async function getMe() {
   const supabase = await supabaseServer();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { supabase, user: null, me: null as Profile | null };
   const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
   return { supabase, user, me: data as Profile | null };
-}
+});
 
 /** Where a signed-in person should be, based on how far they are. */
 export function nextStep(me: Profile): string {

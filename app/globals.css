@@ -8,7 +8,7 @@
   --glass: rgba(22,22,25,.72); --glass-strong: rgba(22,22,25,.78); --glass-line: rgba(255,255,255,.07); --glass-hi: rgba(255,255,255,.04);
   --shadow: rgba(0,0,0,.55); --appbar: rgba(11,11,12,.8); --appbar-line: rgba(255,255,255,.05); --tab-on: rgba(201,169,97,.12); --dot-ring: #161619;
   --band-elite: #E8E8EC; --band-strong: #D4B46A; --band-solid: #C4C5CA; --band-building: #C98E62; --hero-glow: rgba(201,169,97,.10);
-  --serif: 'Instrument Serif', Georgia, serif; --sans: 'Inter', system-ui, sans-serif; --mono: 'JetBrains Mono', ui-monospace, monospace;
+  --serif: var(--font-serif), 'Instrument Serif', Georgia, serif; --sans: var(--font-sans), 'Inter', system-ui, sans-serif; --mono: var(--font-mono), 'JetBrains Mono', ui-monospace, monospace;
   color-scheme: dark;
 }
 /* Light theme: chosen in Settings → Appearance, or "System" on a light-mode phone. */

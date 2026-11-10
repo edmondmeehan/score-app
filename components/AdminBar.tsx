@@ -19,9 +19,18 @@ export default function AdminBar() {
     if (inAdmin) return;
     // Only signed-in visitors can be staff; skip the check entirely for everyone else.
     if (!document.cookie.includes('-auth-token')) { setMe(null); return; }
+    // Members (not staff) are remembered for this session, so we don't ask the server again on every page.
+    const sig = (document.cookie.match(/sb-[^=]*auth-token[^=]*=([^;]{0,48})/) || [])[1] || '';
+    let known = '';
+    try { known = sessionStorage.getItem('sd_not_staff') || ''; } catch { /* ignore */ }
+    if (sig && known === sig) { setMe(null); return; }
     let live = true;
     fetch(`/api/staff/me${memberId ? `?user=${memberId}` : ''}`, { cache: 'no-store' })
-      .then((r) => (r.ok ? r.json() : { staff: false })).then((d) => { if (live) setMe(d); }).catch(() => {});
+      .then((r) => (r.ok ? r.json() : { staff: false }))
+      .then((d) => {
+        if (!d?.staff && sig) { try { sessionStorage.setItem('sd_not_staff', sig); } catch { /* ignore */ } }
+        if (live) setMe(d);
+      }).catch(() => {});
     setOpen(false);
     return () => { live = false; };
   }, [path, memberId, inAdmin]);

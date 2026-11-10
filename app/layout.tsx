@@ -23,6 +23,12 @@ import IntroSplash, { INTRO_SCRIPT } from '@/components/IntroSplash';
 import LiveBeat from '@/components/LiveBeat';
 import NavProgress from '@/components/NavProgress';
 import { Suspense } from 'react';
+import localFont from 'next/font/local';
+
+// Self-hosted (no request to Google, no layout shift): preloaded with the page.
+const serif = localFont({ src: [{ path: './fonts/instrument-serif-latin-400-normal.woff2', weight: '400', style: 'normal' }, { path: './fonts/instrument-serif-latin-400-italic.woff2', weight: '400', style: 'italic' }], variable: '--font-serif', display: 'swap' });
+const sans = localFont({ src: [{ path: './fonts/inter-latin-400-normal.woff2', weight: '400' }, { path: './fonts/inter-latin-500-normal.woff2', weight: '500' }, { path: './fonts/inter-latin-600-normal.woff2', weight: '600' }], variable: '--font-sans', display: 'swap' });
+const mono = localFont({ src: [{ path: './fonts/jetbrains-mono-latin-400-normal.woff2', weight: '400' }, { path: './fonts/jetbrains-mono-latin-500-normal.woff2', weight: '500' }], variable: '--font-mono', display: 'swap' });
 
 export const viewport: Viewport = { themeColor: '#0B0B0C', width: 'device-width', initialScale: 1, viewportFit: 'cover' };
 
@@ -40,13 +46,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const path = h.get('x-sd-path') || '';
   const shown = (path === '/' || path === '/meet') && !/ScoreDateApp/.test(h.get('user-agent') || '');
   return (
-    <html lang="en" data-theme="dark" data-season={season?.key} style={seasonVars} suppressHydrationWarning>
+    <html lang="en" className={`${serif.variable} ${sans.variable} ${mono.variable}`} data-theme="dark" data-season={season?.key} style={seasonVars} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: INTRO_SCRIPT }} />
         {shown && <script defer src="https://shown.io/metrics/V40zqXKR9r" type="text/javascript"></script>}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
       </head>
       <body><Suspense fallback={null}><NavProgress /></Suspense><IntroSplash /><AdminBar />{children}{season && <SeasonLayer seasonKey={season.key} name={season.name} banner={season.banner} effect={season.effect} preview={Boolean(previewKey)} />}<Analytics /><SpeedInsights /><AdPixels /><LiveBeat /></body>
     </html>
