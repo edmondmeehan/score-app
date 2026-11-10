@@ -5,6 +5,7 @@ import { cookies, headers } from 'next/headers';
 import { afterSignIn } from '@/lib/session';
 import { supabaseServer } from '@/lib/supabase/server';
 import { trackEvent } from '@/lib/track';
+import { clientIp, verifyHuman } from '@/lib/turnstile';
 import { flushNotifications } from '@/lib/notify';
 
 const safeNext = (n: string) => (n.startsWith('/') && !n.startsWith('//') ? n : '');
@@ -54,6 +55,7 @@ export async function signUpPassword(form: FormData) {
   const next = String(form.get('next') || '');
   if (password.length < 8) back('signup', next, 'Use at least 8 characters for your password.', email);
   if (password !== String(form.get('confirm') || '')) back('signup', next, 'Those passwords don’t match.', email);
+  if (!(await verifyHuman(form, await clientIp()))) back('signup', next, 'Please confirm you’re not a bot, then try again.', email);
   const supabase = await supabaseServer();
   const { data, error } = await supabase.auth.signUp({
     email,

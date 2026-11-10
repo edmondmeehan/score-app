@@ -1,4 +1,5 @@
 'use server';
+import { clientIp, verifyHuman } from '@/lib/turnstile';
 import { cookies } from 'next/headers';
 import { supabaseServer } from '@/lib/supabase/server';
 import { SITE_URL } from '@/lib/emails';
@@ -22,6 +23,7 @@ export async function joinWaitlist(_: WaitlistState, form: FormData): Promise<Wa
   if (!EMAIL.test(email)) return { ok: false, message: 'Enter a valid email address.' };
   if (!quick && !first) return { ok: false, message: 'Add your first name and a valid email.' };
   if (!/^[0-9]{5}$/.test(zip)) return { ok: false, message: 'Add your 5-digit zip code.' };
+  if (!quick && !(await verifyHuman(form, await clientIp()))) return { ok: false, message: 'Please confirm you’re not a bot, then try again.' };
 
   const supabase = await supabaseServer();
   const { data: where } = await supabase.rpc('zip_area', { p_zip: zip });

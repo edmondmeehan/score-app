@@ -1,5 +1,6 @@
 'use client';
 import { useActionState } from 'react';
+import Turnstile from '@/components/Turnstile';
 import { joinWaitlist, notifyMe, type WaitlistState } from './actions';
 import JoinedCard from '@/components/JoinedCard';
 import ZipInput from '@/components/ZipInput';
@@ -32,6 +33,7 @@ export default function WaitlistForm({ note = 'You’ll share your credit band, 
       <label className="field" style={{ gridColumn: '1 / -1' }}>Email<input className="input" name="email" type="email" required autoComplete="email" /></label>
       <ZipInput />
       <label className="field">What you do<input className="input" name="job" /></label>
+      <Turnstile key={state?.message || 'start'} />
       {state && !state.ok && <div className="notice error" style={{ gridColumn: '1 / -1' }}>{state.message}</div>}
       <button className="btn" style={{ gridColumn: '1 / -1' }} disabled={pending}>{pending ? 'Adding you…' : 'Join the waitlist'}</button>
       <p className="small muted" style={{ gridColumn: '1 / -1', margin: 0 }}>New York City opens first, then more areas. Members must be 25 or older. {note}</p>
