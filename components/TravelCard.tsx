@@ -18,10 +18,8 @@ export default function TravelCard({ me }: { me: Profile }) {
       ) : (
         <form action={setTraveling} className="stack" style={{ gap: 10 }}>
           <span className="small muted">Away for a while but not moving? Keep your home zip, and your profile shows when you’ll be back. Up to 90 days.</span>
-          <div className="row" style={{ gap: 10, flexWrap: 'wrap' }}>
-            <label className="field grow">Back on<input className="input" type="date" name="until" required min={isoPlus(1)} max={isoPlus(90)} /></label>
-            <label className="field grow">Where (optional, only you see it)<input className="input" name="where" maxLength={60} placeholder="e.g. London" /></label>
-          </div>
+          <label className="field">Back on<input className="input" type="date" name="until" required min={isoPlus(1)} max={isoPlus(90)} defaultValue={isoPlus(7)} /></label>
+          <label className="field">Where <span className="small muted">(optional, only you see it)</span><input className="input" name="where" maxLength={60} placeholder="e.g. London" /></label>
           <label className="choice" style={{ alignItems: 'flex-start' }}><input type="checkbox" name="pause" style={{ accentColor: 'var(--gold)', marginTop: 4, width: 18, height: 18 }} /><span className="stack" style={{ gap: 2 }}><strong>Pause my Drops while I’m away</strong><span className="small muted">Leave it off to keep getting Drops and plan dates for when you’re back.</span></span></label>
           <button className="btn ghost sm" style={{ alignSelf: 'flex-start' }}>Turn on Traveling</button>
         </form>
