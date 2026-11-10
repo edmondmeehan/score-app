@@ -5,6 +5,7 @@ import { faceMatchConfigured } from '@/lib/facematch';
 import { TestBanner } from '@/components/ui';
 import PhotoUploader from '../../onboarding/photos/PhotoUploader';
 import SongPicker from './SongPicker';
+import ProfileVideo from './ProfileVideo';
 import VoiceIntro from './VoiceIntro';
 import { PROMPTS } from '@/lib/prompts';
 import { answerVouch, clearSong, movePhoto, removePhoto, saveAbout, saveDetails, saveFlags, saveImproving, saveInstagram, saveNycSpot, savePrompts } from './actions';
@@ -32,6 +33,7 @@ export default async function EditProfile({ searchParams }: { searchParams: Prom
   const list = photos || [];
   const strength = profileStrength(me, list.filter((p) => p.match_status !== 'rejected').length);
   const { data: voiceSigned } = me.voice_path ? await supabase.storage.from('voices').createSignedUrl(me.voice_path, 3600) : { data: null };
+  const { data: videoSigned } = me.video_path ? await supabase.storage.from('videos').createSignedUrl(me.video_path, 3600) : { data: null };
   const { data: voucherName } = vouch ? await supabase.rpc('first_name_of', { p: vouch.voucher_id }) : { data: null };
   const { data: signed } = list.length ? await supabase.storage.from('photos').createSignedUrls(list.map((p) => p.path), 3600) : { data: [] };
   const room = 6 - list.length;
@@ -191,6 +193,7 @@ export default async function EditProfile({ searchParams }: { searchParams: Prom
         <button className="btn ghost sm" style={{ alignSelf: 'flex-start' }}>Save</button>
       </form>
 
+      <ProfileVideo userId={user.id} url={videoSigned?.signedUrl || null} status={me.video_status || 'none'} seconds={me.video_seconds ?? null} />
       <VoiceIntro userId={user.id} url={voiceSigned?.signedUrl || null} seconds={me.voice_seconds ?? null} />
 
       {/* Song */}

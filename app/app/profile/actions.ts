@@ -171,3 +171,14 @@ export async function setVoiceIntro(path: string, seconds: number) {
   revalidatePath('/app/profile');
   return { ok: !error, error: error?.message };
 }
+
+export async function setProfileVideo(path: string, seconds: number) {
+  const { supabase, user } = await ctx();
+  if (path && !path.startsWith(`${user.id}/`)) return { ok: false, error: 'Upload failed' };
+  const { data: old } = await supabase.from('profiles').select('video_path').eq('id', user.id).single();
+  const { error } = await supabase.rpc('set_video', { p_path: path, p_seconds: seconds });
+  if (error) return { ok: false, error: /does not exist|schema cache/i.test(error.message) ? 'Video clips aren’t switched on yet.' : error.message };
+  if (old?.video_path && old.video_path !== path) await supabase.storage.from('videos').remove([old.video_path]);
+  revalidatePath('/app/profile');
+  return { ok: true };
+}

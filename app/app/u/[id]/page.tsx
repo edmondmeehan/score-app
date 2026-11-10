@@ -24,6 +24,8 @@ export default async function Member({ params, searchParams }: { params: Promise
   const photos = (await photoUrls(supabase, [p.id]))[p.id] || [];
   const { data: social } = await supabase.from('profile_socials').select('instagram').eq('user_id', p.id).maybeSingle();
   const { data: inviter } = p.invited_by ? await supabase.from('profiles').select('first_name').eq('id', p.invited_by).maybeSingle() : { data: null };
+  const showVideo = p.video_path && (p.video_status === 'approved' || p.id === me.id);
+  const { data: videoSigned } = showVideo ? await supabase.storage.from('videos').createSignedUrl(p.video_path!, 3600) : { data: null };
   const { data: voiceSigned } = p.voice_path ? await supabase.storage.from('voices').createSignedUrl(p.voice_path, 3600) : { data: null };
   const { data: vouch } = await supabase.from('vouches').select('body, voucher_id').eq('member_id', p.id).eq('status', 'approved').maybeSingle();
   const b = p.band ? BANDS[p.band] : null;
@@ -57,6 +59,12 @@ export default async function Member({ params, searchParams }: { params: Promise
       )}
       {detailChips(p).length > 0 && (
         <div className="row" style={{ flexWrap: 'wrap', gap: 8 }}>{detailChips(p).map((c) => <span key={c} className="chip">{c}</span>)}</div>
+      )}
+      {videoSigned?.signedUrl && (
+        <div className="card stack" style={{ gap: 8, padding: 10 }}>
+          <video src={videoSigned.signedUrl} controls playsInline muted loop preload="metadata" style={{ width: '100%', maxHeight: 520, borderRadius: 12, background: '#000' }} />
+          {p.id === me.id && p.video_status !== 'approved' && <span className="small muted">In review. Only you can see this for now.</span>}
+        </div>
       )}
       {voiceSigned?.signedUrl && (
         <div className="card stack" style={{ gap: 8 }}>
