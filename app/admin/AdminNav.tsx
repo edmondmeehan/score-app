@@ -5,8 +5,9 @@ import { useEffect, useState } from 'react';
 import { Logo } from '@/components/ui';
 import ThemeSwitch from '@/components/ThemeSwitch';
 import { BUILD_LABEL } from '@/lib/build';
+import { canOpen } from '@/lib/staffAccess';
 
-export default function AdminNav({ counts, email }: { counts: { rep: number; ver: number; del: number; sup: number; vid?: number }; email: string }) {
+export default function AdminNav({ counts, email, role }: { counts: { rep: number; ver: number; del: number; sup: number; vid?: number }; email: string; role?: string | null }) {
   const path = usePathname();
   const [open, setOpen] = useState(false);
   useEffect(() => { setOpen(false); }, [path]);
@@ -14,7 +15,8 @@ export default function AdminNav({ counts, email }: { counts: { rep: number; ver
     document.documentElement.style.overflow = open ? 'hidden' : '';
     return () => { document.documentElement.style.overflow = ''; };
   }, [open]);
-  const groups: { title: string; items: [string, string, number][] }[] = [
+  type Group = { title: string; items: [string, string, number][] };
+  const allGroups: Group[] = [
     { title: 'Dashboard', items: [['/admin', 'Overview', 0], ['/admin/analytics', 'Analytics', 0], ['/admin/health', 'Site health', 0], ['/admin/reports', 'Daily report', 0], ['/admin/map', 'Map', 0]] },
     { title: 'Growth', items: [['/admin/waitlist', 'Waitlist & invites', 0], ['/admin/zips', 'Commuter zip codes', 0], ['/admin/partners', 'Credit partners', 0], ['/admin/campaigns', 'Campaigns', 0], ['/admin/messages', 'Message members', 0], ['/admin/assets', 'Brand assets', 0], ['/admin/featured', 'Featured spots', 0], ['/admin/investors', 'Investors', 0]] },
     { title: 'Members', items: [['/admin/members', 'Members', 0], ['/admin/wellbeing', 'Wellbeing', 0], ['/admin/reserve', 'Reserve', 0], ['/admin/verification', 'Verification', counts.ver], ['/admin/support', 'Support', counts.sup], ['/admin/deletions', 'Deletions', counts.del]] },
@@ -22,6 +24,7 @@ export default function AdminNav({ counts, email }: { counts: { rep: number; ver
     { title: 'Content', items: [['/admin/content', 'Content', 0], ['/admin/events', 'Events', 0], ['/admin/giveaways', 'Giveaways', 0], ['/admin/scan', 'Scan members', 0], ['/admin/date-challenge', '$50 Date Challenge', 0], ['/admin/emails', 'Emails', 0], ['/admin/footer', 'Footer', 0], ['/admin/policies', 'Policies', 0], ['/admin/themes', 'Seasonal themes', 0]] },
     { title: 'Business', items: [['/admin/billing', 'Billing', 0], ['/admin/integrations', 'Integrations', 0], ['/admin/team', 'Admins', 0]] },
   ];
+  const groups: Group[] = allGroups.map((g) => ({ ...g, items: g.items.filter(([href]) => canOpen(role, href)) })).filter((g) => g.items.length > 0);
   const items = groups.flatMap((g) => g.items);
   const isOn = (href: string) => (href === '/admin' ? path === '/admin' : path.startsWith(href));
   // Accordion: one section open at a time. The section holding the current page opens on each navigation.

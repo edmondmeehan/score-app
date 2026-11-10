@@ -2,6 +2,7 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabase/server';
 import type { Profile } from '@/lib/types';
+import { canOpen } from '@/lib/staffAccess';
 
 export async function getMe() {
   const supabase = await supabaseServer();
@@ -70,6 +71,9 @@ export async function requireStaff() {
   if (!ctx.user) redirect('/signin?next=/admin');
   const { data: isStaff } = await ctx.supabase.rpc('is_staff');
   if (!isStaff) redirect('/app');
-  const { data: email } = await ctx.supabase.rpc('staff_email');
-  return { ...ctx, staffEmail: email as string };
+  const [{ data: email }, { data: role }] = await Promise.all([ctx.supabase.rpc('staff_email'), ctx.supabase.rpc('staff_role')]);
+  // Role-based access (lib/staffAccess): pages and form actions under /admin check the area they belong to.
+  const path = (await headers()).get('x-sd-path') || '';
+  if (path.startsWith('/admin') && !canOpen(role as string | null, path)) redirect('/admin?denied=1');
+  return { ...ctx, staffEmail: email as string, staffRole: (role as string) || null };
 }

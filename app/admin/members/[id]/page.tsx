@@ -68,6 +68,8 @@ export default async function MemberDetail({ params, searchParams }: { params: P
   const { id } = await params;
   const sp = await searchParams;
   const supabase = await supabaseServer();
+  const { data: staffRole } = await supabase.rpc('staff_role');
+  const owner = staffRole === 'owner'; // spend and billing are owner-only
   const { data } = await supabase.from('profiles').select('*').eq('id', id).maybeSingle();
   const p = data as Profile | null;
   if (!p) notFound();
@@ -126,8 +128,8 @@ export default async function MemberDetail({ params, searchParams }: { params: P
 
       {/* Key numbers */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
-        <Stat k="Lifetime spend" v={usd(o?.spend.gross ?? 0)} sub={o ? `${o.spend.payments} payment${o.spend.payments === 1 ? '' : 's'}${o.spend.refunds ? ` · ${usd(o.spend.refunds)} refunded` : ''}` : undefined} tone="gold" />
-        <Stat k="After store fees" v={usd(o?.spend.takehome ?? 0)} sub="Estimated take-home" />
+        {owner && <Stat k="Lifetime spend" v={usd(o?.spend.gross ?? 0)} sub={o ? `${o.spend.payments} payment${o.spend.payments === 1 ? '' : 's'}${o.spend.refunds ? ` · ${usd(o.spend.refunds)} refunded` : ''}` : undefined} tone="gold" />}
+        {owner && <Stat k="After store fees" v={usd(o?.spend.takehome ?? 0)} sub="Estimated take-home" />}
         <Stat k="Member for" v={tenure(p.created_at)} sub={`Since ${day(p.created_at)}`} />
         <Stat k="Paying since" v={o?.spend.first_paid ? tenure(o.spend.first_paid) : 'Not yet'} sub={o?.spend.renews ? `Renews ${day(o.spend.renews)}` : o?.spend.last_paid ? `Last paid ${day(o.spend.last_paid)}` : undefined} />
         <Stat k="Opens (30 days)" v={u?.opens_30d ?? '—'} sub={u ? `${u.days_active_30d} of 30 days active · ${u.app_opens_30d} in the app` : 'Run migration 0051'} />
@@ -137,8 +139,8 @@ export default async function MemberDetail({ params, searchParams }: { params: P
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16, alignItems: 'start' }}>
-        {/* Billing */}
-        <Section title="Membership & billing">
+        {/* Billing (owners only) */}
+        {owner && <Section title="Membership & billing">
           <Row k="Plan" v={`${PLAN_NAME[p.plan] || p.plan}${(p as Profile & { plan_store?: string }).plan_store ? ` · ${({ app_store: 'App Store', play_store: 'Google Play', stripe: 'Web' } as Record<string, string>)[(p as Profile & { plan_store?: string }).plan_store!] || (p as Profile & { plan_store?: string }).plan_store}` : ''}`} />
           {p.plan === 'preview' && <Row k="Preview ends" v={day(p.preview_ends_at)} />}
           <Row k="First payment" v={day(o?.spend.first_paid)} />
@@ -159,7 +161,7 @@ export default async function MemberDetail({ params, searchParams }: { params: P
               ))}
             </div>
           )}
-        </Section>
+        </Section>}
 
         {/* Usage */}
         <Section title="App usage" right={<span className="small muted">Last open {ago(u?.last_open)}</span>}>

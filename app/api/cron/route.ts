@@ -49,6 +49,26 @@ export async function GET(request: NextRequest) {
       // Monthly nudge to keep self-reported bands current (once per 30 days per member; respects reminder settings).
       const band = await sb.rpc('queue_band_refresh', { p_secret: secret });
       out.band_refresh = band.data ?? band.error?.message;
+      // Data retention: finish held deletions, erase old emails/logs, and delete files left by deleted accounts.
+      const ret = await sb.rpc('cron_retention', { p_secret: secret });
+      if (ret.error) out.retention = ret.error.message;
+      else {
+        const r = ret.data as { orphan_files?: { bucket: string; name: string }[] } & Record<string, unknown>;
+        const files = r.orphan_files || [];
+        const admin = supabaseAdmin();
+        let removed = 0;
+        if (admin && files.length) {
+          const byBucket = new Map<string, string[]>();
+          for (const f of files) byBucket.set(f.bucket, [...(byBucket.get(f.bucket) || []), f.name]);
+          for (const [bucket, names] of byBucket) {
+            for (let i = 0; i < names.length; i += 100) {
+              const { error } = await admin.storage.from(bucket).remove(names.slice(i, i + 100));
+              if (!error) removed += Math.min(100, names.length - i);
+            }
+          }
+        }
+        out.retention = { ...r, orphan_files: admin ? removed : `${files.length} found (add SUPABASE_SERVICE_ROLE_KEY to delete)` };
+      }
       // Staff daily report (each person once per day, only the sections they picked).
       const rep = await sb.rpc('cron_daily_report', { p_secret: secret });
       if (rep.error) out.admin_daily = rep.error.message;

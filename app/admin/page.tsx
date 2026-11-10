@@ -1,3 +1,4 @@
+import { ROLE_LABEL, type StaffRole } from '@/lib/staffAccess';
 import Link from 'next/link';
 import { supabaseServer } from '@/lib/supabase/server';
 import { BANDS, PLANS, type Band } from '@/lib/types';
@@ -63,8 +64,25 @@ const Panel = ({ title, href, children, flex = '1 1 320px' }: { title: string; h
   </section>
 );
 
-export default async function Overview({ searchParams }: { searchParams: Promise<{ d?: string; test?: string }> }) {
+export default async function Overview({ searchParams }: { searchParams: Promise<{ d?: string; test?: string; denied?: string }> }) {
   const sp = await searchParams;
+  {
+    const sb = await supabaseServer();
+    const { data: role } = await sb.rpc('staff_role');
+    if (role !== 'owner') {
+      return (
+        <div className="stack" style={{ gap: 16, maxWidth: 640 }}>
+          <h1 className="serif" style={{ fontSize: 40, margin: 0 }}>Admin</h1>
+          {sp.denied && <div className="notice">Your role doesn’t include that area. Ask an owner if you need access.</div>}
+          <div className="card stack" style={{ gap: 6 }}>
+            <span className="label">Your role</span>
+            <span>{ROLE_LABEL[(role as StaffRole) || 'moderator'] || String(role)}</span>
+            <span className="small muted">Use the menu to open the areas your role includes. Business numbers, billing and settings are for owners.</span>
+          </div>
+        </div>
+      );
+    }
+  }
   const days = [7, 30, 90].includes(Number(sp.d)) ? Number(sp.d) : 30;
   const test = sp.test === '1';
   const supabase = await supabaseServer();
