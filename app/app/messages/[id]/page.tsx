@@ -12,6 +12,7 @@ import { BandPill } from '@/components/ui';
 import { SITE_URL } from '@/lib/emails';
 import type { Profile } from '@/lib/types';
 import Chat from './Chat';
+import { photoUrls } from '@/lib/photos';
 import DatePanel, { type Pick, type Plan } from './DatePanel';
 import { nearestFirst, openers, publicTrend } from '@/lib/engagement';
 
@@ -26,7 +27,7 @@ export default async function Conversation({ params, searchParams }: { params: P
   const otherId = conv.user_a === me.id ? conv.user_b : conv.user_a;
   type Geo = { lat: number | null; lng: number | null };
   // Everything this screen needs, fetched at once (it used to be six round trips in a row).
-  const [{ data: other }, { data: messages }, { data: plans }, , { data: picksData }, { data: myGeo }, { data: readAt }, { data: presence }, { data: sharedQ }, { data: deeper }, { count: pastDates }, { data: marks }] = await Promise.all([
+  const [{ data: other }, { data: messages }, { data: plans }, , { data: picksData }, { data: myGeo }, { data: readAt }, { data: presence }, { data: sharedQ }, { data: deeper }, { count: pastDates }, { data: marks }, otherPhotos] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', otherId).maybeSingle(),
     supabase.from('messages').select('*').eq('conversation_id', id).order('created_at').limit(200),
     supabase.from('date_plans').select('*').eq('conversation_id', id).in('status', ['proposed', 'accepted']).order('created_at', { ascending: false }).limit(1),
@@ -39,6 +40,7 @@ export default async function Conversation({ params, searchParams }: { params: P
     supabase.rpc('deeper_state', { p_conversation: id }),
     supabase.from('date_plans').select('id', { count: 'exact', head: true }).eq('conversation_id', id).eq('status', 'accepted').lt('starts_at', new Date().toISOString()),
     supabase.from('together_marks').select('user_id').eq('conversation_id', id),
+    photoUrls(supabase, [otherId]).catch(() => ({} as Record<string, string[]>)),
   ]);
   const plan = (plans?.[0] as Plan | undefined) || null;
   const o = other as Profile | null;
@@ -60,6 +62,9 @@ export default async function Conversation({ params, searchParams }: { params: P
       <ScreenshotContext context="chat" target={otherId} />
       <div className="row appbar">
         <Link href="/app/messages" aria-label="Back" className="btn ghost sm" style={{ width: 44, padding: 0 }}>‹</Link>
+        <Link href={`/app/u/${otherId}`} className="avatar" aria-label={`${o?.first_name || 'Member'}'s profile`} style={{ width: 44, height: 44, fontSize: 18, textDecoration: 'none' }}>
+          {otherPhotos[otherId]?.[0] ? <img src={otherPhotos[otherId][0]} alt="" /> : (o?.first_name?.[0] || '·')}
+        </Link>
         <Link href={`/app/u/${otherId}`} className="stack grow" style={{ gap: 4, textDecoration: 'none', color: 'inherit' }}><strong>{o?.first_name || 'Member'}</strong>{presence === 'now' ? <span className="small" style={{ color: 'var(--rise)' }}><span className="presence-dot" />Active now</span> : presence === 'hour' ? <span className="small muted"><span className="presence-dot hour" />Active in the last hour</span> : null}{o && awayLabel(o) && <span className="small" style={{ color: 'var(--gold-light)' }}>{awayLabel(o)}</span>}{o && <BandPill band={o.band} trend={publicTrend(o)} verified={Boolean(o.credit_verified_at)} />}</Link>
         <details className="chat-menu">
           <summary className="small muted" aria-label="More">More</summary>
