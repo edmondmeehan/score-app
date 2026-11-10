@@ -4,6 +4,7 @@ import { Gauge, Steps, TestBanner } from '@/components/ui';
 import { BANDS, type Band } from '@/lib/types';
 import { testSetBand, creditStart, creditVerify, selfReportBand } from '../actions';
 import { getCreditMode } from '@/lib/creditMode';
+import CreditPartners from '@/components/CreditPartners';
 import { spinwheelConfigured, spinwheelSandbox } from '@/lib/spinwheel';
 
 export default async function Credit({ searchParams }: { searchParams: Promise<{ error?: string; revealed?: string; step?: string }> }) {
@@ -37,7 +38,8 @@ export default async function Credit({ searchParams }: { searchParams: Promise<{
       <form action={selfReportBand} className="phone">
         <Steps at={3} />
         <h1 className="serif" style={{ fontSize: 38 }}>Share your credit band</h1>
-        <p className="muted" style={{ margin: 0, lineHeight: 1.55 }}>Check your score on a free service like Credit Karma, Credit Sesame, or your bank or card app. Checking it there doesn&apos;t affect your credit. Then pick the band it falls in. Members see your band, never the number.</p>
+        <p className="muted" style={{ margin: 0, lineHeight: 1.55 }}>Check your score on a free service below, or in your bank or card app. Checking it there doesn&apos;t affect your credit. Then pick the band it falls in. Members see your band, never the number.</p>
+        <CreditPartners placement="onboarding" />
         <div role="radiogroup" aria-label="Your band" className="stack">
           {(Object.keys(BANDS) as Band[]).map((k) => (
             <label key={k} className="choice"><input type="radio" name="band" value={k} required style={{ accentColor: 'var(--gold)' }} /><span style={{ color: BANDS[k].color, fontWeight: 600 }}>{BANDS[k].label}</span><span className="muted small">{BANDS[k].range}</span></label>
