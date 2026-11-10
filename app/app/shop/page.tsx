@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import { requireMember } from '@/lib/session';
 import { buyAddon, useExtraDrop, useSpotlight } from '../features';
+import { headers } from 'next/headers';
+import { getIntegration } from '@/lib/integrations';
+import NativeAddonBuy from './NativeAddonBuy';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,6 +22,11 @@ export default async function Shop({ searchParams }: { searchParams: Promise<{ o
   const m = (mine as Mine) || { included: false, extra_drop: 0, spotlight: 0, note: 0, spotlight_until: null };
   const until = m.spotlight_until ? new Date(m.spotlight_until) : null;
   const canUse = me.status === 'active' || me.status === 'preview';
+  const native = /ScoreDateApp/.test((await headers()).get('user-agent') || '');
+  const rc = await getIntegration('revenuecat').catch(() => null);
+  const iosKey = rc?.config.ios_public_key || process.env.NEXT_PUBLIC_REVENUECAT_IOS_KEY;
+  const androidKey = rc?.config.android_public_key || process.env.NEXT_PUBLIC_REVENUECAT_ANDROID_KEY;
+  const useStore = native && Boolean(iosKey || androidKey);
 
   return (
     <div className="phone">
@@ -51,7 +59,9 @@ export default async function Shop({ searchParams }: { searchParams: Promise<{ o
       )}
       <span className="small muted">Send a Note from anyone&apos;s profile in your Drop.</span>
 
-      {!m.included && (
+      {!m.included && useStore && <NativeAddonBuy userId={me.id} iosKey={iosKey} androidKey={androidKey} items={items} />}
+      {!m.included && !useStore && !testMode && <div className="notice">Add-ons are bought in the ScoreDate iPhone app.</div>}
+      {!m.included && !useStore && testMode && (
         <div className="stack">
           {items.map((it) => (
             <form key={it.sku} action={buyAddon} className="card row">

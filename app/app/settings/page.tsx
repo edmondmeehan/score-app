@@ -117,7 +117,8 @@ export default async function Settings({ searchParams }: { searchParams: Promise
       <div className="card stack">
         <span className="label">Membership</span>
         <Link href="/plans">Change plan</Link>
-        <span className="small muted">On iPhone, subscriptions are managed in your App Store settings.</span>
+        <a href="https://apps.apple.com/account/subscriptions">Manage or cancel subscription</a>
+        <span className="small muted">On iPhone, subscriptions are billed and managed by Apple. To restore a purchase on a new phone, open Change plan and tap Restore purchases.</span>
       </div>
       <Link href="/app/invites" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}><span className="grow">Invites <span className="small muted">· Invite friends and track who joined</span></span><span className="muted">›</span></Link>
       <Link href="/app/shop" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}><span className="grow">Add-ons <span className="small muted">· Spotlight, Extra connections, Notes</span></span><span className="muted">›</span></Link>

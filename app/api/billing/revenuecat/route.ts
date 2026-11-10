@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { getIntegration } from '@/lib/integrations';
 import { activeEntitlements, isPreviewProduct, planFromEntitlements } from '@/lib/revenuecat';
 import { supabaseAnon } from '@/lib/supabase/server';
+import { skuForProduct } from '@/lib/iap';
 
 // RevenueCat → ScoreDate. In RevenueCat: Project settings → Integrations → Webhooks.
 //   URL: https://<domain>/api/billing/revenuecat
@@ -52,6 +53,11 @@ export async function POST(req: Request) {
     p_environment: e.environment ?? null,
   });
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  // Add-ons (consumables): grant once per store transaction (the in-app sync uses the same reference).
+  const sku = e.type === 'NON_RENEWING_PURCHASE' ? skuForProduct(e.product_id) : null;
+  if (sku && data === 'ok' && (e.transaction_id || e.id)) {
+    await supabaseAnon().rpc('grant_addon', { p_secret: process.env.SCORE_SERVER_SECRET, p_user: userId, p_sku: sku, p_source: 'apple', p_ref: String(e.transaction_id || e.id) }).then(() => null, () => null);
+  }
   // Revenue for the admin command center. RevenueCat sends USD price (negative on refunds) and the share kept after store fees.
   if (data === 'ok' && typeof e.price === 'number') {
     await supabaseAnon().rpc('billing_event_amount', {
