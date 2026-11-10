@@ -15,9 +15,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const { data: pres } = user ? await supabase.from('profiles').select('show_online').eq('id', user.id).maybeSingle() : { data: null };
   return (
     <>
-      {children}
+      <PullToRefresh>{children}</PullToRefresh>
       <TabBar />
-      <PullToRefresh />
       <AppFeedback />
       {user && <NativePush />}
       {user && <PresenceBeat on={Boolean((pres as { show_online?: boolean } | null)?.show_online)} />}
