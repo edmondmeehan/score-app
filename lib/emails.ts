@@ -1,3 +1,4 @@
+import { dropTimeLabel } from '@/lib/engagement';
 // ScoreDate email templates. Every template renders to { subject, html, text }.
 // Styling is inline and table-based so it holds up in Gmail, Apple Mail and Outlook.
 
@@ -228,14 +229,14 @@ export const templates = {
 
   welcome_member: (d: { first_name?: string | null; plan: string; drop_size: number }) => ({
     subject: 'Welcome to ScoreDate',
-    preheader: `Your first Daily Drop of ${d.drop_size} arrives tomorrow at noon.`,
+    preheader: `Your first Daily Drop of ${d.drop_size} arrives at ${dropTimeLabel()} ET.`,
     eyebrow: `Member · ${d.plan}`,
     heading: 'Welcome in.',
     kind: 'transactional',
     blocks: [
-      { p: `${hi(d.first_name)} you're verified and your profile is live. Every day at noon you'll get your Daily Drop: ${d.drop_size} people picked for shared money values and compatible bands.` },
-      { facts: [['Plan', d.plan], ['Daily Drop', `${d.drop_size} a day at noon`], ['Status', 'Active']] },
-      { button: { label: "See today's Drop", url: `${SITE_URL}/app` } },
+      { p: `${hi(d.first_name)} you're verified and your profile is live. Every night at ${dropTimeLabel()} ET you'll get your Daily Drop: ${d.drop_size} people picked for shared money values and compatible bands.` },
+      { facts: [['Plan', d.plan], ['Daily Drop', `${d.drop_size} a night at ${dropTimeLabel()} ET`], ['Status', 'Active']] },
+      { button: { label: 'Open ScoreDate', url: `${SITE_URL}/app` } },
       { p: 'Two house rules: be honest, and be kind. You can pause or mark yourself Taken any time from settings, and your profile hides right away.' },
     ],
   }) satisfies Email,
@@ -302,7 +303,7 @@ export const templates = {
     blocks: [
       { p: `${hi(d.first_name)} tonight's Drop is ready${d.top_match ? `, led by ${d.top_match}` : ''}. Everyone in it is ID-verified and picked for your money values and preferences.` },
       { button: { label: 'Open the Drop', url: `${SITE_URL}/app` } },
-      { note: 'A new Drop arrives every day around noon.' },
+      { note: `A new Drop arrives every night at ${dropTimeLabel()} ET.` },
     ],
   }) satisfies Email,
 
@@ -379,7 +380,7 @@ export const templates = {
     heading: d.status === 'taken' ? 'Taken. We love that.' : d.status === 'paused' ? 'Paused.' : 'Welcome back.',
     kind: 'transactional',
     blocks: [
-      { p: d.status === 'active' ? `${hi(d.first_name)} your profile is visible again and your next Daily Drop arrives at noon.` : `${hi(d.first_name)} your profile is hidden from new people. Existing conversations stay open, and you can switch back any time in settings.` },
+      { p: d.status === 'active' ? `${hi(d.first_name)} your profile is visible again and your next Daily Drop arrives at ${dropTimeLabel()} ET.` : `${hi(d.first_name)} your profile is hidden from new people. Existing conversations stay open, and you can switch back any time in settings.` },
       { button: { label: 'Account settings', url: `${SITE_URL}/app/settings` } },
     ],
   }) satisfies Email,
