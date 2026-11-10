@@ -509,3 +509,10 @@ main, .phone { animation: screenin .2s ease-out; }
 .pill-link:hover { color: var(--gold-light); border-color: var(--gold); }
 .pill-link:active { transform: scale(.97); }
 a.chip { text-decoration: none; color: inherit; }
+/* Match moment and pull to refresh (gauge → heart). */
+.match-moment { position: fixed; inset: 0; z-index: 90; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; background: color-mix(in srgb, var(--onyx) 94%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); animation: mm-in .35s ease-out both; cursor: pointer; }
+.match-moment.out { animation: mm-out .4s ease-in both; }
+@keyframes mm-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes mm-out { from { opacity: 1; } to { opacity: 0; transform: scale(1.02); } }
+.ptr { position: fixed; top: calc(8px + env(safe-area-inset-top)); left: 50%; z-index: 30; width: 52px; height: 52px; border-radius: 999px; display: grid; place-items: center; background: var(--glass-strong); border: 1px solid var(--glass-line); box-shadow: 0 8px 24px var(--shadow); pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .match-moment, .match-moment.out { animation: none; } }

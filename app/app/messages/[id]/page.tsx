@@ -4,6 +4,7 @@ import { markTogether, unmatchConversation } from '../../actions';
 import DeeperCard, { type DeeperState } from './DeeperCard';
 import MoneyTalk from './MoneyTalk';
 import Link from 'next/link';
+import MatchMoment from '@/components/MatchMoment';
 import { awayLabel } from '@/lib/away';
 import { notFound } from 'next/navigation';
 import { requireMember } from '@/lib/session';
@@ -84,7 +85,7 @@ export default async function Conversation({ params, searchParams }: { params: P
       {fromNote && <div className="notice">{o?.first_name} sent you a Note. Reply any time{me.plan === 'preview' ? ', even on Preview' : ''}.</div>}
       {sp.error && <div className="notice error">{sp.error}</div>}
       {sp.ok && <div className="notice">{sp.ok}</div>}
-      {sp.match && <HapticOnMount kind="success" />}
+      {sp.match && <MatchMoment name={o?.first_name} />}
       {conv.ended_at && <div className="notice">{conv.ended_by === me.id ? 'You unmatched.' : 'This conversation has ended.'} Messages can’t be sent anymore.</div>}
       {sp.second && !conv.ended_at && (
         <div className="card gold stack" style={{ gap: 6 }}>

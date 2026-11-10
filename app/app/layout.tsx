@@ -3,6 +3,7 @@ import NativePurchases from '@/components/NativePurchases';
 import AppFeedback from '@/components/AppFeedback';
 import NativePush from '@/components/NativePush';
 import PresenceBeat from '@/components/PresenceBeat';
+import PullToRefresh from '@/components/PullToRefresh';
 import { supabaseServer } from '@/lib/supabase/server';
 import { getIntegration } from '@/lib/integrations';
 
@@ -16,6 +17,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <>
       {children}
       <TabBar />
+      <PullToRefresh />
       <AppFeedback />
       {user && <NativePush />}
       {user && <PresenceBeat on={Boolean((pres as { show_online?: boolean } | null)?.show_online)} />}

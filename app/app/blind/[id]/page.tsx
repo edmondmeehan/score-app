@@ -1,3 +1,4 @@
+import MatchMoment from '@/components/MatchMoment';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireMember } from '@/lib/session';
@@ -25,7 +26,7 @@ export default async function BlindRoundPage({ params, searchParams }: { params:
   return (
     <div className="phone">
       <ScreenshotContext context="blind" target={r.other?.id ?? null} />
-      {sp.matched && <HapticOnMount kind="success" />}
+      {sp.matched && <MatchMoment />}
       {sp.revealed && <HapticOnMount kind="medium" />}
       <div className="row"><Link href="/app/blind" aria-label="Back" className="btn ghost sm" style={{ width: 44, padding: 0 }}>‹</Link><span className="eyebrow">Blind round</span></div>
       {sp.error && <div className="notice error">{sp.error}</div>}
