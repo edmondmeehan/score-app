@@ -54,7 +54,7 @@ function Gate({ error }: { error: string | null }) {
   );
 }
 
-const TOC = [['overview', 'Overview'], ['product', 'Product'], ['traction', 'Live demand'], ['model', 'Business model'], ['growth', 'Growth plan'], ['pnl', 'Sample P&L'], ['unit', 'Unit economics'], ['trust', 'Trust & compliance'], ['team', 'Team'], ['raise', 'The raise']] as const;
+const TOC = [['overview', 'Overview'], ['product', 'Product'], ['traction', 'Live demand'], ['market', 'Market report'], ['model', 'Business model'], ['growth', 'Growth plan'], ['pnl', 'Sample P&L'], ['unit', 'Unit economics'], ['trust', 'Trust & compliance'], ['team', 'Team'], ['raise', 'The raise']] as const;
 
 function Section({ id, eyebrow, title, children }: { id: string; eyebrow: string; title: string; children: React.ReactNode }) {
   return (
@@ -152,6 +152,19 @@ function RoomView({ room }: { room: Room }) {
               </div>
             )}
             <span className="small muted">Counts exclude test accounts. The waitlist is demand, not paying members. As of {new Date(live.as_of).toLocaleString('en-US', { timeZone: 'America/New_York', dateStyle: 'medium', timeStyle: 'short' })} ET.</span>
+          </Section>
+
+          <Section id="market" eyebrow="Market report" title="Dating apps and financial compatibility">
+            <p className="muted" style={{ margin: 0 }}>Our research on the dating app market, its growth through 2030, how money drives breakups, and why credit is a trusted signal of responsibility, with sources and revenue scenarios.</p>
+            <div className="row" style={{ gap: 12, flexWrap: 'wrap' }}>
+              <Stat n="$8.9B" label="Global dating app revenue by 2030" sub="From $6B+ in 2024 (Business of Apps)" />
+              <Stat n="2–3x" label="More likely to split" sub="Couples with the lowest credit scores (Federal Reserve)" />
+              <Stat n="$34M" label="Base-case annual revenue, Year 5" sub="100k paying members. Illustrative, not a forecast" />
+            </div>
+            <div className="row" style={{ gap: 10, flexWrap: 'wrap' }}>
+              <a href="/investors/market-report" target="_blank" rel="noopener" className="btn">Read the report</a>
+              <a href="/investors/market-report?download=1" className="btn ghost">Download PDF</a>
+            </div>
           </Section>
 
           <Section id="model" eyebrow="Business model" title="Paid membership, priced for a premium audience">
