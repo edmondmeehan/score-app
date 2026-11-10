@@ -61,10 +61,10 @@ export default async function Search({ searchParams }: { searchParams: Promise<S
       </div>
       <h1 className="serif" style={{ fontSize: 38 }}>Search &amp; directory</h1>
       <div className="row" style={{ gap: 8, flexWrap: 'wrap' }}>
-        <Link href="/app/discover" className="chip">Discover</Link>
-        <Link href="/app/events" className="chip">Events</Link>
-        <Link href="/app/map" className="chip">Member map</Link>
-        <Link href="/app/likes" className="chip">Likes</Link>
+        <Link href="/app/discover" className="pill-link">Discover</Link>
+        <Link href="/app/events" className="pill-link">Events</Link>
+        <Link href="/app/map" className="pill-link">Member map</Link>
+        <Link href="/app/likes" className="pill-link">Likes</Link>
       </div>
 
       <form action="/app/search" method="get" className="stack" style={{ gap: 12 }}>

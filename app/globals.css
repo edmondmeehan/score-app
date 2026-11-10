@@ -508,3 +508,4 @@ main, .phone { animation: screenin .2s ease-out; }
 .pill-link { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 14px; border-radius: 999px; background: var(--tab-on); border: 1px solid color-mix(in srgb, var(--gold) 28%, transparent); color: var(--gold-light); font: 500 13px var(--sans); text-decoration: none; white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: background .2s, border-color .2s; }
 .pill-link:hover { color: var(--gold-light); border-color: var(--gold); }
 .pill-link:active { transform: scale(.97); }
+a.chip { text-decoration: none; color: inherit; }
