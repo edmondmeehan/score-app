@@ -162,7 +162,7 @@ function RoomView({ room }: { room: Room }) {
               <Stat n="$34M" label="Base-case annual revenue, Year 5" sub="100k paying members. Illustrative, not a forecast" />
             </div>
             <div className="row" style={{ gap: 10, flexWrap: 'wrap' }}>
-              <a href="/investors/market-report" target="_blank" rel="noopener" className="btn">Read the report</a>
+              <a href="/investors/market-report" className="btn">Read the report</a>
               <a href="/investors/market-report?download=1" className="btn ghost">Download PDF</a>
             </div>
           </Section>
