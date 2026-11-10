@@ -10,3 +10,7 @@ updates:
     groups:
       minor-and-patch:
         update-types: [minor, patch]
+    # Major upgrades (like Next.js 15 → 16) change how the app works; we do those by hand, not automatically.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
