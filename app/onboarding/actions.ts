@@ -158,10 +158,11 @@ export async function notifyArea(form: FormData) {
 // ---------- Self-reported band (credit mode = 'self') ----------
 export async function selfReportBand(form: FormData) {
   const supabase = await supabaseServer();
-  if (form.get('confirm') !== 'yes') redirect('/onboarding/credit?error=' + encodeURIComponent('Please confirm your band matches your current credit score.'));
+  if (form.get('confirm') !== 'yes') redirect('/onboarding/credit?error=' + encodeURIComponent('Please confirm your band matches your current credit score.') + (form.get('update') === '1' ? '&update=1' : ''));
+  const upd = form.get('update') === '1' ? '&update=1' : '';
   const { error } = await supabase.rpc('self_report_band', { p_band: String(form.get('band') || ''), p_trend: String(form.get('trend') || 'steady') });
-  if (error) redirect('/onboarding/credit?error=' + encodeURIComponent(error.message));
-  redirect('/onboarding/credit?revealed=1');
+  if (error) redirect('/onboarding/credit?error=' + encodeURIComponent(error.message) + upd);
+  redirect('/onboarding/credit?revealed=1' + upd);
 }
 
 // ---------- Credit band via Spinwheel ----------

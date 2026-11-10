@@ -7,12 +7,14 @@ import { getCreditMode } from '@/lib/creditMode';
 import CreditPartners from '@/components/CreditPartners';
 import { spinwheelConfigured, spinwheelSandbox } from '@/lib/spinwheel';
 
-export default async function Credit({ searchParams }: { searchParams: Promise<{ error?: string; revealed?: string; step?: string }> }) {
+export default async function Credit({ searchParams }: { searchParams: Promise<{ error?: string; revealed?: string; step?: string; update?: string }> }) {
   const { me } = await getMe();
   if (!me) redirect('/signin');
   const sp = await searchParams;
   const mode = await getCreditMode();
   const verified = Boolean(me.credit_verified_at);
+  const updating = sp.update === '1' && Boolean(me.band) && mode === 'self' && !verified;
+  if (me.band && sp.revealed && sp.update === '1') redirect('/app/settings?saved=band#band');
   if (me.band && sp.revealed) {
     const b = BANDS[me.band];
     return (
@@ -31,21 +33,22 @@ export default async function Credit({ searchParams }: { searchParams: Promise<{
       </div>
     );
   }
-  if (me.band && (mode === 'self' || verified)) redirect('/onboarding');
+  if (me.band && (mode === 'self' || verified) && !updating) redirect(sp.update === '1' ? '/app/settings#band' : '/onboarding');
   const fromSelf = Boolean(me.band) && !verified; // verified mode, member who self-reported earlier
   if (mode === 'self') {
     return (
       <form action={selfReportBand} className="phone">
-        <Steps at={3} />
-        <h1 className="serif" style={{ fontSize: 38 }}>Share your credit band</h1>
+        {updating ? <a href="/app/settings#band" className="pill-link" style={{ alignSelf: 'flex-start' }}>← Settings</a> : <Steps at={3} />}
+        {updating && <input type="hidden" name="update" value="1" />}
+        <h1 className="serif" style={{ fontSize: 38 }}>{updating ? 'Update your credit band' : 'Share your credit band'}</h1>
         <p className="muted" style={{ margin: 0, lineHeight: 1.55 }}>Check your score on a free service below, or in your bank or card app. Checking it there doesn&apos;t affect your credit. Then pick the band it falls in. Members see your band, never the number.</p>
         <CreditPartners placement="onboarding" />
         <div role="radiogroup" aria-label="Your band" className="stack">
           {(Object.keys(BANDS) as Band[]).map((k) => (
-            <label key={k} className="choice"><input type="radio" name="band" value={k} required style={{ accentColor: 'var(--gold)' }} /><span style={{ color: BANDS[k].color, fontWeight: 600 }}>{BANDS[k].label}</span><span className="muted small">{BANDS[k].range}</span></label>
+            <label key={k} className="choice"><input type="radio" name="band" value={k} required defaultChecked={updating && me.band === k} style={{ accentColor: 'var(--gold)' }} /><span style={{ color: BANDS[k].color, fontWeight: 600 }}>{BANDS[k].label}</span><span className="muted small">{BANDS[k].range}</span></label>
           ))}
         </div>
-        <label className="field">Over the last 12 months, your score has gone<select className="input" name="trend" defaultValue="steady"><option value="up">Up</option><option value="steady">About the same</option><option value="down">Down</option></select></label>
+        <label className="field">Over the last 12 months, your score has gone<select className="input" name="trend" defaultValue={updating ? me.trend || 'steady' : 'steady'}><option value="up">Up</option><option value="steady">About the same</option><option value="down">Down</option></select></label>
         <label className="choice" style={{ alignItems: 'flex-start' }}>
           <input type="checkbox" name="confirm" value="yes" required style={{ accentColor: 'var(--gold)', width: 18, height: 18, marginTop: 2 }} />
           <span className="small">This matches my current credit score. I understand my band shows as <strong>self-reported</strong> and that giving a false band breaks the Community Guidelines.</span>

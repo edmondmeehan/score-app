@@ -12,6 +12,8 @@ import { saveEmailPrefs, saveMapPrivacy, saveNotifyPrefs, setShowOnline } from '
 import PushToggle from '@/components/PushToggle';
 import FounderBadge from '@/components/FounderBadge';
 import TravelCard from '@/components/TravelCard';
+import BandCard from '@/components/BandCard';
+import { getCreditMode } from '@/lib/creditMode';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,7 +34,7 @@ export default async function Settings({ searchParams }: { searchParams: Promise
       {me.status === 'suspended' && <div className="notice error">Your account is suspended. Check your email for details and how to appeal.</div>}
       {sp.error && <div className="notice error">{sp.error}</div>}
       {sp.ok && <div className="notice">{sp.ok}</div>}
-      {sp.saved && <div className="notice">{sp.saved === 'email' ? 'Your email is updated.' : sp.saved === 'email_sent' ? 'Check your inbox to confirm the change. If you get a link at your old address too, confirm that one as well.' : 'Saved.'}</div>}
+      {sp.saved && <div className="notice">{sp.saved === 'email' ? 'Your email is updated.' : sp.saved === 'band' ? 'Your band is up to date. Thanks for keeping it current.' : sp.saved === 'email_sent' ? 'Check your inbox to confirm the change. If you get a link at your old address too, confirm that one as well.' : 'Saved.'}</div>}
       {me.plan === 'black' && (
         <Link href="/app/matchmaker" className="card gold row" style={{ textDecoration: 'none', color: 'inherit' }}>
           <span className="stack grow" style={{ gap: 2 }}><strong>Your matchmaker</strong><span className="small muted">Book a call, message or email</span></span>
@@ -105,6 +107,7 @@ export default async function Settings({ searchParams }: { searchParams: Promise
         <label className="choice" style={{ alignItems: 'flex-start' }}><input type="checkbox" name="show_online" defaultChecked={Boolean((me as { show_online?: boolean }).show_online)} style={{ accentColor: 'var(--gold)', marginTop: 4, width: 18, height: 18 }} /><span className="stack" style={{ gap: 2 }}><strong>Show when I’m active</strong><span className="small muted">Your matches see “Active now” or “Active in the last hour” in your chat. It’s off by default, and you only see others’ status while yours is on. Turning it off clears your last active time.</span></span></label>
         <button className="btn ghost sm">Save</button>
       </form>
+      <BandCard me={me} mode={await getCreditMode()} />
       <TravelCard me={me} />
       <span className="label" style={{ marginTop: 8 }}>Membership &amp; add-ons</span>
       {['membership', 'premium', 'black', 'paused'].includes(me.plan) && (

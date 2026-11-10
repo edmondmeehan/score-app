@@ -235,3 +235,11 @@ export async function endVisit() {
   revalidatePath('/app', 'layout');
   redirect('/app/settings?saved=1#travel');
 }
+
+// ---------- Credit band ----------
+/** "Still the same": re-confirm the current self-reported band (resets the monthly reminder). */
+export async function confirmBand() {
+  const { supabase } = await ctx();
+  const { error } = await supabase.rpc('confirm_band');
+  redirect('/app/settings?' + (error ? 'error=' + encodeURIComponent(error.message) : 'saved=band') + '#band');
+}

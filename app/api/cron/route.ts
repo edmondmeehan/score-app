@@ -46,6 +46,9 @@ export async function GET(request: NextRequest) {
       // Sunday recap (no-op other days; only goes to people with good news).
       const weekly = await sb.rpc('queue_weekly', { p_secret: secret });
       out.weekly = weekly.data ?? weekly.error?.message;
+      // Monthly nudge to keep self-reported bands current (once per 30 days per member; respects reminder settings).
+      const band = await sb.rpc('queue_band_refresh', { p_secret: secret });
+      out.band_refresh = band.data ?? band.error?.message;
       // Staff daily report (each person once per day, only the sections they picked).
       const rep = await sb.rpc('cron_daily_report', { p_secret: secret });
       if (rep.error) out.admin_daily = rep.error.message;

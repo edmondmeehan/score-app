@@ -31,6 +31,7 @@ export type Profile = {
   band: Band | null;
   trend: 'up' | 'steady' | 'down' | null;
   credit_verified_at: string | null;
+  band_reported_at?: string | null;
   id_status: 'none' | 'pending' | 'approved' | 'declined' | 'review';
   photo_status: 'none' | 'pending' | 'approved' | 'review' | 'rejected';
   status: 'onboarding' | 'preview' | 'active' | 'paused' | 'taken' | 'suspended' | 'removed';
