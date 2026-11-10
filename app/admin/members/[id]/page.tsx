@@ -6,6 +6,7 @@ import { photoUrls } from '@/lib/photos';
 import type { Profile } from '@/lib/types';
 import { DRINKING, EDUCATION, EXERCISE, HAS_KIDS, LOOKING_FOR, PETS, POLITICS, RELIGION, SMOKING, WANTS_KIDS, label } from '@/lib/profileDetails';
 import { staffAct } from '../../actions';
+import { testPush } from './pushActions';
 
 export const dynamic = 'force-dynamic';
 
@@ -63,7 +64,7 @@ function Section({ title, children, right }: { title: string; children: React.Re
   );
 }
 
-export default async function MemberDetail({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string }> }) {
+export default async function MemberDetail({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string; push?: string }> }) {
   const { id } = await params;
   const sp = await searchParams;
   const supabase = await supabaseServer();
@@ -78,6 +79,8 @@ export default async function MemberDetail({ params, searchParams }: { params: P
     photoUrls(supabase, [id], false),
     supabase.rpc('staff_member_usage', { p_user: id }),
   ]);
+  const { data: ps } = await supabase.rpc('staff_push_status', { p_user: id });
+  const push = ps as { devices: { platform: string; tail: string; registered: string; seen: string; last_push: string | null; result: string | null }[]; web: number; recent: { at: string; title: string; push: string; email: string }[] } | null;
   const o = (ov as Overview | null) || null;
   const u = (us as Usage | null) || null;
   const peak = Math.max(1, ...(u?.by_day || []).map((x) => x.n));
@@ -225,6 +228,25 @@ export default async function MemberDetail({ params, searchParams }: { params: P
             <Row k="Invites sent" v={o ? `${o.growth.invites_sent} (${o.growth.invites_redeemed} used)` : '—'} />
             {o && o.growth.referred.length > 0 && <div className="row small" style={{ gap: 8, flexWrap: 'wrap', marginTop: 6 }}><span className="muted">Brought in:</span>{o.growth.referred.map((r) => <Link key={r.id} href={`/admin/members/${r.id}`}>{r.name || 'Member'}</Link>)}</div>}
           </Section>
+
+          {/* Push */}
+          <section id="push" className="card stack" style={{ gap: 6 }}>
+            <div className="row" style={{ justifyContent: 'space-between', gap: 8 }}>
+              <h2 style={{ fontSize: 15, fontWeight: 600 }}>Push notifications</h2>
+              <form action={testPush}><input type="hidden" name="id" value={id} /><button className="btn ghost sm">Send a test push</button></form>
+            </div>
+            {sp.push && <div className="notice small">{sp.push}</div>}
+            {!push ? <span className="small muted">Run migration 0055 to see push status.</span> : (
+              <>
+                {push.devices.length === 0 ? <span className="small muted">No phone registered yet. It registers when they open the app and allow notifications.</span>
+                  : push.devices.map((d) => (
+                    <Row key={d.tail} k={`${d.platform === 'ios' ? 'iPhone' : 'Android'} …${d.tail}`} v={<span>Registered {day(d.registered)} · seen {ago(d.seen)}{d.last_push ? <><br /><span className="muted">Last push {ago(d.last_push)}: {d.result}</span></> : null}</span>} />
+                  ))}
+                <Row k="Web push (browser)" v={push.web ? `${push.web} browser${push.web === 1 ? '' : 's'}` : 'None'} />
+                {push.recent.length > 0 && <span className="small muted" style={{ marginTop: 4 }}>Recent: {push.recent.map((r) => `${r.title} (push ${r.push})`).join(' · ')}</span>}
+              </>
+            )}
+          </section>
 
           {/* Safety */}
           <Section title="Trust & support">

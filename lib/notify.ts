@@ -5,7 +5,7 @@ import { sendBatch } from '@/lib/mailer';
 import { unsubUrl, type UnsubKind } from '@/lib/unsub';
 import { SITE_URL } from '@/lib/emails';
 import { fcmReady, sendNativePush } from '@/lib/fcm';
-import { apnsReady, sendApns } from '@/lib/apns';
+import { apnsReady, sendApns, sendApnsDetail } from '@/lib/apns';
 
 type Sub = { endpoint: string; p256dh: string; auth: string };
 type Claimed = {
@@ -62,8 +62,14 @@ export async function flushNotifications(actorId: string | null = null, limit = 
       const byUser = new Map<string, { token: string; platform: string }[]>();
       for (const t of (toks as { user_id: string; token: string; platform: string }[]) || []) byUser.set(t.user_id, [...(byUser.get(t.user_id) || []), t]);
       // iPhone tokens from the Capacitor app are raw APNs tokens; Android tokens go through Firebase.
-      const send = (t: { token: string; platform: string }, msg: Parameters<typeof sendApns>[1]) =>
-        t.platform === 'ios' && apnsReady() ? sendApns(t.token, msg) : fcmReady() ? sendNativePush(t.token, msg) : Promise.resolve('error' as const);
+      const send = async (t: { token: string; platform: string }, msg: Parameters<typeof sendApns>[1]) => {
+        if (t.platform === 'ios' && apnsReady()) {
+          const d = await sendApnsDetail(t.token, msg);
+          await sb.rpc('native_push_result', { p_secret: secret, p_token: t.token, p_result: d.result === 'ok' ? `ok (${d.host})` : `${d.result}: ${d.status} ${d.reason || ''}`.trim() }).then(() => undefined, () => undefined);
+          return d.result;
+        }
+        return fcmReady() ? sendNativePush(t.token, msg) : ('error' as const);
+      };
       await Promise.all(rows.flatMap((n) => (byUser.get(n.user_id) || []).map(({ token: tk, platform }) =>
         send({ token: tk, platform }, { title: n.title, body: n.body, url: n.url, tag: n.kind, high: n.category === 'interaction' }).then((r) => {
           if (r === 'ok') out.pushed++;
