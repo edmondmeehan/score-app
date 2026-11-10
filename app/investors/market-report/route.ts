@@ -1,9 +1,8 @@
-import { readFile } from 'node:fs/promises';
-import path from 'node:path';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { supabaseAnon } from '@/lib/supabase/server';
 import { INVESTOR_COOKIE, sha256 } from '@/lib/investors';
+import { MARKET_REPORT_PDF_B64 } from '@/lib/marketReportPdf';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,7 +11,7 @@ export async function GET(req: Request) {
   const token = (await cookies()).get(INVESTOR_COOKIE)?.value;
   const room = token ? (await supabaseAnon().rpc('investor_room', { p_token_hash: sha256(token) })).data : null;
   if (!room) return NextResponse.redirect(new URL('/investors', req.url));
-  const pdf = await readFile(path.join(process.cwd(), 'assets/investors/market-report.pdf'));
+  const pdf = Buffer.from(MARKET_REPORT_PDF_B64, 'base64');
   const download = new URL(req.url).searchParams.has('download');
   return new NextResponse(new Uint8Array(pdf), {
     headers: {
