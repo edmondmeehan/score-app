@@ -115,6 +115,7 @@ export default async function MemberDetail({ params, searchParams }: { params: P
             <span className="chip" style={{ textTransform: 'capitalize' }}>{p.status}</span>
             <span className="chip" style={paid ? { borderColor: 'var(--gold-edge)', color: 'var(--gold-light)' } : undefined}>{PLAN_NAME[p.plan] || p.plan}</span>
             {p.is_founder && <span className="chip" style={{ borderColor: 'var(--gold-edge)', color: 'var(--gold-light)' }}>Founding Member</span>}
+            {p.nomad && <span className="chip" style={{ borderColor: 'var(--alert)', color: 'var(--alert)' }} title={`Home zip ${p.zip || '—'} (${p.area || 'unknown area'}) is outside the open areas${p.nomad_since ? ` · since ${day(p.nomad_since)}` : ''}`}>Nomad</span>}
             {p.spotlight_until && new Date(p.spotlight_until) > new Date() && <span className="chip">Spotlight on</span>}
           </div>
           <span className="small muted">{p.email} · Active {ago(p.last_active_at)} · Last sign-in {ago(o?.last_sign_in)} · <span className="mono" style={{ fontSize: 11 }}>{p.id}</span></span>

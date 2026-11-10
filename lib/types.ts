@@ -11,6 +11,9 @@ export type Profile = {
   zip: string | null;
   borough: string | null;
   city: string | null;
+  area?: string | null;
+  nomad?: boolean;
+  nomad_since?: string | null;
   prompt_q: string | null;
   prompt_a: string | null;
   song_id: string | null;

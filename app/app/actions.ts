@@ -160,7 +160,6 @@ export async function saveProfile(form: FormData) {
   const { supabase, user } = await ctx();
   await supabase.from('profiles').update({
     job: String(form.get('job') || '').trim() || null,
-    neighborhood: String(form.get('neighborhood') || '').trim() || null,
     prompt_q: String(form.get('prompt_q') || ''),
     prompt_a: String(form.get('prompt_a') || '').trim() || null,
   }).eq('id', user.id);

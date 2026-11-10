@@ -19,9 +19,17 @@ export async function saveAbout(form: FormData) {
   const { supabase, user } = await ctx();
   const { error } = await supabase.from('profiles').update({
     job: String(form.get('job') || '').trim().slice(0, 80) || null,
-    neighborhood: String(form.get('neighborhood') || '').trim().slice(0, 80) || null,
   }).eq('id', user.id);
-  back(error ? 'error=' + encodeURIComponent(error.message) : 'saved=about');
+  if (error) back('error=' + encodeURIComponent(error.message));
+  // The neighborhood (and Nomad tag) come from the zip, set by the database.
+  const zip = String(form.get('zip') || '').trim();
+  if (zip) {
+    if (!/^[0-9]{5}$/.test(zip)) back('error=' + encodeURIComponent('Enter a 5-digit zip code.'));
+    const { error: zErr } = await supabase.from('profiles').update({ zip }).eq('id', user.id);
+    if (zErr) back('error=' + encodeURIComponent(zErr.message));
+  }
+  revalidatePath('/app', 'layout');
+  back('saved=about');
 }
 
 export async function saveFlags(form: FormData) {

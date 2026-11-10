@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import ZipFields from '@/app/onboarding/basics/ZipFields';
 import { requireMember } from '@/lib/session';
 import { spotifyConfigured } from '@/lib/spotify';
 import { faceMatchConfigured } from '@/lib/facematch';
@@ -136,7 +137,7 @@ export default async function EditProfile({ searchParams }: { searchParams: Prom
       <form id="about" action={saveAbout} className="card stack">
         <span className="label">About you</span>
         <label className="field">What you do<input className="input" name="job" maxLength={80} defaultValue={me.job || ''} /></label>
-        <label className="field">Neighborhood<input className="input" name="neighborhood" maxLength={80} defaultValue={me.neighborhood || ''} /></label>
+        <ZipFields zip={me.zip || ''} neighborhood={me.neighborhood || ''} current />
         <div className="row"><button className="btn ghost sm">Save</button><Link href="/onboarding/quiz" className="small">Retake money quiz</Link></div>
       </form>
 

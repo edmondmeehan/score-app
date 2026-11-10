@@ -82,6 +82,13 @@ export default async function Drop({ searchParams }: { searchParams: Promise<{ o
       <span className="muted small">{preview ? 'Look all you want. Members can say hello, or send a Note.' : `New people every night at ${dropTimeLabel()} ET`}</span>
       {!preview && <DropCountdown at={nextDropAt().toISOString()} label={`${dropTimeLabel()} ET`} />}
       {sp.ok && <div className="notice">{sp.ok}</div>}
+      {me.nomad && (
+        <div className="card gold stack" style={{ gap: 8 }}>
+          <span className="label">You’re a Nomad</span>
+          <span className="small">Your home zip ({me.zip}) is outside the areas ScoreDate has opened, so new Drops are on hold. Your chats and matches are all still here, and we’ll let you know as soon as we open near you.</span>
+          <span className="small muted">Back in NYC? <Link href="/app/profile#about">Update your zip</Link>. Away for a while? You can <Link href="/app/settings">pause your membership</Link> for $4.99 a month.</span>
+        </div>
+      )}
       <PushPrompt />
       {sp.error && <div className="notice error">{sp.error}</div>}
       {checkins.map((c) => (

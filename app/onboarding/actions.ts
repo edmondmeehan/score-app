@@ -32,7 +32,6 @@ export async function saveBasics(form: FormData) {
     gender: String(form.get('gender')),
     seeking: form.getAll('seeking').map(String),
     job: String(form.get('job') || '').trim() || null,
-    neighborhood: String(form.get('neighborhood') || '').trim() || (await lookupZip(zip))?.neighborhood || null,
   }).eq('id', user.id);
   if (error) redirect('/onboarding/basics?error=' + encodeURIComponent(error.message));
   await trackEvent('onboarding_basics', user.id);
@@ -207,4 +206,14 @@ export async function lookupZip(zip: string): Promise<ZipInfo> {
   const { data } = await supabaseAnon().rpc('zip_lookup', { p_zip: zip });
   if (!data) return null;
   return { nyc: Boolean(data.nyc), borough: data.borough ?? null, neighborhood: data.neighborhood ?? null };
+}
+
+export type ZipPreview = { area: string; open: boolean; neighborhood: string | null } | null;
+
+/** What a zip would mean for a member: its neighborhood, and whether ScoreDate is open there. */
+export async function previewZip(zip: string): Promise<ZipPreview> {
+  if (!/^[0-9]{5}$/.test(zip)) return null;
+  const { data } = await supabaseAnon().rpc('zip_preview', { p_zip: zip });
+  if (!data) return null;
+  return { area: String(data.area), open: Boolean(data.open), neighborhood: data.neighborhood ?? null };
 }

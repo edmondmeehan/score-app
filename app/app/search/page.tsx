@@ -36,7 +36,7 @@ export default async function Search({ searchParams }: { searchParams: Promise<S
     searched ? supabase.rpc('member_search', { f, p_page: page }) : Promise.resolve({ data: null, error: null }),
   ]);
   const areas = (areasData as Area[]) || [];
-  const data = search.data as { results: Result[]; total: number; remaining: number | null; limited: boolean; per_page: number } | null;
+  const data = search.data as { results: Result[]; total: number; remaining: number | null; limited: boolean; per_page: number; nomad?: boolean } | null;
   const results = data?.results || [];
   const [photos, vmap] = await Promise.all([photoUrls(supabase, results.map((r) => r.id)), verifiedMap(supabase, results.map((r) => r.id))]);
   const remaining = data ? data.remaining : (remainingData as number | null);
@@ -130,7 +130,14 @@ export default async function Search({ searchParams }: { searchParams: Promise<S
         </div>
       )}
 
-      {data && !data.limited && (
+      {data?.nomad && (
+        <div className="card gold stack" style={{ gap: 8 }}>
+          <span className="serif" style={{ fontSize: 24 }}>Search is on hold while you’re a Nomad</span>
+          <span className="small muted">Your home zip is outside the areas ScoreDate has opened. Back in NYC? <Link href="/app/profile#about">Update your zip</Link>.</span>
+        </div>
+      )}
+
+      {data && !data.limited && !data.nomad && (
         <>
           <span className="small muted">{data.total === 0 ? 'No one matches those filters yet. Try widening them.' : `${data.total} ${data.total === 1 ? 'member' : 'members'}`}</span>
           <div className="stack" style={{ gap: 10 }}>
