@@ -1,4 +1,4 @@
-// Generated list of the creative in assets/creative (served to staff only by /api/admin/asset).
+// Generated list of the creative in public/_creative (served to signed-in staff only; see middleware).
 export type CreativeSection = { key: string; title: string; note: string; files: string[] };
 export const CREATIVE: CreativeSection[] = [
  {

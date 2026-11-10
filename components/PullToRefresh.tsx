@@ -17,6 +17,13 @@ export default function PullToRefresh() {
   const [pending, start] = useTransition();
   const startY = useRef<number | null>(null);
   const armed = useRef(false);
+  const [done, setDone] = useState(false);
+  const was = useRef(false);
+  // When a refresh finishes, show "Updated" for a moment so it's clear the page reloaded.
+  useEffect(() => {
+    if (was.current && !pending) { setDone(true); const t = setTimeout(() => setDone(false), 1400); was.current = false; return () => clearTimeout(t); }
+    if (pending) was.current = true;
+  }, [pending]);
 
   useEffect(() => {
     if (SKIP.some((r) => r.test(path))) return;
@@ -43,12 +50,12 @@ export default function PullToRefresh() {
     return () => { window.removeEventListener('touchstart', down); window.removeEventListener('touchmove', move); window.removeEventListener('touchend', up); window.removeEventListener('touchcancel', up); };
   }, [path, router]);
 
-  const show = pending || pull > 8;
-  const y = pending ? 24 : Math.max(0, pull - 28);
+  const show = pending || done || pull > 8;
+  const y = pending || done ? 24 : Math.max(0, pull - 28);
   return (
     <div className="ptr" aria-hidden={!pending} role="status" aria-label={pending ? 'Refreshing' : undefined}
-      style={{ transform: `translate(-50%, ${y}px)`, opacity: show ? (pending ? 1 : Math.min(1, pull / PULL)) : 0, transition: pull ? 'none' : 'transform .25s, opacity .25s' }}>
-      <GaugeHeart mode="loop" size={34} dur={1.6} paused={!pending} />
+      style={{ transform: `translate(-50%, ${y}px)`, opacity: show ? (pending || done ? 1 : Math.min(1, pull / PULL)) : 0, width: done ? 'auto' : undefined, padding: done ? '0 14px' : undefined, transition: pull ? 'none' : 'transform .25s, opacity .25s' }}>
+      {done ? <span className="small" style={{ color: 'var(--gold-light)', whiteSpace: 'nowrap', fontWeight: 600 }}>Updated</span> : <GaugeHeart mode="loop" size={34} dur={1.6} paused={!pending} />}
     </div>
   );
 }

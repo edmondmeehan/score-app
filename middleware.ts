@@ -28,6 +28,15 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
   const { data: { user } } = hasSession ? await supabase.auth.getUser() : { data: { user: null } };
   const path = request.nextUrl.pathname;
 
+  // Brand creative (public/_creative) is staff-only: anyone else gets a plain 404.
+  if (path.startsWith('/_creative/')) {
+    const staff = user ? (await supabase.rpc('is_staff')).data === true : false;
+    if (!staff) return new NextResponse('Not found', { status: 404, headers: { 'X-Robots-Tag': 'noindex' } });
+    response.headers.set('Cache-Control', 'private, max-age=3600');
+    response.headers.set('X-Robots-Tag', 'noindex');
+    return response;
+  }
+
   // Maintenance mode (Admin → Maintenance). Staff, sign-in, legal pages and webhooks keep working.
   if (!MAINT_OPEN.some((p) => path === p || path.startsWith(p + '/')) && (await maintenanceOn(supabase))) {
     const staff = user ? (await supabase.rpc('is_staff')).data === true : false;

@@ -2,7 +2,8 @@ import { requireStaff } from '@/lib/session';
 import { CREATIVE } from '@/lib/creative';
 
 export const dynamic = 'force-dynamic';
-const src = (p: string) => `/api/admin/asset/${p}`;
+// Files live in public/_creative; middleware only serves them to signed-in staff.
+const src = (p: string) => `/_creative/${p}`;
 const thumb = (k: string, f: string) => src(`_thumbs/${k}_${f.replace(/\.png$/, '.jpg')}`);
 const nice = (f: string) => f.replace(/\.(png|mp4|md|txt)$/, '').replace(/^_/, '').replace(/^\d+-/, '').replace(/-/g, ' ');
 
@@ -33,7 +34,7 @@ export default async function Assets() {
                     : <a href={src(`${s.key}/${f}`)} target="_blank" rel="noopener noreferrer"><img src={thumb(s.key, f)} alt={nice(f)} loading="lazy" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: s.key === 'avatars' ? '50%' : 8 }} /></a>}
                   <div className="row small" style={{ gap: 8, justifyContent: 'space-between' }}>
                     <span className="muted" style={{ textTransform: 'capitalize', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{nice(f)}</span>
-                    <a href={`${src(`${s.key}/${f}`)}?dl=1`} className="small">Download</a>
+                    <a href={src(`${s.key}/${f}`)} download={f} className="small">Download</a>
                   </div>
                 </figure>
               ))}
