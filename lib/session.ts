@@ -51,7 +51,9 @@ export async function afterSignIn(supabase: Sb, dest: string): Promise<string> {
   const { data: onStaff } = await supabase.rpc('am_staff');
   if (onStaff) {
     const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-    if (aal?.currentLevel !== 'aal2') return `/two-step?required=1&next=${encodeURIComponent(dest)}`;
+    if (aal?.currentLevel !== 'aal2') return `/two-step?required=1&next=${encodeURIComponent(dest.startsWith('/onboarding') ? '/app' : dest)}`;
+    // Staff skip the member sign-up steps and the invite check.
+    return dest.startsWith('/onboarding') ? '/app' : dest;
   }
   if (!(dest === '/app' || dest.startsWith('/app/') || dest.startsWith('/onboarding'))) return dest;
   return (await hasInvite(supabase, user.id)) ? dest : '/join?need=1';
@@ -60,6 +62,9 @@ export async function afterSignIn(supabase: Sb, dest: string): Promise<string> {
 export async function requireMember() {
   const ctx = await getMe();
   if (!ctx.user || !ctx.me) redirect('/signin');
+  // Staff can use the whole app without finishing member sign-up (ID check, band, photos) or an invite.
+  const { data: onStaff } = await ctx.supabase.rpc('am_staff');
+  if (onStaff) return ctx as { supabase: typeof ctx.supabase; user: NonNullable<typeof ctx.user>; me: Profile };
   const step = nextStep(ctx.me);
   if (step !== '/app' && !['paused', 'taken'].includes(ctx.me.status)) {
     if (step.startsWith('/onboarding') && !(await hasInvite(ctx.supabase, ctx.user.id))) redirect('/join?need=1');
