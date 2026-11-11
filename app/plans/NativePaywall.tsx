@@ -18,12 +18,16 @@ export default function NativePaywall({ userId, iosKey, androidKey, plans, curre
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ ok?: string; error?: string } | null>(null);
   const [ready, setReady] = useState<boolean | null>(null);
+  // Diagnostics: open /plans?debug=1 in the app to see what the App Store returned.
+  const [diag, setDiag] = useState<string>('');
+  const [debug, setDebug] = useState(false);
+  useEffect(() => { setDebug(new URLSearchParams(window.location.search).has('debug')); }, []);
 
   useEffect(() => {
     (async () => {
       try {
         const mod = await purchases(userId, iosKey, androidKey);
-        if (!mod) { setReady(false); return; }
+        if (!mod) { setDiag(`RevenueCat didn’t start (key: ${iosKey ? iosKey.slice(0, 5) + '…' : 'none'})`); setReady(false); return; }
         const { Purchases, PRODUCT_CATEGORY } = mod as any;
         const [subs, once] = await Promise.all([
           Purchases.getProducts({ productIdentifiers: SUBSCRIPTIONS.map((s) => s.id), type: PRODUCT_CATEGORY.SUBSCRIPTION }),
@@ -32,7 +36,10 @@ export default function NativePaywall({ userId, iosKey, androidKey, plans, curre
         const p: Price = {};
         for (const pr of [...(subs.products || []), ...(once.products || [])]) p[pr.identifier] = { price: pr.priceString, product: pr };
         setPrices(p); setReady(true);
-      } catch (e) { console.warn('[paywall]', e); setReady(false); }
+        const wanted = [...SUBSCRIPTIONS.map((x) => x.id), PREVIEW_PRODUCT];
+        const missing = wanted.filter((id) => !p[id]);
+        setDiag(`Apple returned ${Object.keys(p).length} of ${wanted.length} products. Key ${iosKey ? iosKey.slice(0, 5) + '…' : 'none'}.${missing.length ? ` Missing: ${missing.map((id) => id.replace('co.please.scoredate.', '')).join(', ')}` : ''}`);
+      } catch (e) { console.warn('[paywall]', e); setDiag(`Error: ${(e as Error)?.message || String(e)}`); setReady(false); }
     })();
   }, [userId, iosKey, androidKey]);
 
@@ -70,6 +77,7 @@ export default function NativePaywall({ userId, iosKey, androidKey, plans, curre
     <div className="phone">
       <PageBack />
         <h1 className="serif" style={{ fontSize: 36 }}>Become a member</h1>
+      {debug && <div className="card small mono" style={{ wordBreak: 'break-word' }}>{diag || 'Checking the App Store…'}</div>}
       {ready === false && <div className="notice">The App Store isn’t available right now. Check your connection and try again.</div>}
       <div className="row" role="tablist" style={{ gap: 6, padding: 4, borderRadius: 999, border: '1px solid var(--line-soft)', alignSelf: 'flex-start' }}>
         {[['Monthly', false], ['Annual', true]].map(([l, v]) => (
