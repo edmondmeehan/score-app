@@ -1,7 +1,7 @@
 'use server';
 import { clientIp, verifyHuman } from '@/lib/turnstile';
 import { cookies } from 'next/headers';
-import { supabaseServer } from '@/lib/supabase/server';
+import { supabaseAnon, supabaseServer } from '@/lib/supabase/server';
 import { SITE_URL } from '@/lib/emails';
 import { sendEmail } from '@/lib/mailer';
 import { trackEvent } from '@/lib/track';
@@ -64,6 +64,7 @@ export async function joinWaitlist(_: WaitlistState, form: FormData): Promise<Wa
     sendEmail(email, 'waitlist_joined', { first_name: first || null, place, open, share_url: shareUrl, position: r.position ?? null, founder: Boolean(r.founder) }),
     trackEvent(quick ? 'waitlist_join_app' : 'waitlist_join'),
     r.referred ? trackEvent('waitlist_join_referred') : Promise.resolve(),
+    r.referred ? notifyReferrer(email) : Promise.resolve(),
   ]);
   const joined: Joined = { eventId, code: r.share_code!, token: r.status_token!, position: r.position ?? null, total: r.total ?? null, founder: Boolean(r.founder), founderReason: r.founder_reason ?? null, referred: Boolean(r.referred) };
   return {
@@ -88,4 +89,17 @@ export async function notifyMe(_: unknown, form: FormData) {
   if (error && !error.message.includes('duplicate')) return { ok: false, message: 'Something went wrong. Try again.' };
   if (!error) await Promise.all([sendEmail(email, 'notify_area', { first_name: String(form.get('first_name') || '') || null, zip }), trackEvent('notify_outside_nyc')]);
   return { ok: true, message: "Thanks. We'll email you when ScoreDate opens near you." };
+}
+
+/** A friend joined with someone's link: email them their new spot (and the Founding Member news at 3 friends). */
+async function notifyReferrer(newEmail: string) {
+  try {
+    const { data } = await supabaseAnon().rpc('waitlist_referral_notice', { p_secret: process.env.SCORE_SERVER_SECRET, p_email: newEmail });
+    const n = data as { email: string; first_name: string | null; status_token: string; friend: string | null; position: number | null; referrals: number; referrals_needed: number; founder: boolean; unlocked_founder: boolean; spots_per_referral: number } | null;
+    if (!n?.email) return;
+    await sendEmail(n.email, 'waitlist_referral', {
+      first_name: n.first_name, friend: n.friend, position: n.position, referrals: n.referrals, referrals_needed: n.referrals_needed,
+      founder: n.founder, unlocked_founder: n.unlocked_founder, spots: n.spots_per_referral, share_url: `${SITE_URL}/w/${n.status_token}`,
+    });
+  } catch { /* never block a signup on this */ }
 }

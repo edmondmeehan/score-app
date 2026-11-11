@@ -92,6 +92,28 @@ ScoreDate is invite-only dating for people who are honest about money. Exact cre
 const hi = (name?: string | null) => (name ? `${name},` : 'Hi,');
 
 export const templates = {
+  waitlist_referral: (d: { first_name?: string | null; friend?: string | null; position?: number | null; referrals: number; referrals_needed: number; founder: boolean; unlocked_founder: boolean; spots: number; share_url: string }) => {
+    const who = d.friend || 'A friend';
+    const progress = d.unlocked_founder
+      ? 'That’s 3 friends, so you’re now a Founding Member: a badge on your profile, first in line when invites go out, and extra invites to bring friends.'
+      : d.founder
+        ? `You’re already a Founding Member. Every friend who joins still moves you up ${d.spots} more spots.`
+        : `${d.referrals_needed} more ${d.referrals_needed === 1 ? 'friend' : 'friends'} and you’re a Founding Member: a badge on your profile, first in line, and extra invites.`;
+    return {
+      subject: d.unlocked_founder ? 'You’re a ScoreDate Founding Member' : `${who} joined with your link`,
+      preheader: d.position ? `You moved up to #${d.position.toLocaleString('en-US')} on the waitlist.` : `You moved up ${d.spots} spots on the waitlist.`,
+      eyebrow: 'Waitlist',
+      heading: d.unlocked_founder ? 'You’re a Founding Member.' : 'You moved up.',
+      kind: 'transactional',
+      blocks: [
+        { p: `${hi(d.first_name)} ${who} just joined the ScoreDate waitlist with your link, so you moved up ${d.spots} spots.` },
+        { facts: [...(d.position ? [['Your spot', `#${d.position.toLocaleString('en-US')}`] as [string, string]] : []), ['Friends joined', String(d.referrals)]] },
+        { p: progress },
+        { button: { label: 'Share my link again', url: d.share_url } },
+        { note: `Your link: ${d.share_url}` },
+      ],
+    } satisfies Email;
+  },
   waitlist_joined: (d: { first_name?: string | null; place: string; open: boolean; share_url?: string; position?: number | null; founder?: boolean; again?: boolean }) => {
     const share: Block[] = d.share_url
       ? [
@@ -496,6 +518,7 @@ export type TemplateName = keyof typeof templates;
 /** Sample data for the admin preview page. */
 export const SAMPLES: { [K in TemplateName]: Parameters<(typeof templates)[K]>[0] } = {
   waitlist_joined: { first_name: 'Nadia', place: 'Williamsburg & Greenpoint', open: true, share_url: `${SITE_URL}/w/KH2KVJ`, position: 214, founder: true },
+  waitlist_referral: { first_name: 'Nadia', friend: 'Priya', position: 187, referrals: 3, referrals_needed: 0, founder: true, unlocked_founder: true, spots: 5, share_url: `${SITE_URL}/w/KH2KVJ` },
   notify_area: { first_name: 'Nadia', zip: '07030' },
   invite: { first_name: 'Nadia', code: 'SCR-7KQ2-M9', days: 14, inviter: null },
   date_confirmed: { first_name: 'Nadia', other_name: 'Owen', place: 'Bar Pisellino', address: '52 Grove St, New York, NY 10014', when: 'Thu, Nov 12, 7:30 PM', conversation_id: '00000000-0000-0000-0000-000000000000' },
@@ -528,6 +551,7 @@ export const SAMPLES: { [K in TemplateName]: Parameters<(typeof templates)[K]>[0
 
 export const TEMPLATE_INFO: Record<TemplateName, { label: string; when: string; live: boolean }> = {
   waitlist_joined: { label: 'Waitlist confirmation', when: 'Someone joins the waitlist (open area or opening soon wording by zip)', live: true },
+  waitlist_referral: { label: 'Waitlist: a friend joined with your link', when: 'Someone joins with a waitlist member’s link (their new spot, and the Founding Member news at 3 friends)', live: true },
   notify_area: { label: 'Notify me (legacy)', when: 'Not used now: everyone goes on the waitlist', live: false },
   invite: { label: 'Invite', when: 'Staff emails an invite from the waitlist', live: true },
   date_confirmed: { label: 'Date confirmed + calendar invite', when: 'Both people, when a date is confirmed (with a .ics calendar file attached)', live: true },
