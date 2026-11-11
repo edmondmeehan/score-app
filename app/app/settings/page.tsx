@@ -61,6 +61,12 @@ export default async function Settings({ searchParams }: { searchParams: Promise
       <Link href="/app/week" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="grow">Your week</span><span className="muted">›</span>
       </Link>
+      <div className="card stack">
+        <span className="label">Membership</span>
+        <Link href="/plans">Change plan</Link>
+        <a href="https://apps.apple.com/account/subscriptions">Manage or cancel subscription</a>
+        <span className="small muted">On iPhone, subscriptions are billed and managed by Apple. To restore a purchase on a new phone, open Change plan and tap Restore purchases.</span>
+      </div>
       <form action={setFocusMode} className="card stack" id="focus">
         <span className="label">Focus mode</span>
         <span className="small muted">Keep dating to a few people at a time. With it on, you can’t start new chats while 5 are open. People can still send you Notes.</span>
@@ -123,12 +129,6 @@ export default async function Settings({ searchParams }: { searchParams: Promise
           <button className="btn ghost sm">Save status</button>
         </form>
       )}
-      <div className="card stack">
-        <span className="label">Membership</span>
-        <Link href="/plans">Change plan</Link>
-        <a href="https://apps.apple.com/account/subscriptions">Manage or cancel subscription</a>
-        <span className="small muted">On iPhone, subscriptions are billed and managed by Apple. To restore a purchase on a new phone, open Change plan and tap Restore purchases.</span>
-      </div>
       <Link href="/app/invites" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}><span className="grow">Invites <span className="small muted">· Invite friends and track who joined</span></span><span className="muted">›</span></Link>
       <Link href="/app/shop" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}><span className="grow">Add-ons <span className="small muted">· Spotlight, Extra connections, Notes</span></span><span className="muted">›</span></Link>
       <Link href="/help" className="card row" style={{ textDecoration: 'none', color: 'inherit' }}>
