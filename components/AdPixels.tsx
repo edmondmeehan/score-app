@@ -10,6 +10,8 @@ const META = process.env.NEXT_PUBLIC_META_PIXEL_ID;
 const GADS = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;            // AW-XXXXXXXXX
 const GADS_LEAD = process.env.NEXT_PUBLIC_GOOGLE_ADS_LEAD_LABEL; // conversion label for "Waitlist signup"
 const GA4 = process.env.NEXT_PUBLIC_GA4_ID;                     // G-XXXXXXXXXX (Google Analytics)
+// The Meta Pixel runs on the homepage and /meet only.
+const META_PATHS = /^\/(meet\/?)?$/;
 
 /** Ads may run for this visitor: not opted out, no Global Privacy Control, not a private page. */
 export function adsAllowed(path = typeof location !== 'undefined' ? location.pathname : '/') {
@@ -51,8 +53,8 @@ export default function AdPixels() {
     if (!META && !GADS && !GA4) return;
     if (!adsAllowed(path)) return;
     const w = window as W;
-    loadMeta(w); loadGoogle(w);
-    w.fbq?.('track', 'PageView');
+    if (META_PATHS.test(path)) { loadMeta(w); w.fbq?.('track', 'PageView'); }
+    loadGoogle(w);
     if (GA4) w.gtag?.('event', 'page_view', { send_to: GA4, page_path: path, page_location: location.href, page_title: document.title });
   }, [path]);
   return null;
@@ -62,7 +64,7 @@ export default function AdPixels() {
 export function trackLead(eventId: string) {
   if (!adsAllowed()) return;
   const w = window as W;
-  w.fbq?.('track', 'Lead', {}, { eventID: eventId });
+  if (META_PATHS.test(location.pathname)) w.fbq?.('track', 'Lead', {}, { eventID: eventId });
   if (GADS && GADS_LEAD) w.gtag?.('event', 'conversion', { send_to: `${GADS}/${GADS_LEAD}`, transaction_id: eventId });
   if (GA4) w.gtag?.('event', 'generate_lead', { send_to: GA4 });
 }
