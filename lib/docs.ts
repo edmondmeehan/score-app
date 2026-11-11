@@ -352,6 +352,36 @@ export const DOCS: Record<string, Doc> = {
     ],
   },
 
+  accessibility: {
+    title: 'Accessibility', eyebrow: 'ScoreDate', updated: UPDATED,
+    summary: 'We want everyone who is 25 or older to be able to use ScoreDate. Here is what works today, what we are improving, and how to reach us.',
+    sections: [
+      { id: 'today', h: 'What works today', body: [
+        { ul: [
+          '**Dark and light appearance:** ScoreDate is dark by default. Choose Light, or System to follow your phone, in Settings → Appearance.',
+          '**Reduced motion:** if Reduce Motion is on in your phone’s settings, ScoreDate turns off its larger animations, including the welcome animation, the match celebration and the Spotlight effect.',
+          '**Haptics you control:** vibration feedback can be turned off in Settings → Appearance.',
+          '**Screen readers:** buttons and controls throughout the app are labeled for screen readers like VoiceOver, and we are adding labels where they are still missing.',
+          '**Not color alone:** credit bands always show their name (Building, Solid, Strong, Elite), not just a color, and status is shown in words as well as with dots or colors.',
+        ] },
+      ] },
+      { id: 'working-on', h: 'What we are working on', body: [
+        { ul: [
+          'text that grows with your phone’s text size setting;',
+          'higher contrast for smaller text in the light appearance;',
+          'full screen reader testing of sign-up, the Daily Drop, messaging and purchases;',
+          'captions for member videos and transcripts for voice notes.',
+        ] },
+      ] },
+      { id: 'help', h: 'Need help or found a problem?', body: [
+        'If something in ScoreDate is hard to use with a screen reader, larger text or any other assistive technology, email support@scoredate.app with “Accessibility” in the subject. Tell us the screen and what happened, and we’ll help you directly and fix it. We aim to reply within two business days.',
+      ] },
+      { id: 'contact', h: 'Contact', body: [
+        `${COMPANY}, ${ADDRESS}. Email support@scoredate.app.`,
+      ] },
+    ],
+  },
+
   biometric: {
     title: 'Biometric Data Policy', eyebrow: 'Trust & safety', updated: UPDATED, draft: DRAFT,
     summary: 'We use face comparison for one reason: to confirm that you are you and that your photos show you. Here is exactly how.',
