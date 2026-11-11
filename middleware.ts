@@ -58,6 +58,17 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
     url.searchParams.set('next', path);
     return NextResponse.redirect(url);
   }
+  // Two-step sign-in: someone who turned it on must enter their code before using the app.
+  if (needsAuth && user) {
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (aal?.currentLevel === 'aal1' && aal.nextLevel === 'aal2') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/two-step';
+      url.search = '';
+      url.searchParams.set('next', path + request.nextUrl.search);
+      return NextResponse.redirect(url);
+    }
+  }
   track(request, response, event, user?.id ?? null);
   // Referral links (scoredate.app/?ref=CODE): remember the code for 30 days so the waitlist form can credit it.
   const ref = request.nextUrl.searchParams.get('ref');

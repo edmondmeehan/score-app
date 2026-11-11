@@ -7,6 +7,7 @@ import type { Profile } from '@/lib/types';
 import { DRINKING, EDUCATION, EXERCISE, HAS_KIDS, LOOKING_FOR, PETS, POLITICS, RELIGION, SMOKING, WANTS_KIDS, label } from '@/lib/profileDetails';
 import { staffAct } from '../../actions';
 import { testPush } from './pushActions';
+import { resetTwoStep } from './twoStepActions';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,7 +65,7 @@ function Section({ title, children, right }: { title: string; children: React.Re
   );
 }
 
-export default async function MemberDetail({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string; push?: string }> }) {
+export default async function MemberDetail({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string; push?: string; tfa?: string }> }) {
   const { id } = await params;
   const sp = await searchParams;
   const supabase = await supabaseServer();
@@ -139,6 +140,13 @@ export default async function MemberDetail({ params, searchParams }: { params: P
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16, alignItems: 'start' }}>
+        {/* Two-step sign-in reset (owners only), for a member who lost their phone */}
+        {owner && <Section title="Two-step sign-in">
+          <span className="small muted">If this member lost the phone with their authenticator app, reset it. They sign in with their password and can set it up again.</span>
+          {sp.tfa === 'reset' && <span className="small" style={{ color: 'var(--rise)' }}>Reset. They can sign in with just their password now.</span>}
+          {sp.tfa === 'nokey' && <span className="small" style={{ color: 'var(--alert)' }}>Needs SUPABASE_SERVICE_ROLE_KEY in Vercel to reset.</span>}
+          <form action={resetTwoStep}><input type="hidden" name="id" value={p.id} /><button className="btn ghost sm">Reset two-step sign-in</button></form>
+        </Section>}
         {/* Billing (owners only) */}
         {owner && <Section title="Membership & billing">
           <Row k="Plan" v={`${PLAN_NAME[p.plan] || p.plan}${(p as Profile & { plan_store?: string }).plan_store ? ` · ${({ app_store: 'App Store', play_store: 'Google Play', stripe: 'Web' } as Record<string, string>)[(p as Profile & { plan_store?: string }).plan_store!] || (p as Profile & { plan_store?: string }).plan_store}` : ''}`} />

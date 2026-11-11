@@ -71,11 +71,16 @@ export async function requireMember() {
 export async function requireStaff() {
   const ctx = await getMe();
   if (!ctx.user) redirect('/signin?next=/admin');
+  const path = (await headers()).get('x-sd-path') || '';
+  // Everyone on the staff list must use two-step sign-in; staff powers don't switch on until they do.
+  const { data: onStaff } = await ctx.supabase.rpc('am_staff');
+  if (!onStaff) redirect('/app');
+  const { data: aal } = await ctx.supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (aal?.currentLevel !== 'aal2') redirect(`/two-step?required=1&next=${encodeURIComponent(path.startsWith('/admin') ? path : '/admin')}`);
   const { data: isStaff } = await ctx.supabase.rpc('is_staff');
   if (!isStaff) redirect('/app');
   const [{ data: email }, { data: role }] = await Promise.all([ctx.supabase.rpc('staff_email'), ctx.supabase.rpc('staff_role')]);
   // Role-based access (lib/staffAccess): pages and form actions under /admin check the area they belong to.
-  const path = (await headers()).get('x-sd-path') || '';
   if (path.startsWith('/admin') && !canOpen(role as string | null, path)) redirect('/admin?denied=1');
   return { ...ctx, staffEmail: email as string, staffRole: (role as string) || null };
 }

@@ -5,6 +5,7 @@ import { getMe } from '@/lib/session';
 import { BandPill } from '@/components/ui';
 import ThemeSwitch from '@/components/ThemeSwitch';
 import HapticsToggle from '@/components/HapticsToggle';
+import TwoStepCard from '@/components/TwoStepCard';
 import AppFooter from '@/components/AppFooter';
 import { signOut } from '../../signin/actions';
 import { changeEmail, deleteAccount, setAiIdeas, setFocusMode, setStatus } from '../actions';
@@ -27,6 +28,7 @@ export default async function Settings({ searchParams }: { searchParams: Promise
   const sp = await searchParams;
   const { count: photoCount } = await supabase.from('photos').select('id', { count: 'exact', head: true }).eq('user_id', me.id).neq('match_status', 'rejected');
   const strength = profileStrength(me, photoCount || 0);
+  const { data: onStaff } = await supabase.rpc('am_staff');
   const current = me.status === 'taken' ? 'taken' : me.status === 'paused' ? 'paused' : 'active';
   return (
     <div className="phone">
@@ -77,6 +79,7 @@ export default async function Settings({ searchParams }: { searchParams: Promise
         <HapticsToggle />
         <span className="small muted">System follows your phone&apos;s light or dark mode.</span>
       </div>
+      <TwoStepCard staff={Boolean(onStaff)} />
       <form action={saveNotifyPrefs} className="card stack" id="notifications">
         <span className="label">Notifications</span>
         <PushToggle />
