@@ -4,13 +4,13 @@ import PageBack from '@/components/PageBack';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { purchases, cancelled } from '@/lib/purchasesClient';
-import { SUBSCRIPTIONS, PREVIEW_PRODUCTS, LIFETIME_PRODUCT, MANAGE_SUBSCRIPTIONS_URL } from '@/lib/iap';
+import { SUBSCRIPTIONS, PREVIEW_PRODUCTS, LIFETIME_PRODUCT, LIFETIME_PRODUCT_2, LIFETIME_PRODUCTS, MANAGE_SUBSCRIPTIONS_URL } from '@/lib/iap';
 import { syncPurchases } from '@/app/app/billing';
 import { haptic } from '@/lib/haptics';
 
 type Plan = { key: string; name: string; perks: string };
 type Price = Record<string, { price: string; product: any }>;
-type Lifetime = { enabled: boolean; cap: number; sold: number; left: number; price: string; mine: string | null } | null;
+type Lifetime = { enabled: boolean; cap: number; sold: number; left: number; price: string; mine: string | null; early_cap?: number; early_left?: number; price2?: string; tier?: number } | null;
 
 /** In the iPhone app: real App Store prices, buy with Apple, and Restore purchases (Apple requires it). */
 export default function NativePaywall({ userId, iosKey, androidKey, plans, currentPlan, staff = false, lifetime = null }: { userId: string; iosKey?: string; androidKey?: string; plans: Plan[]; currentPlan: string; staff?: boolean; lifetime?: Lifetime }) {
@@ -34,7 +34,7 @@ export default function NativePaywall({ userId, iosKey, androidKey, plans, curre
         const { Purchases, PRODUCT_CATEGORY } = mod as any;
         const [subs, once] = await Promise.all([
           Purchases.getProducts({ productIdentifiers: SUBSCRIPTIONS.map((s) => s.id), type: PRODUCT_CATEGORY.SUBSCRIPTION }),
-          Purchases.getProducts({ productIdentifiers: [...PREVIEW_PRODUCTS, LIFETIME_PRODUCT], type: PRODUCT_CATEGORY.NON_SUBSCRIPTION }),
+          Purchases.getProducts({ productIdentifiers: [...PREVIEW_PRODUCTS, ...LIFETIME_PRODUCTS], type: PRODUCT_CATEGORY.NON_SUBSCRIPTION }),
         ]);
         const p: Price = {};
         for (const pr of [...(subs.products || []), ...(once.products || [])]) p[pr.identifier] = { price: pr.priceString, product: pr };
@@ -44,7 +44,7 @@ export default function NativePaywall({ userId, iosKey, androidKey, plans, curre
         setPrices(p); setReady(true);
         const wanted = [...SUBSCRIPTIONS.map((x) => x.id), 'preview'];
         const missing = wanted.filter((id) => (id === 'preview' ? !pv : !p[id]));
-        setDiag(`Apple returned ${wanted.length - missing.length} of ${wanted.length} products${pv ? ` (Preview: ${pv.replace('co.please.scoredate.', '')})` : ''}. Key ${iosKey ? iosKey.slice(0, 5) + '…' : 'none'}.${p[LIFETIME_PRODUCT] ? ' Lifetime: yes.' : ' Lifetime: not in store yet.'}${missing.length ? ` Missing: ${missing.map((id) => id.replace('co.please.scoredate.', '')).join(', ')}` : ''}`);
+        setDiag(`Apple returned ${wanted.length - missing.length} of ${wanted.length} products${pv ? ` (Preview: ${pv.replace('co.please.scoredate.', '')})` : ''}. Key ${iosKey ? iosKey.slice(0, 5) + '…' : 'none'}.${` Lifetime: early ${p[LIFETIME_PRODUCT] ? 'yes' : 'not in store'}, regular ${p[LIFETIME_PRODUCT_2] ? 'yes' : 'not in store'}.`}${missing.length ? ` Missing: ${missing.map((id) => id.replace('co.please.scoredate.', '')).join(', ')}` : ''}`);
       } catch (e) { console.warn('[paywall]', e); setDiag(`Error: ${(e as Error)?.message || String(e)}`); setReady(false); }
     })();
   }, [userId, iosKey, androidKey]);
@@ -60,7 +60,7 @@ export default function NativePaywall({ userId, iosKey, androidKey, plans, curre
       haptic('success');
       const RANK = ['none', 'preview', 'paused', 'membership', 'premium', 'black'];
       const isPreview = productId === '__preview';
-      if (productId === LIFETIME_PRODUCT) {
+      if (LIFETIME_PRODUCTS.includes(productId)) {
         setDone({ title: 'Welcome, Founding Lifetime member', detail: 'Premium is yours for as long as ScoreDate runs. No renewals, nothing more to pay. If you had a subscription, cancel it in your App Store settings so you’re not billed again.' });
         router.refresh();
         return;
@@ -127,15 +127,22 @@ export default function NativePaywall({ userId, iosKey, androidKey, plans, curre
           <span className="small muted">Thanks for being one of the first {lifetime.cap}.</span>
         </div>
       )}
-      {lifetime && !lifetime.mine && lifetime.enabled && lifetime.left > 0 && prices[LIFETIME_PRODUCT] && (
-        <div className="card gold stack" style={{ gap: 8 }}>
-          <div className="row" style={{ justifyContent: 'space-between' }}><span className="eyebrow">Founding Lifetime</span><span className="small" style={{ color: 'var(--gold-light)', fontWeight: 600 }}>{lifetime.left} of {lifetime.cap} left</span></div>
-          <div className="row" style={{ justifyContent: 'space-between' }}><strong>Premium for life</strong><strong>{prices[LIFETIME_PRODUCT].price} once</strong></div>
-          <span className="small muted">Everything in Premium for as long as ScoreDate runs. Pay once, never renew. Only {lifetime.cap} will ever be sold.</span>
-          <div style={{ height: 6, borderRadius: 3, background: 'var(--track)' }}><div style={{ height: 6, borderRadius: 3, width: `${Math.min(100, (lifetime.sold / Math.max(1, lifetime.cap)) * 100)}%`, background: 'var(--gold)' }} /></div>
-          <button className="btn block" disabled={Boolean(busy)} onClick={() => buy(LIFETIME_PRODUCT)}>{busy === LIFETIME_PRODUCT ? 'Opening the App Store…' : `Become a Founding member · ${prices[LIFETIME_PRODUCT].price}`}</button>
-        </div>
-      )}
+      {(() => {
+        if (!lifetime || lifetime.mine || !lifetime.enabled || lifetime.left <= 0) return null;
+        const early = (lifetime.tier ?? 1) === 1;
+        const lp = early ? LIFETIME_PRODUCT : LIFETIME_PRODUCT_2;
+        if (!prices[lp]) return null;
+        return (
+          <div className="card gold stack" style={{ gap: 8 }}>
+            <div className="row" style={{ justifyContent: 'space-between' }}><span className="eyebrow">Founding Lifetime</span><span className="small" style={{ color: 'var(--gold-light)', fontWeight: 600 }}>{lifetime.left} of {lifetime.cap} left</span></div>
+            <div className="row" style={{ justifyContent: 'space-between' }}><strong>Premium for life</strong><strong>{prices[lp].price} once</strong></div>
+            {early && <span className="small" style={{ color: 'var(--gold-light)' }}>Early price for the first {lifetime.early_cap}: {lifetime.early_left} left, then {prices[LIFETIME_PRODUCT_2]?.price || lifetime.price2}.</span>}
+            <span className="small muted">Everything in Premium for as long as ScoreDate runs. Pay once, never renew. Only {lifetime.cap} will ever be sold.</span>
+            <div style={{ height: 6, borderRadius: 3, background: 'var(--track)' }}><div style={{ height: 6, borderRadius: 3, width: `${Math.min(100, (lifetime.sold / Math.max(1, lifetime.cap)) * 100)}%`, background: 'var(--gold)' }} /></div>
+            <button className="btn block" disabled={Boolean(busy)} onClick={() => buy(lp)}>{busy === lp ? 'Opening the App Store…' : `Become a Founding member · ${prices[lp].price}`}</button>
+          </div>
+        );
+      })()}
       <div className="stack" style={{ gap: 10 }}>
         {plans.map((p) => {
           const s = sub(p.key);

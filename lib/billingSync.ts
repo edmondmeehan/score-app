@@ -2,7 +2,7 @@ import 'server-only';
 import { getIntegration } from '@/lib/integrations';
 import { planFromEntitlements } from '@/lib/revenuecat';
 import { supabaseAnon } from '@/lib/supabase/server';
-import { LIFETIME_PRODUCT, PREVIEW_PRODUCT, PREVIEW_PRODUCTS, planForProduct, skuForProduct } from '@/lib/iap';
+import { LIFETIME_PRODUCT, LIFETIME_PRODUCTS, PREVIEW_PRODUCT, PREVIEW_PRODUCTS, planForProduct, skuForProduct } from '@/lib/iap';
 
 type Sub = { expires_date?: string | null; is_sandbox?: boolean; store?: string; purchase_date?: string };
 type NonSub = { id?: string; store_transaction_id?: string; purchase_date?: string; is_sandbox?: boolean; store?: string };
@@ -39,7 +39,7 @@ export async function syncFromStore(userId: string): Promise<{ plan: string; add
   const sb = supabaseAnon(); const secret = process.env.SCORE_SERVER_SECRET;
 
   // Founding Lifetime: owned forever, so Premium at least.
-  const lifetime = (nonSubs[LIFETIME_PRODUCT] || [])[0];
+  const lifetime = LIFETIME_PRODUCTS.map((id) => (nonSubs[id] || [])[0]).find(Boolean);
   if (lifetime) {
     await sb.rpc('grant_lifetime', { p_secret: secret, p_user: userId, p_ref: String(lifetime.store_transaction_id || lifetime.id || 'lifetime'), p_environment: lifetime.is_sandbox ? 'SANDBOX' : 'PRODUCTION' });
     if (['none', 'preview', 'paused', 'membership'].includes(plan)) plan = 'premium';

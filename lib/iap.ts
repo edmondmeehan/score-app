@@ -17,6 +17,9 @@ export const SUBSCRIPTIONS = [
 export const PREVIEW_PRODUCT = `${BUNDLE}.preview.30day`;
 /** Founding Lifetime: one-time (non-consumable) purchase that unlocks Premium for as long as ScoreDate runs. */
 export const LIFETIME_PRODUCT = `${BUNDLE}.lifetime.premium`;
+/** Founding Lifetime, regular price (sold once the early-price spots are gone). Same unlock as LIFETIME_PRODUCT. */
+export const LIFETIME_PRODUCT_2 = `${BUNDLE}.lifetime.premium.tier2`;
+export const LIFETIME_PRODUCTS = [LIFETIME_PRODUCT, LIFETIME_PRODUCT_2];
 
 /** Every Preview product ID we accept (the first ID was taken on Apple's side, so the old one stays as a fallback). */
 export const PREVIEW_PRODUCTS = [PREVIEW_PRODUCT, `${BUNDLE}.preview.once`];
