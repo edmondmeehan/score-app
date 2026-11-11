@@ -26,12 +26,16 @@ export async function saveBasics(form: FormData) {
   if (!year || new Date().getFullYear() - year < minAge) redirect('/onboarding/basics?error=' + encodeURIComponent('ScoreDate members must be 25 or older.'));
   const zip = String(form.get('zip') || '').trim();
   if (!/^[0-9]{5}$/.test(zip)) redirect('/onboarding/basics?error=' + encodeURIComponent('Add your 5-digit home zip code.'));
+  const seeking = form.getAll('seeking').map(String).filter((g) => ['woman', 'man', 'nonbinary'].includes(g));
+  if (!seeking.length) redirect('/onboarding/basics?error=' + encodeURIComponent('Choose who you’d like to meet.'));
+  const gender = String(form.get('gender') || '');
+  if (!['woman', 'man', 'nonbinary'].includes(gender)) redirect('/onboarding/basics?error=' + encodeURIComponent('Choose your gender.'));
   const { error } = await supabase.from('profiles').update({
     zip,
     first_name: String(form.get('first_name') || '').trim(),
     birth_year: year,
-    gender: String(form.get('gender')),
-    seeking: form.getAll('seeking').map(String),
+    gender,
+    seeking,
     job: String(form.get('job') || '').trim() || null,
   }).eq('id', user.id);
   if (error) redirect('/onboarding/basics?error=' + encodeURIComponent(error.message));
