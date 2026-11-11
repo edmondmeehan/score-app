@@ -4,7 +4,7 @@ import PageBack from '@/components/PageBack';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { purchases, cancelled } from '@/lib/purchasesClient';
-import { SUBSCRIPTIONS, PREVIEW_PRODUCT, MANAGE_SUBSCRIPTIONS_URL } from '@/lib/iap';
+import { SUBSCRIPTIONS, PREVIEW_PRODUCTS, MANAGE_SUBSCRIPTIONS_URL } from '@/lib/iap';
 import { syncPurchases } from '@/app/app/billing';
 
 type Plan = { key: string; name: string; perks: string };
@@ -30,14 +30,17 @@ export default function NativePaywall({ userId, iosKey, androidKey, plans, curre
         const { Purchases, PRODUCT_CATEGORY } = mod as any;
         const [subs, once] = await Promise.all([
           Purchases.getProducts({ productIdentifiers: SUBSCRIPTIONS.map((s) => s.id), type: PRODUCT_CATEGORY.SUBSCRIPTION }),
-          Purchases.getProducts({ productIdentifiers: [PREVIEW_PRODUCT], type: PRODUCT_CATEGORY.NON_SUBSCRIPTION }),
+          Purchases.getProducts({ productIdentifiers: PREVIEW_PRODUCTS, type: PRODUCT_CATEGORY.NON_SUBSCRIPTION }),
         ]);
         const p: Price = {};
         for (const pr of [...(subs.products || []), ...(once.products || [])]) p[pr.identifier] = { price: pr.priceString, product: pr };
+        // Preview: use whichever Preview ID Apple returned.
+        const pv = PREVIEW_PRODUCTS.find((id) => p[id]);
+        if (pv) p.__preview = p[pv];
         setPrices(p); setReady(true);
-        const wanted = [...SUBSCRIPTIONS.map((x) => x.id), PREVIEW_PRODUCT];
-        const missing = wanted.filter((id) => !p[id]);
-        setDiag(`Apple returned ${Object.keys(p).length} of ${wanted.length} products. Key ${iosKey ? iosKey.slice(0, 5) + '…' : 'none'}.${missing.length ? ` Missing: ${missing.map((id) => id.replace('co.please.scoredate.', '')).join(', ')}` : ''}`);
+        const wanted = [...SUBSCRIPTIONS.map((x) => x.id), 'preview'];
+        const missing = wanted.filter((id) => (id === 'preview' ? !pv : !p[id]));
+        setDiag(`Apple returned ${wanted.length - missing.length} of ${wanted.length} products${pv ? ` (Preview: ${pv.replace('co.please.scoredate.', '')})` : ''}. Key ${iosKey ? iosKey.slice(0, 5) + '…' : 'none'}.${missing.length ? ` Missing: ${missing.map((id) => id.replace('co.please.scoredate.', '')).join(', ')}` : ''}`);
       } catch (e) { console.warn('[paywall]', e); setDiag(`Error: ${(e as Error)?.message || String(e)}`); setReady(false); }
     })();
   }, [userId, iosKey, androidKey]);
@@ -99,9 +102,9 @@ export default function NativePaywall({ userId, iosKey, androidKey, plans, curre
           );
         })}
         <div className="card stack" style={{ gap: 8 }}>
-          <div className="row" style={{ justifyContent: 'space-between' }}><strong>Preview</strong><strong>{prices[PREVIEW_PRODUCT]?.price || '$9.99'} once</strong></div>
+          <div className="row" style={{ justifyContent: 'space-between' }}><strong>Preview</strong><strong>{prices.__preview?.price || '$9.99'} once</strong></div>
           <span className="small muted">30 days, 5 matches you can view but not message. Doesn’t renew.</span>
-          <button className="btn ghost block" disabled={Boolean(busy) || currentPlan === 'preview'} onClick={() => buy(PREVIEW_PRODUCT)}>{busy === PREVIEW_PRODUCT ? 'Opening the App Store…' : 'Try Preview'}</button>
+          <button className="btn ghost block" disabled={Boolean(busy) || currentPlan === 'preview'} onClick={() => buy('__preview')}>{busy === '__preview' ? 'Opening the App Store…' : 'Try Preview'}</button>
         </div>
       </div>
       {msg?.ok && <div className="notice">{msg.ok}</div>}

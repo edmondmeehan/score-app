@@ -14,7 +14,9 @@ export const SUBSCRIPTIONS = [
 ] as const;
 
 /** One-time: Preview (30 days, non-renewing) and consumable add-ons (sku = addon_catalog sku). */
-export const PREVIEW_PRODUCT = `${BUNDLE}.preview.once`;
+export const PREVIEW_PRODUCT = `${BUNDLE}.preview.30day`;
+/** Every Preview product ID we accept (the first ID was taken on Apple's side, so the old one stays as a fallback). */
+export const PREVIEW_PRODUCTS = [PREVIEW_PRODUCT, `${BUNDLE}.preview.once`];
 export const ADDON_PRODUCTS: Record<string, string> = {
   extra_drop_1: `${BUNDLE}.addon.extra_drop_1`,
   spotlight_1: `${BUNDLE}.addon.spotlight_1`,

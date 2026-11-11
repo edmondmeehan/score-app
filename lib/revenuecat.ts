@@ -1,6 +1,6 @@
 import 'server-only';
 import { getIntegration } from '@/lib/integrations';
-import { PREVIEW_PRODUCT } from '@/lib/iap';
+import { PREVIEW_PRODUCTS } from '@/lib/iap';
 
 const RANK = ['none', 'preview', 'paused', 'membership', 'premium', 'black'] as const;
 export type Plan = (typeof RANK)[number];
@@ -20,7 +20,7 @@ export async function planFromEntitlements(active: string[]): Promise<Plan> {
 export async function isPreviewProduct(productId: string | null | undefined) {
   if (!productId) return false;
   const [apple, google] = await Promise.all([getIntegration('apple'), getIntegration('google')]);
-  return [PREVIEW_PRODUCT, apple.config.products?.preview_once, google.config.products?.preview_once].filter(Boolean).includes(productId);
+  return [...PREVIEW_PRODUCTS, apple.config.products?.preview_once, google.config.products?.preview_once].filter(Boolean).includes(productId);
 }
 
 /** Ask RevenueCat for the subscriber's current entitlements (source of truth). */

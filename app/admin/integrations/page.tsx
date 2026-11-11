@@ -41,7 +41,8 @@ export default async function Integrations({ searchParams }: { searchParams: Pro
               {s.fields.map((f) => f.secret ? (
                 <div key={f.key} className="field">
                   <label htmlFor={`${s.provider}-${f.key}`}>{f.label} {r?.secret_hints?.[f.key] ? <span style={{ color: 'var(--rise)' }}>· set {r.secret_hints[f.key].hint}</span> : <span style={{ color: 'var(--faint)' }}>· not set</span>}</label>
-                  <input id={`${s.provider}-${f.key}`} className="input mono" type="password" name={`sec:${f.key}`} autoComplete="off" placeholder={r?.secret_hints?.[f.key] ? 'Leave blank to keep current' : f.placeholder} disabled={!owner} />
+                  {/* Not type="password": browsers and password managers were auto-filling a saved key into every secret box on Save. */}
+                  <input id={`${s.provider}-${f.key}`} className="input mono secret-input" type="text" name={`sec:${f.key}`} autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false} data-1p-ignore="true" data-lpignore="true" data-bwignore="true" data-form-type="other" placeholder={r?.secret_hints?.[f.key] ? 'Leave blank to keep current' : f.placeholder} disabled={!owner} />
                   {r?.secret_hints?.[f.key] && owner && <label className="row small"><input type="checkbox" name={`clear:${f.key}`} />Clear this key</label>}
                   {f.help && <span className="small muted">{f.help}</span>}
                 </div>

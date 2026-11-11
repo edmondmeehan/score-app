@@ -2,7 +2,7 @@ import 'server-only';
 import { getIntegration } from '@/lib/integrations';
 import { planFromEntitlements } from '@/lib/revenuecat';
 import { supabaseAnon } from '@/lib/supabase/server';
-import { PREVIEW_PRODUCT, skuForProduct } from '@/lib/iap';
+import { PREVIEW_PRODUCT, PREVIEW_PRODUCTS, skuForProduct } from '@/lib/iap';
 
 type Sub = { expires_date?: string | null; is_sandbox?: boolean; store?: string; purchase_date?: string };
 type NonSub = { id?: string; store_transaction_id?: string; purchase_date?: string; is_sandbox?: boolean; store?: string };
@@ -29,7 +29,7 @@ export async function syncFromStore(userId: string): Promise<{ plan: string; add
   const sb = supabaseAnon(); const secret = process.env.SCORE_SERVER_SECRET;
 
   // Preview: a one-time purchase in the last 30 days counts if there's no subscription.
-  const preview = (nonSubs[PREVIEW_PRODUCT] || []).find((p) => p.purchase_date && now - new Date(p.purchase_date).getTime() < 31 * 86400000);
+  const preview = PREVIEW_PRODUCTS.flatMap((id) => nonSubs[id] || []).find((p) => p.purchase_date && now - new Date(p.purchase_date).getTime() < 31 * 86400000);
   if (plan === 'none' && preview) plan = 'preview';
 
   if (plan !== 'none') {

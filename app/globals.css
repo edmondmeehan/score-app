@@ -524,3 +524,6 @@ a.chip { text-decoration: none; color: inherit; }
 /* Back button floating over a full-bleed profile photo. */
 .photo-back { position: absolute; top: calc(12px + env(safe-area-inset-top)); left: 14px; z-index: 2; width: 40px; height: 40px; border-radius: 999px; display: grid; place-items: center; color: #fff; background: rgba(11,11,12,.45); border: 1px solid rgba(255,255,255,.18); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); cursor: pointer; padding: 0; }
 .photo-back:active { transform: scale(.94); }
+
+/* Admin secret boxes: hide what's typed without being a password field (so password managers leave them alone). */
+.secret-input { -webkit-text-security: disc; text-security: disc; }
