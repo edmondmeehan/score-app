@@ -5,6 +5,7 @@ import NativePush from '@/components/NativePush';
 import PresenceBeat from '@/components/PresenceBeat';
 import PullToRefresh from '@/components/PullToRefresh';
 import { getMe } from '@/lib/session';
+import SpotlightGlow from '@/components/SpotlightGlow';
 import { getIntegration } from '@/lib/integrations';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -15,6 +16,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <>
       <PullToRefresh>{children}</PullToRefresh>
       <TabBar />
+      <SpotlightGlow until={(me as { spotlight_until?: string | null } | null)?.spotlight_until} />
       <AppFeedback />
       {user && <NativePush />}
       {user && <PresenceBeat on={Boolean((me as { show_online?: boolean } | null)?.show_online)} />}

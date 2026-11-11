@@ -527,3 +527,11 @@ a.chip { text-decoration: none; color: inherit; }
 
 /* Admin secret boxes: hide what's typed without being a password field (so password managers leave them alone). */
 .secret-input { -webkit-text-security: disc; text-security: disc; }
+
+/* Spotlight: a soft gold glow around the app while a member is featured, plus a small pill at the top. */
+.spot-glow { position: fixed; inset: 0; z-index: 25; pointer-events: none; box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--gold) 45%, transparent), inset 0 0 60px color-mix(in srgb, var(--gold) 22%, transparent); background: radial-gradient(120% 40% at 50% 0%, color-mix(in srgb, var(--gold) 14%, transparent), transparent 70%); transition: opacity .6s; }
+.spot-glow.pulse { animation: spot-pulse 1.6s ease-out; }
+@keyframes spot-pulse { 0% { opacity: 0; } 25% { opacity: 1; box-shadow: inset 0 0 0 3px var(--gold), inset 0 0 120px color-mix(in srgb, var(--gold) 45%, transparent); } 100% { opacity: 1; } }
+.spot-pill { position: fixed; bottom: calc(92px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 26; padding: 6px 14px; border-radius: 999px; font: 600 12px var(--sans); letter-spacing: .02em; color: var(--on-gold); background: var(--gold); box-shadow: 0 6px 18px color-mix(in srgb, var(--gold) 35%, transparent); white-space: nowrap; pointer-events: none; }
+html.spotlit .btn:not(.ghost) { box-shadow: 0 0 0 1px color-mix(in srgb, var(--gold) 30%, transparent), 0 6px 20px color-mix(in srgb, var(--gold) 28%, transparent); }
+@media (prefers-reduced-motion: reduce) { .spot-glow.pulse { animation: none; } }
