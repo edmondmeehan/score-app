@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { getIntegration } from '@/lib/integrations';
 import { activeEntitlements, isPreviewProduct, planFromEntitlements } from '@/lib/revenuecat';
 import { supabaseAnon } from '@/lib/supabase/server';
-import { skuForProduct } from '@/lib/iap';
+import { planForProduct, skuForProduct } from '@/lib/iap';
 
 // RevenueCat → ScoreDate. In RevenueCat: Project settings → Integrations → Webhooks.
 //   URL: https://<domain>/api/billing/revenuecat
@@ -37,6 +37,11 @@ export async function POST(req: Request) {
     plan = 'unchanged';
   } else {
     plan = await planFromEntitlements(e.entitlement_ids || (e.entitlement_id ? [e.entitlement_id] : []));
+  }
+  // Backup when no RevenueCat entitlement is attached: use the subscription product itself while it's unexpired.
+  if (plan === 'none' && e.type !== 'EXPIRATION' && (!e.expiration_at_ms || e.expiration_at_ms > Date.now())) {
+    const pp = planForProduct(e.new_product_id || e.product_id);
+    if (pp) plan = pp;
   }
   if ((e.type === 'NON_RENEWING_PURCHASE' || e.type === 'INITIAL_PURCHASE') && (await isPreviewProduct(e.product_id)) && plan === 'none') plan = 'preview';
 

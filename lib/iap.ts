@@ -27,3 +27,6 @@ export const skuForProduct = (productId: string | null | undefined) =>
   Object.entries(ADDON_PRODUCTS).find(([, p]) => p === productId)?.[0] ?? null;
 
 export const MANAGE_SUBSCRIPTIONS_URL = 'https://apps.apple.com/account/subscriptions';
+
+/** ScoreDate plan for a subscription product ID (used when RevenueCat entitlements aren't attached). */
+export const planForProduct = (productId: string | null | undefined) => SUBSCRIPTIONS.find((x) => x.id === productId)?.plan ?? null;

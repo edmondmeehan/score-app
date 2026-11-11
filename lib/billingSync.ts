@@ -2,7 +2,7 @@ import 'server-only';
 import { getIntegration } from '@/lib/integrations';
 import { planFromEntitlements } from '@/lib/revenuecat';
 import { supabaseAnon } from '@/lib/supabase/server';
-import { PREVIEW_PRODUCT, PREVIEW_PRODUCTS, skuForProduct } from '@/lib/iap';
+import { PREVIEW_PRODUCT, PREVIEW_PRODUCTS, planForProduct, skuForProduct } from '@/lib/iap';
 
 type Sub = { expires_date?: string | null; is_sandbox?: boolean; store?: string; purchase_date?: string };
 type NonSub = { id?: string; store_transaction_id?: string; purchase_date?: string; is_sandbox?: boolean; store?: string };
@@ -24,7 +24,17 @@ export async function syncFromStore(userId: string): Promise<{ plan: string; add
     .filter(([, e]) => !e.expires_date || new Date(e.expires_date).getTime() > now);
   let plan: string = await planFromEntitlements(ents.map(([k]) => k));
   const subs = (s.subscriptions || {}) as Record<string, Sub>;
-  const activeSub = ents.map(([, e]) => subs[e.product_identifier || '']).find(Boolean);
+  let activeSub = ents.map(([, e]) => subs[e.product_identifier || '']).find(Boolean);
+  let subProduct: string | null = null;
+  // Backup: if no entitlement is attached in RevenueCat, use the active subscription's product (highest plan wins).
+  if (plan === 'none') {
+    const RANK = ['membership', 'premium', 'black'];
+    for (const [pid, sub] of Object.entries(subs)) {
+      const pp = planForProduct(pid);
+      if (!pp || !sub.expires_date || new Date(sub.expires_date).getTime() <= now) continue;
+      if (plan === 'none' || RANK.indexOf(pp) > RANK.indexOf(plan)) { plan = pp; activeSub = sub; subProduct = pid; }
+    }
+  }
   const nonSubs = (s.non_subscriptions || {}) as Record<string, NonSub[]>;
   const sb = supabaseAnon(); const secret = process.env.SCORE_SERVER_SECRET;
 
@@ -35,7 +45,7 @@ export async function syncFromStore(userId: string): Promise<{ plan: string; add
   if (plan !== 'none') {
     await sb.rpc('record_billing_event', {
       p_server_secret: secret, p_event_id: `app_sync:${userId}:${now}`, p_user: userId, p_type: 'APP_SYNC',
-      p_store: activeSub?.store || preview?.store || 'app_store', p_product: ents[0]?.[1]?.product_identifier || (preview ? PREVIEW_PRODUCT : null),
+      p_store: activeSub?.store || preview?.store || 'app_store', p_product: ents[0]?.[1]?.product_identifier || subProduct || (preview ? PREVIEW_PRODUCT : null),
       p_entitlement: ents[0]?.[0] || null, p_plan: plan, p_expires: activeSub?.expires_date || null,
       p_environment: (activeSub?.is_sandbox ?? preview?.is_sandbox) ? 'SANDBOX' : 'PRODUCTION',
     });

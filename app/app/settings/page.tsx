@@ -32,7 +32,7 @@ export default async function Settings({ searchParams }: { searchParams: Promise
   const current = me.status === 'taken' ? 'taken' : me.status === 'paused' ? 'paused' : 'active';
   return (
     <div className="phone">
-      <div className="row"><div className="stack grow" style={{ gap: 4 }}><span className="serif" style={{ fontSize: 32 }}>{me.first_name || 'You'}</span><span className="small muted">{me.plan} · {me.status}</span>{me.is_founder && <FounderBadge />}</div><BandPill band={me.band} trend={me.trend} verified={Boolean(me.credit_verified_at)} /></div>
+      <div className="row"><div className="stack grow" style={{ gap: 4 }}><span className="serif" style={{ fontSize: 32 }}>{me.first_name || 'You'}</span><span className="small muted">{onStaff ? `Team access (all features) · paid plan: ${(me as { paid_plan?: string | null }).paid_plan || 'none'}` : `${me.plan} · ${me.status}`}</span>{me.is_founder && <FounderBadge />}</div><BandPill band={me.band} trend={me.trend} verified={Boolean(me.credit_verified_at)} /></div>
       {me.status === 'suspended' && <div className="notice error">Your account is suspended. Check your email for details and how to appeal.</div>}
       {sp.error && <div className="notice error">{sp.error}</div>}
       {sp.ok && <div className="notice">{sp.ok}</div>}

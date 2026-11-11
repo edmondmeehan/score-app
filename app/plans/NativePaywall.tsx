@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { purchases, cancelled } from '@/lib/purchasesClient';
 import { SUBSCRIPTIONS, PREVIEW_PRODUCTS, MANAGE_SUBSCRIPTIONS_URL } from '@/lib/iap';
 import { syncPurchases } from '@/app/app/billing';
+import { haptic } from '@/lib/haptics';
 
 type Plan = { key: string; name: string; perks: string };
 type Price = Record<string, { price: string; product: any }>;
@@ -18,6 +19,8 @@ export default function NativePaywall({ userId, iosKey, androidKey, plans, curre
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ ok?: string; error?: string } | null>(null);
   const [ready, setReady] = useState<boolean | null>(null);
+  // After a purchase: a confirmation screen instead of jumping away.
+  const [done, setDone] = useState<{ title: string; detail: string } | null>(null);
   // Diagnostics for the ScoreDate team (shown only to staff): what the App Store returned.
   const [diag, setDiag] = useState<string>('');
   const debug = staff;
@@ -52,9 +55,22 @@ export default function NativePaywall({ userId, iosKey, androidKey, plans, curre
     try {
       const mod = await purchases(userId, iosKey, androidKey);
       await (mod as any).Purchases.purchaseStoreProduct({ product: item.product });
-      const r = await syncPurchases('plan');
-      if (r.error) setMsg({ ok: 'Thank you! Your purchase went through. It can take a minute to show up.' });
-      router.push('/app?welcome=1');
+      await syncPurchases('plan').catch(() => null);
+      haptic('success');
+      const RANK = ['none', 'preview', 'paused', 'membership', 'premium', 'black'];
+      const isPreview = productId === '__preview';
+      const sub = SUBSCRIPTIONS.find((x) => x.id === productId);
+      const name = isPreview ? 'Preview' : plans.find((p) => p.key === sub?.plan)?.name || 'your new plan';
+      const downgrade = !isPreview && sub && RANK.indexOf(sub.plan) < RANK.indexOf(currentPlan) && currentPlan !== 'none';
+      setDone({
+        title: isPreview ? 'Your Preview has started' : downgrade ? `You’re switching to ${name}` : `Welcome to ${name}`,
+        detail: isPreview
+          ? 'You have 30 days to see your matches. It won’t renew.'
+          : downgrade
+            ? `Apple keeps your current plan until the end of this billing period, then switches you to ${name}. You won’t be charged twice.`
+            : `Your ${name} membership is active${sub ? ` and renews ${sub.period === 'year' ? 'yearly' : 'monthly'} until you cancel` : ''}. A receipt is on its way from Apple.`,
+      });
+      router.refresh();
     } catch (e) {
       if (!cancelled(e)) setMsg({ error: 'The purchase didn’t go through. You haven’t been charged.' });
     } finally { setBusy(null); }
@@ -76,6 +92,18 @@ export default function NativePaywall({ userId, iosKey, androidKey, plans, curre
   const isCurrent = (plan: string) => currentPlan === plan;
 
   return (
+    done ? (
+      <div className="phone" style={{ justifyContent: 'center' }}>
+        <div className="card gold stack" style={{ gap: 14, textAlign: 'center', alignItems: 'center', padding: 28 }}>
+          <span style={{ fontSize: 44, color: 'var(--gold)' }} aria-hidden="true">✓</span>
+          <span className="serif" style={{ fontSize: 32 }}>{done.title}</span>
+          <span className="small muted" style={{ lineHeight: 1.5 }}>{done.detail}</span>
+          {staff && <span className="small muted">Your team account always has full access, so it keeps showing Reserve.</span>}
+          <a className="btn block" href="/app?welcome=1">Continue</a>
+          <a className="small" href={MANAGE_SUBSCRIPTIONS_URL}>Manage subscription</a>
+        </div>
+      </div>
+    ) : (
     <div className="phone">
       <PageBack />
         <h1 className="serif" style={{ fontSize: 36 }}>Become a member</h1>
@@ -117,5 +145,6 @@ export default function NativePaywall({ userId, iosKey, androidKey, plans, curre
         Payment is charged to your Apple ID when you confirm. Subscriptions renew automatically at the same price unless cancelled at least 24 hours before the end of the current period. Manage or cancel any time in your App Store account settings. <a href="/legal/terms">Terms of Use</a> · <a href="/legal/privacy">Privacy Policy</a>
       </p>
     </div>
+    )
   );
 }
