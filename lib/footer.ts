@@ -21,9 +21,9 @@ export const FOOTER_DEFAULT: FooterConfig = {
   email: 'support@scoredate.app',
   columns: [
     { title: 'ScoreDate', links: [{ label: 'How it works', href: '/#how' }, { label: 'Where we’re live', href: '/#where' }, { label: 'Request an invite', href: '/#invite' }, { label: 'I have a code', href: '/join' }, { label: 'Sign in', href: '/signin' }, { label: 'Help center', href: '/help' }] },
-    { title: 'Trust & safety', links: [{ label: 'Safety center', href: '/safety' }, { label: 'Community guidelines', href: '/legal/community' }, { label: 'Biometric data policy', href: '/legal/biometric' }, { label: 'Report a concern', href: '/safety#report' }] },
+    { title: 'Trust & safety', links: [{ label: 'Safety center', href: '/safety' }, { label: 'Community guidelines', href: '/legal/community' }, { label: 'Biometric data policy', href: '/legal/biometric' }, { label: 'Report a concern', href: '/safety#report' }, { label: 'Age requirements', href: '/legal/age' }] },
     { title: 'Company', links: [{ label: 'Partners', href: '/partners' }, { label: 'Press', href: '/press' }, { label: 'Brand & marketing', href: '/brand' }, { label: 'Contact', href: '/contact' }] },
-    { title: 'Legal', links: [{ label: 'Terms of Service', href: '/legal/terms' }, { label: 'Privacy Policy', href: '/legal/privacy' }, { label: 'Your privacy choices', href: '/legal/choices' }, { label: 'Cookie notice', href: '/legal/cookies' }] },
+    { title: 'Legal', links: [{ label: 'Terms of Service', href: '/legal/terms' }, { label: 'Privacy Policy', href: '/legal/privacy' }, { label: 'Your privacy choices', href: '/legal/choices' }, { label: 'Cookie notice', href: '/legal/cookies' }, { label: 'Accessibility', href: '/legal/accessibility' }] },
   ],
   copyright: '© {year} ScoreDate, LLC. All rights reserved. Members must be 25+.',
   disclaimer: 'ScoreDate is not a credit bureau, lender or credit repair service. ScoreDate never sees or stores your exact score or credit report. In an emergency, call 911.',
