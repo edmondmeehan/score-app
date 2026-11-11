@@ -311,6 +311,47 @@ export const DOCS: Record<string, Doc> = {
     ],
   },
 
+  age: {
+    title: 'Age Requirements and Content', eyebrow: 'Trust & safety', updated: UPDATED,
+    summary: 'ScoreDate is a dating app for adults 25 and older. Here is how we keep it that way and what members can expect to see.',
+    sections: [
+      { id: 'who', h: 'Who ScoreDate is for', body: [
+        'ScoreDate is an invite-only dating app for adults **25 and older**. It is not intended for, and may not be used by, anyone younger than 25. It is never directed at children, and no one under 13 may create an account or give us information.',
+      ] },
+      { id: 'how', h: 'How we check age', body: [
+        { ul: [
+          '**At sign-up:** every member enters their birth year. Anyone younger than 25 can’t continue, and our database refuses any profile with an under-25 birth year.',
+          '**Government ID check:** before a member can see matches or message anyone, they verify their identity with a government-issued photo ID and a live selfie through our identity verification partner. If the birthdate on the ID shows the person is younger than 25, the account is never approved automatically and goes to our team, who decline it.',
+          '**Ongoing:** members can report anyone they believe is underage from any profile or chat, and our team reviews reports, usually within 24 hours. Accounts found to belong to anyone under 25 are removed.',
+        ] },
+      ] },
+      { id: 'children', h: 'Children’s privacy', body: [
+        'We don’t knowingly collect personal information from children under 13, or from anyone under 18. If we learn that we have, we delete it and close the account. Parents or guardians who believe a minor has signed up can email support@scoredate.app and we’ll act right away.',
+      ] },
+      { id: 'content', h: 'What members can see and do', body: [
+        'ScoreDate is a dating service, so it includes:',
+        { ul: [
+          'profiles with photos, written prompts and short videos created by other members;',
+          'private messaging, voice notes and photos shared between matched members;',
+          'date planning, member events and conversations about relationships and personal finances.',
+        ] },
+        'Our [Community Guidelines](/legal/community) prohibit nudity, sexual content, unsolicited sexual messages, harassment, hate speech, violence, drugs and requests for money. There is no gambling, and there are no ads inside the app.',
+      ] },
+      { id: 'safety', h: 'Safety and moderation', body: [
+        { ul: [
+          'every member’s identity is verified, and profile photos are checked against their selfie;',
+          'members can block and report anyone from any profile or chat, and blocked members can no longer see or message them;',
+          'automatic checks flag messages that ask for money or try to move the conversation off ScoreDate;',
+          'our team reviews reports and removes members who break the rules, and we cooperate with law enforcement.',
+        ] },
+        'More in our [Safety Center](/safety), [Terms of Service](/legal/terms) and [Privacy Policy](/legal/privacy).',
+      ] },
+      { id: 'contact', h: 'Contact', body: [
+        `${COMPANY}, ${ADDRESS}. Email support@scoredate.app.`,
+      ] },
+    ],
+  },
+
   biometric: {
     title: 'Biometric Data Policy', eyebrow: 'Trust & safety', updated: UPDATED, draft: DRAFT,
     summary: 'We use face comparison for one reason: to confirm that you are you and that your photos show you. Here is exactly how.',
