@@ -11,17 +11,16 @@ type Plan = { key: string; name: string; perks: string };
 type Price = Record<string, { price: string; product: any }>;
 
 /** In the iPhone app: real App Store prices, buy with Apple, and Restore purchases (Apple requires it). */
-export default function NativePaywall({ userId, iosKey, androidKey, plans, currentPlan }: { userId: string; iosKey?: string; androidKey?: string; plans: Plan[]; currentPlan: string }) {
+export default function NativePaywall({ userId, iosKey, androidKey, plans, currentPlan, staff = false }: { userId: string; iosKey?: string; androidKey?: string; plans: Plan[]; currentPlan: string; staff?: boolean }) {
   const router = useRouter();
   const [prices, setPrices] = useState<Price>({});
   const [annual, setAnnual] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ ok?: string; error?: string } | null>(null);
   const [ready, setReady] = useState<boolean | null>(null);
-  // Diagnostics: open /plans?debug=1 in the app to see what the App Store returned.
+  // Diagnostics for the ScoreDate team (shown only to staff): what the App Store returned.
   const [diag, setDiag] = useState<string>('');
-  const [debug, setDebug] = useState(false);
-  useEffect(() => { setDebug(new URLSearchParams(window.location.search).has('debug')); }, []);
+  const debug = staff;
 
   useEffect(() => {
     (async () => {
@@ -77,7 +76,7 @@ export default function NativePaywall({ userId, iosKey, androidKey, plans, curre
     <div className="phone">
       <PageBack />
         <h1 className="serif" style={{ fontSize: 36 }}>Become a member</h1>
-      {debug && <div className="card small mono" style={{ wordBreak: 'break-word' }}>{diag || 'Checking the App Store…'}</div>}
+      {debug && <div className="card small mono" style={{ wordBreak: 'break-word' }}><strong>Team only:</strong> {diag || 'Checking the App Store…'}</div>}
       {ready === false && <div className="notice">The App Store isn’t available right now. Check your connection and try again.</div>}
       <div className="row" role="tablist" style={{ gap: 6, padding: 4, borderRadius: 999, border: '1px solid var(--line-soft)', alignSelf: 'flex-start' }}>
         {[['Monthly', false], ['Annual', true]].map(([l, v]) => (
