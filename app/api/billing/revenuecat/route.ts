@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { getIntegration } from '@/lib/integrations';
 import { activeEntitlements, isPreviewProduct, planFromEntitlements } from '@/lib/revenuecat';
 import { supabaseAnon } from '@/lib/supabase/server';
-import { planForProduct, skuForProduct } from '@/lib/iap';
+import { LIFETIME_PRODUCT, planForProduct, skuForProduct } from '@/lib/iap';
 
 // RevenueCat → ScoreDate. In RevenueCat: Project settings → Integrations → Webhooks.
 //   URL: https://<domain>/api/billing/revenuecat
@@ -42,6 +42,11 @@ export async function POST(req: Request) {
   if (plan === 'none' && e.type !== 'EXPIRATION' && (!e.expiration_at_ms || e.expiration_at_ms > Date.now())) {
     const pp = planForProduct(e.new_product_id || e.product_id);
     if (pp) plan = pp;
+  }
+  // Founding Lifetime: mark the member first (so later plan changes never drop them below Premium), then record as Premium.
+  if (e.product_id === LIFETIME_PRODUCT && e.type !== 'CANCELLATION' && e.type !== 'EXPIRATION') {
+    await supabaseAnon().rpc('grant_lifetime', { p_secret: process.env.SCORE_SERVER_SECRET, p_user: userId, p_ref: String(e.transaction_id || e.id), p_environment: e.environment ?? null }).then(() => null, () => null);
+    if (plan === 'none' || plan === 'preview' || plan === 'membership' || plan === 'paused' || plan === 'unchanged') plan = 'premium';
   }
   if ((e.type === 'NON_RENEWING_PURCHASE' || e.type === 'INITIAL_PURCHASE') && (await isPreviewProduct(e.product_id)) && plan === 'none') plan = 'preview';
 

@@ -2,7 +2,7 @@ import 'server-only';
 import { getIntegration } from '@/lib/integrations';
 import { planFromEntitlements } from '@/lib/revenuecat';
 import { supabaseAnon } from '@/lib/supabase/server';
-import { PREVIEW_PRODUCT, PREVIEW_PRODUCTS, planForProduct, skuForProduct } from '@/lib/iap';
+import { LIFETIME_PRODUCT, PREVIEW_PRODUCT, PREVIEW_PRODUCTS, planForProduct, skuForProduct } from '@/lib/iap';
 
 type Sub = { expires_date?: string | null; is_sandbox?: boolean; store?: string; purchase_date?: string };
 type NonSub = { id?: string; store_transaction_id?: string; purchase_date?: string; is_sandbox?: boolean; store?: string };
@@ -38,6 +38,13 @@ export async function syncFromStore(userId: string): Promise<{ plan: string; add
   const nonSubs = (s.non_subscriptions || {}) as Record<string, NonSub[]>;
   const sb = supabaseAnon(); const secret = process.env.SCORE_SERVER_SECRET;
 
+  // Founding Lifetime: owned forever, so Premium at least.
+  const lifetime = (nonSubs[LIFETIME_PRODUCT] || [])[0];
+  if (lifetime) {
+    await sb.rpc('grant_lifetime', { p_secret: secret, p_user: userId, p_ref: String(lifetime.store_transaction_id || lifetime.id || 'lifetime'), p_environment: lifetime.is_sandbox ? 'SANDBOX' : 'PRODUCTION' });
+    if (['none', 'preview', 'paused', 'membership'].includes(plan)) plan = 'premium';
+  }
+
   // Preview: a one-time purchase in the last 30 days counts if there's no subscription.
   const preview = PREVIEW_PRODUCTS.flatMap((id) => nonSubs[id] || []).find((p) => p.purchase_date && now - new Date(p.purchase_date).getTime() < 31 * 86400000);
   if (plan === 'none' && preview) plan = 'preview';
@@ -45,9 +52,9 @@ export async function syncFromStore(userId: string): Promise<{ plan: string; add
   if (plan !== 'none') {
     await sb.rpc('record_billing_event', {
       p_server_secret: secret, p_event_id: `app_sync:${userId}:${now}`, p_user: userId, p_type: 'APP_SYNC',
-      p_store: activeSub?.store || preview?.store || 'app_store', p_product: ents[0]?.[1]?.product_identifier || subProduct || (preview ? PREVIEW_PRODUCT : null),
+      p_store: activeSub?.store || preview?.store || 'app_store', p_product: ents[0]?.[1]?.product_identifier || subProduct || (lifetime ? LIFETIME_PRODUCT : preview ? PREVIEW_PRODUCT : null),
       p_entitlement: ents[0]?.[0] || null, p_plan: plan, p_expires: activeSub?.expires_date || null,
-      p_environment: (activeSub?.is_sandbox ?? preview?.is_sandbox) ? 'SANDBOX' : 'PRODUCTION',
+      p_environment: (activeSub?.is_sandbox ?? lifetime?.is_sandbox ?? preview?.is_sandbox) ? 'SANDBOX' : 'PRODUCTION',
     });
   }
 

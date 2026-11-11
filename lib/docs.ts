@@ -68,7 +68,8 @@ export const DOCS: Record<string, Doc> = {
           'If you subscribe through the **Apple App Store or Google Play**, that store bills you and handles cancellations and refunds under its own terms. Cancel in your device’s subscription settings. Deleting the app or your account does not cancel a store subscription.',
           'Add-ons (like Extra matches, Spotlight and Notes) are consumed when used and are non-refundable except where the law or the store requires.',
           'Introductory or Founding Member offers apply only to eligible members and only as described when offered.',
-        ] },
+          '**Founding Lifetime:** a limited number of one-time Founding Lifetime purchases may be offered. Founding Lifetime gives you the features of the Premium plan for as long as ScoreDate operates the Service, with no renewals. It is personal to your account and can’t be transferred. It doesn’t change these Terms: we can still suspend or remove an account that breaks them, and we may change what Premium includes over time. If ScoreDate stops operating the Service, Founding Lifetime ends with it. Refunds are handled by Apple under its policies.',
+      ] },
         'If we change a price, we’ll tell you in advance, and the new price applies from your next renewal.',
       ] },
       { id: 'safety', h: 'Safety and your interactions', body: [

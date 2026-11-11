@@ -15,6 +15,9 @@ export const SUBSCRIPTIONS = [
 
 /** One-time: Preview (30 days, non-renewing) and consumable add-ons (sku = addon_catalog sku). */
 export const PREVIEW_PRODUCT = `${BUNDLE}.preview.30day`;
+/** Founding Lifetime: one-time (non-consumable) purchase that unlocks Premium for as long as ScoreDate runs. */
+export const LIFETIME_PRODUCT = `${BUNDLE}.lifetime.premium`;
+
 /** Every Preview product ID we accept (the first ID was taken on Apple's side, so the old one stays as a fallback). */
 export const PREVIEW_PRODUCTS = [PREVIEW_PRODUCT, `${BUNDLE}.preview.once`];
 export const ADDON_PRODUCTS: Record<string, string> = {
