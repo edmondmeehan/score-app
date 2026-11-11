@@ -173,7 +173,7 @@ export const DOCS: Record<string, Doc> = {
           'Shown (website metrics on our public waitlist pages only, never in the app or your account).',
           'Anthropic (AI conversation ideas, only if you and the other member both turn them on: first names, prompts, NYC spots, song, job and neighborhood are sent to write suggestions; never your credit band, messages, photos or contact details, and not used to train AI models).',
         ] },
-        '**Advertising partners:** on our public website only (never in the app or your account), Meta (the Meta Pixel and Conversions API) and Google (the Google tag) receive your visit, your browser and device details, your IP address and, when you join the waitlist, a scrambled (hashed) copy of your email, so we can measure which ads work and show ads to people likely to be interested. Under some state laws this counts as “sharing” for targeted advertising. We never send them your credit band, verification results, profile or messages. Opt out at [Your Privacy Choices](/legal/choices); we also honor Global Privacy Control. Meta and Google use this data under their own privacy policies.',
+        '**Advertising partners:** on our public website only (never in the app or your account), Meta (the Meta Pixel and Conversions API) and Google (the Google tag and Google Analytics) receive your visit, your browser and device details, your IP address and, when you join the waitlist, a scrambled (hashed) copy of your email, so we can measure which ads work and show ads to people likely to be interested. Under some state laws this counts as “sharing” for targeted advertising. We never send them your credit band, verification results, profile or messages. Opt out at [Your Privacy Choices](/legal/choices); we also honor Global Privacy Control. Meta and Google use this data under their own privacy policies.',
         '**Legal and safety:** when required by law, or when we believe in good faith it’s necessary to prevent harm or fraud.',
         '**Business changes:** if ScoreDate is involved in a merger or sale, data may transfer under this policy.',
         'We do not sell personal information for money.',
@@ -215,7 +215,7 @@ export const DOCS: Record<string, Doc> = {
     summary: 'Every control you have over your data, and how to use it.',
     sections: [
       { id: 'sell', h: 'Opt out of sale and sharing', body: [
-        'ScoreDate does not sell personal information. On our public website (never inside the app), we use the Meta Pixel, Meta’s Conversions API and the Google tag to measure whether our ads bring people to the waitlist. Some state laws call this “sharing” for targeted advertising. Use the switch above to opt out on this browser. We never share your credit band, verification results, profile or messages with advertisers.',
+        'ScoreDate does not sell personal information. On our public website (never inside the app), we use the Meta Pixel, Meta’s Conversions API, the Google tag and Google Analytics to measure whether our ads bring people to the waitlist and how visitors use the site. Some state laws call this “sharing” for targeted advertising. Use the switch above to opt out on this browser. We never share your credit band, verification results, profile or messages with advertisers.',
       ] },
       { id: 'in-app', h: 'Controls in the app', body: [
         { ul: [

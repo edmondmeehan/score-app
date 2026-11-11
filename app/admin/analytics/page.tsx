@@ -64,6 +64,14 @@ export default async function Analytics({ searchParams }: { searchParams: Promis
 
       <LiveNow initial={(liveData as Live) || null} />
 
+      {/* Google Analytics covers the public website only (never the app); this page covers everything. */}
+      <div className="card row" style={{ gap: 12, flexWrap: 'wrap', justifyContent: 'space-between' }}>
+        <span className="small muted grow">{process.env.NEXT_PUBLIC_GA4_ID
+          ? 'Google Analytics is on for the public website (homepage, waitlist and info pages, never inside the app). Use it for traffic sources and ad campaigns; this page covers members and the app.'
+          : 'Google Analytics is off. To turn it on for the public website, add NEXT_PUBLIC_GA4_ID (G-…) in Vercel and redeploy.'}</span>
+        {process.env.NEXT_PUBLIC_GA4_ID && <a className="btn ghost sm" href="https://analytics.google.com/" target="_blank" rel="noopener noreferrer">Open Google Analytics ↗</a>}
+      </div>
+
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 14 }}>
         {kpis.map(([l, v]) => <div key={l} className="card stack" style={{ gap: 8 }}><span className="small muted">{l}</span><span className="serif" style={{ fontSize: 34 }}>{v}</span></div>)}
       </div>
