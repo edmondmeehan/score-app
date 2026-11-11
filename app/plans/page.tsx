@@ -1,3 +1,4 @@
+import PageBack from '@/components/PageBack';
 import { redirect } from 'next/navigation';
 import { getMe } from '@/lib/session';
 import { TestBanner } from '@/components/ui';
@@ -30,6 +31,7 @@ export default async function Plans({ searchParams }: { searchParams: Promise<{ 
     const store = process.env.NEXT_PUBLIC_APP_STORE_URL;
     return (
       <div className="phone">
+        <PageBack />
         <h1 className="serif" style={{ fontSize: 36 }}>Become a member</h1>
         <div className="card gold stack" style={{ gap: 10 }}>
           <strong>Memberships are in the ScoreDate app</strong>
@@ -44,7 +46,8 @@ export default async function Plans({ searchParams }: { searchParams: Promise<{ 
   }
   return (
     <form action={choosePlan} className="phone">
-      <h1 className="serif" style={{ fontSize: 36 }}>Become a member</h1>
+      <PageBack />
+        <h1 className="serif" style={{ fontSize: 36 }}>Become a member</h1>
       <TestBanner>Payments aren&apos;t connected. Choosing a paid plan activates it without charging. The iPhone app will bill through the App Store.</TestBanner>
       {offer?.enabled && (
         <div className="card gold stack" style={{ gap: 6 }}>

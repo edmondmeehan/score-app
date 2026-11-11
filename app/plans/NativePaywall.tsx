@@ -1,5 +1,6 @@
 'use client';
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import PageBack from '@/components/PageBack';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { purchases, cancelled } from '@/lib/purchasesClient';
@@ -67,7 +68,8 @@ export default function NativePaywall({ userId, iosKey, androidKey, plans, curre
 
   return (
     <div className="phone">
-      <h1 className="serif" style={{ fontSize: 36 }}>Become a member</h1>
+      <PageBack />
+        <h1 className="serif" style={{ fontSize: 36 }}>Become a member</h1>
       {ready === false && <div className="notice">The App Store isn’t available right now. Check your connection and try again.</div>}
       <div className="row" role="tablist" style={{ gap: 6, padding: 4, borderRadius: 999, border: '1px solid var(--line-soft)', alignSelf: 'flex-start' }}>
         {[['Monthly', false], ['Annual', true]].map(([l, v]) => (
