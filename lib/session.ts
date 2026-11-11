@@ -45,9 +45,15 @@ export async function hasInvite(supabase: Sb, userId: string): Promise<boolean> 
  * straight to the invite screen, so they never see the app (or its loading screen) for a moment first.
  */
 export async function afterSignIn(supabase: Sb, dest: string): Promise<string> {
-  if (!(dest === '/app' || dest.startsWith('/app/') || dest.startsWith('/onboarding'))) return dest;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return dest;
+  // Staff set up (or enter) their two-step code right at sign-in, not just when they open admin.
+  const { data: onStaff } = await supabase.rpc('am_staff');
+  if (onStaff) {
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (aal?.currentLevel !== 'aal2') return `/two-step?required=1&next=${encodeURIComponent(dest)}`;
+  }
+  if (!(dest === '/app' || dest.startsWith('/app/') || dest.startsWith('/onboarding'))) return dest;
   return (await hasInvite(supabase, user.id)) ? dest : '/join?need=1';
 }
 
