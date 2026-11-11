@@ -520,3 +520,7 @@ a.chip { text-decoration: none; color: inherit; }
 .input[type="date"], .input[type="time"], .input[type="datetime-local"] { -webkit-appearance: none; appearance: none; display: block; width: 100%; min-width: 0; max-width: 100%; text-align: left; }
 .input[type="date"]::-webkit-date-and-time-value, .input[type="time"]::-webkit-date-and-time-value, .input[type="datetime-local"]::-webkit-date-and-time-value { text-align: left; margin: 0; }
 .field { min-width: 0; }
+
+/* Back button floating over a full-bleed profile photo. */
+.photo-back { position: absolute; top: calc(12px + env(safe-area-inset-top)); left: 14px; z-index: 2; width: 40px; height: 40px; border-radius: 999px; display: grid; place-items: center; color: #fff; background: rgba(11,11,12,.45); border: 1px solid rgba(255,255,255,.18); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); cursor: pointer; padding: 0; }
+.photo-back:active { transform: scale(.94); }
