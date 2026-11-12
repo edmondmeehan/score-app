@@ -71,8 +71,8 @@ export const getPolicy = (slug: PolicySlug) => unstable_cache(async () => {
 export type PartnersPage = { eyebrow: string; title: string; intro: string; facts: [string, string][]; ways: [string, string][] };
 export const PARTNERS_DEFAULT: PartnersPage = {
   eyebrow: 'Partnerships',
-  title: 'Meet members who have their act together.',
-  intro: 'ScoreDate is invite-only dating for verified members who are honest about money. We partner with a small number of venues and brands members will love.',
+  title: 'Meet members who follow through.',
+  intro: 'ScoreDate is invite-only dating for verified grown-ups who are serious about building a life. We partner with a small number of venues and brands members will love.',
   facts: [['Verified', 'Every member verifies their ID and credit band'], ['25+', 'Members are 25 and older'], ['NYC first', 'Launching across the five boroughs']],
   ways: [
     ['Venues', 'Host a ScoreDate night. Supper clubs, wine bars, rooftops and listening rooms that want a full room of verified members on a quiet weeknight.'],

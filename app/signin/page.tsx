@@ -22,7 +22,7 @@ export default async function SignIn({ searchParams }: { searchParams: Promise<S
         <Gauge size={72} label="ScoreDate" />
         <span className="mono" style={{ fontSize: 20, letterSpacing: '.28em' }}>SCOREDATE</span>
         <p className="serif" style={{ fontSize: 28, textAlign: 'center', margin: 0 }}>
-          {mode === 'signup' ? 'Create your account.' : mode === 'reset' ? 'Reset your password.' : 'Date someone who has their act together.'}
+          {mode === 'signup' ? 'Create your account.' : mode === 'reset' ? 'Reset your password.' : 'Reliable is the new attractive.'}
         </p>
       </div>
 

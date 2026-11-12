@@ -98,9 +98,9 @@ export default async function Brand() {
 
       <section id="essence">
         <h2>Brand essence</h2>
-        <p><strong>ScoreDate is the dating app where every member has verified their credit and their identity.</strong> We exist because money is one of the biggest sources of friction in relationships, and the honest conversation about it usually comes far too late.</p>
+        <p><strong>ScoreDate is a dating app for grown-ups who follow through.</strong> It’s a place for people who are serious about building a life: everyone is verified, money values come up early, and members get fewer, better matches that lead to real dates. The credit band is one signal among many, never a verdict.</p>
         <div className="tool-grid">
-          <div className="tool-card"><h3>Promise</h3><p>Date someone who has their act together.</p></div>
+          <div className="tool-card"><h3>Promise</h3><p>Reliable is the new attractive.</p></div>
           <div className="tool-card"><h3>Belief</h3><p>Every band is welcome. Honesty about money is required.</p></div>
           <div className="tool-card"><h3>Personality</h3><p>Confident, discreet, warm, a little witty. Never smug, never salesy.</p></div>
           <div className="tool-card"><h3>Feels like</h3><p>A private members’ club with good lighting: quiet luxury, nothing flashy.</p></div>
@@ -142,7 +142,7 @@ export default async function Brand() {
       <section id="type">
         <h2>Typography</h2>
         <div className="stack" style={{ gap: 14 }}>
-          <div className="tool-card"><span className="label">Headlines · Instrument Serif</span><span className="serif" style={{ fontSize: 40, lineHeight: 1.05 }}>Date someone who has their act together.</span><p>Regular weight, tight leading (0.95–1.1). Italic for a single word of emphasis. Sentence case, ending with a period.</p></div>
+          <div className="tool-card"><span className="label">Headlines · Instrument Serif</span><span className="serif" style={{ fontSize: 40, lineHeight: 1.05 }}>Reliable is the new attractive.</span><p>Regular weight, tight leading (0.95–1.1). Italic for a single word of emphasis. Sentence case, ending with a period.</p></div>
           <div className="tool-card"><span className="label">Body · Inter</span><span style={{ fontSize: 18, lineHeight: 1.6 }}>Every member verifies a government ID, a live selfie and their credit band before they can match.</span><p>400 for body, 500–600 for buttons and emphasis. 16 px minimum on screen.</p></div>
           <div className="tool-card"><span className="label">Labels · JetBrains Mono</span><span className="mono" style={{ fontSize: 14, letterSpacing: '.2em', textTransform: 'uppercase', color: 'var(--gold)' }}>Invite only · New York</span><p>Uppercase with wide tracking for eyebrows, labels and the wordmark. Never for paragraphs.</p></div>
         </div>
@@ -190,18 +190,19 @@ export default async function Brand() {
       <section id="messaging">
         <h2>Messaging</h2>
         <h3>Tagline</h3>
-        <p><strong>Date someone who has their act together.</strong></p>
+        <p><strong>Reliable is the new attractive.</strong></p>
         <h3>Supporting lines</h3>
         <ul>
-          <li>Every band is welcome. Honesty about money is required.</li>
-          <li>Verified identity. Verified credit band. No guesswork.</li>
-          <li>A soft check. No impact on your score.</li>
+          <li>For people who follow through.</li>
+          <li>Meet people who show up, call back and plan ahead.</li>
+          <li>Fewer, better matches that lead to real dates.</li>
+          <li>Every member verified. Every band welcome.</li>
           <li>Invite only. New York first.</li>
         </ul>
         <h3>Boilerplate (short)</h3>
-        <p className="card" style={{ padding: 16 }}>ScoreDate is an invite-only dating app where every member verifies their identity and their credit band. Launching in New York City, ScoreDate makes honesty about money part of dating from the start, without ever showing anyone’s exact score.</p>
+        <p className="card" style={{ padding: 16 }}>ScoreDate is an invite-only dating app for grown-ups who follow through. Every member verifies their identity, and matches start from shared values and life plans, not just photos. Launching in New York City.</p>
         <h3>Boilerplate (long)</h3>
-        <p className="card" style={{ padding: 16 }}>ScoreDate is an invite-only dating app for adults 25 and older who want a partner with their act together. Every member verifies a government ID, a live selfie and their credit band through a soft inquiry that never affects their credit score. Members see each other’s band (Elite, Strong, Solid or Building) and 12-month trend, never the number. ScoreDate is launching in New York City and expanding area by area as demand grows. ScoreDate, LLC is based in New York.</p>
+        <p className="card" style={{ padding: 16 }}>ScoreDate is an invite-only dating app for adults 25 and older who are serious about building a life, and want a partner who follows through. Every member verifies a government ID and a live selfie, answers questions about money and life, and shares a credit band (Elite, Strong, Solid or Building), never the number. Members get a small Daily Drop of curated matches instead of endless swiping. ScoreDate is launching in New York City and expanding area by area as demand grows. ScoreDate, LLC is based in New York.</p>
       </section>
 
       <section id="claims">
@@ -273,7 +274,7 @@ export default async function Brand() {
         </div>
         <h3>Suggested captions</h3>
         <ul>
-          <li>Date someone who has their act together. ScoreDate opens in New York first, and new members get their first 60 days free. Get on the list at scoredate.app.</li>
+          <li>Reliable is the new attractive. ScoreDate opens in New York first, and new members get their first 60 days free. Get on the list at scoredate.app.</li>
           <li>Every member verified. Every band welcome. Your first two months are on us when your invite arrives. Link in bio.</li>
           <li>Invite only. New York first. 60 days free for new members. scoredate.app</li>
         </ul>

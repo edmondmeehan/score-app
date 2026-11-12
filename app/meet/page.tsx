@@ -8,14 +8,14 @@ import { getCreditMode, CREDIT_COPY } from '@/lib/creditMode';
 // Ad landing page: dating first, verification explained further down. The homepage (/) stays as it is.
 export const metadata: Metadata = {
   title: 'ScoreDate · Invite-only dating in New York',
-  description: 'Curated matches, verified members, and a first round that starts with money values instead of photos. Request an invite.',
+  description: 'Reliable is the new attractive. Invite-only dating in New York for people who follow through: verified members and fewer, better matches. Request an invite.',
   robots: { index: false, follow: true },
 };
 
 const FEATURES: [string, string][] = [
-  ['A small Daily Drop', 'A few curated matches each day, picked for shared values and what you’re looking for. No endless swiping.'],
-  ['Hot or Financially Compatible?', 'Answer five quick questions about money and life, see how you line up before photos, then both decide.'],
-  ['Everyone is verified', 'Every member verifies a government ID and a live selfie. Members are 25+ and live in New York.'],
+  ['Feel safe from the first message', 'Every member verifies a government ID and a live selfie. Members are 25+ and live in New York.'],
+  ['Be seen for more than your photos', 'Answer five quick questions about money and life, see how you line up before photos, then both decide.'],
+  ['Fewer, better matches', 'A small Daily Drop picked for shared values and what you’re looking for. Less swiping, more real dates.'],
 ];
 
 export default async function Meet() {
@@ -27,8 +27,8 @@ export default async function Meet() {
       <section className="page" style={{ padding: '56px 24px 72px', display: 'flex', flexWrap: 'wrap', gap: 48, alignItems: 'flex-start' }}>
         <div className="stack" style={{ flex: '1 1 440px', gap: 22 }}>
           <span className="eyebrow">Invite only · New York · 25+</span>
-          <h1 className="serif" style={{ fontSize: 'clamp(44px, 7vw, 80px)', lineHeight: 0.98 }}>Date someone who’s good with money.</h1>
-          <p style={{ fontSize: 19, lineHeight: 1.55, color: 'var(--muted)', maxWidth: 520, margin: 0 }}>ScoreDate is invite-only dating for people who have their act together. Curated matches, real people, and a first round that starts with values instead of photos.</p>
+          <h1 className="serif" style={{ fontSize: 'clamp(44px, 7vw, 80px)', lineHeight: 0.98 }}>Reliable is the new attractive.</h1>
+          <p style={{ fontSize: 19, lineHeight: 1.55, color: 'var(--muted)', maxWidth: 520, margin: 0 }}>Meet people who show up, call back and plan ahead. ScoreDate is invite-only dating for grown-ups in New York who are serious about building a life.</p>
           <span className="small muted">New York opens first, in invite drops. Already have a code? <Link href="/join" style={{ color: 'var(--gold)' }}>Join here</Link>.</span>
         </div>
         <div id="invite" style={{ flex: '1 1 400px' }}>

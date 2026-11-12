@@ -11,10 +11,10 @@ import { activeSeason, seasonsWith, type SeasonKey } from '@/lib/seasons';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.scoredate.app'),
-  openGraph: { type: 'website', siteName: 'ScoreDate', images: [{ url: '/brand/score-share-card-dark.png', width: 1200, height: 630, alt: 'ScoreDate: Date someone who has their act together.' }] },
+  openGraph: { type: 'website', siteName: 'ScoreDate', images: [{ url: '/brand/score-share-card-dark.png', width: 1200, height: 630, alt: 'ScoreDate: Reliable is the new attractive.' }] },
   twitter: { card: 'summary_large_image', images: ['/brand/score-share-card-dark.png'] },
-  title: 'ScoreDate — Date someone who has their act together',
-  description: 'Invite-only dating built on honesty about money. Every member verifies their identity.',
+  title: 'ScoreDate — Reliable is the new attractive',
+  description: 'Invite-only dating in New York for people who follow through. Every member is verified. Fewer, better matches that lead to real dates.',
   applicationName: 'ScoreDate',
   appleWebApp: { capable: true, title: 'ScoreDate', statusBarStyle: 'black-translucent' },
   formatDetection: { telephone: false },

@@ -18,7 +18,7 @@ export default async function Join({ searchParams }: { searchParams: Promise<{ c
     <div className="phone" style={{ justifyContent: 'center', paddingBottom: 'calc(24px + env(safe-area-inset-bottom))' }}>
       <Logo />
       <span className="eyebrow">Invite only · New York</span>
-      <h1 className="serif" style={{ fontSize: 44, lineHeight: 1.02 }}>Someone thinks you have your act together.</h1>
+      <h1 className="serif" style={{ fontSize: 44, lineHeight: 1.02 }}>Someone thinks you follow through.</h1>
       {user && invited ? (
         <Link href="/app" className="btn ghost block">Continue to ScoreDate{user.email ? ` as ${user.email}` : ''}</Link>
       ) : user ? (

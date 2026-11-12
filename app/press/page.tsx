@@ -3,12 +3,12 @@ import Link from 'next/link';
 import DocLayout from '@/components/DocLayout';
 import { getCreditMode } from '@/lib/creditMode';
 
-export const metadata: Metadata = { title: 'Press · ScoreDate', description: 'Press information, fast facts and media contact for ScoreDate, the invite-only dating app built around credit bands.' };
+export const metadata: Metadata = { title: 'Press · ScoreDate', description: 'Press information, fast facts and media contact for ScoreDate, the invite-only dating app for people who follow through.' };
 
 const FACTS: [string, string][] = [
   ['What it is', 'An invite-only dating app where every member verifies their identity and photos and shares their credit band.'],
   ['Where', 'New York City first, opening neighborhood by neighborhood, with more areas to follow.'],
-  ['Who it’s for', 'Adults 25 and older who want to date someone with their act together.'],
+  ['Who it’s for', 'Adults 25 and older in New York who are serious about building a life, and want a partner who follows through.'],
   ['How bands work', 'BANDS_HOW'],
   ['Every band is welcome', 'ScoreDate isn’t about having a perfect score. It’s about honesty around money, which is one of the biggest sources of friction in relationships.'],
   ['Company', 'ScoreDate, LLC is based in New York.'],

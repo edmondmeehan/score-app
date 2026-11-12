@@ -15,7 +15,7 @@ export type FooterConfig = {
 };
 
 export const FOOTER_DEFAULT: FooterConfig = {
-  tagline: 'The invite-only dating app built around credit bands. Now open in New York City.',
+  tagline: 'Invite-only dating for people who follow through. Now open in New York City.',
   company: 'ScoreDate, LLC',
   address: '1133 Broadway, Suite 1301\nNew York, NY 10010',
   email: 'support@scoredate.app',
