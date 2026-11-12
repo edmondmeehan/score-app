@@ -103,7 +103,7 @@ export async function movePhoto(form: FormData) {
 export async function saveDetails(form: FormData) {
   const { supabase, user } = await ctx();
   const h = Number(form.get('height_cm'));
-  const { error } = await supabase.from('profiles').update({
+  const details = {
     height_cm: HEIGHTS.some((x) => x.cm === h) ? h : null,
     has_kids: valid(HAS_KIDS, form.get('has_kids')),
     wants_kids: valid(WANTS_KIDS, form.get('wants_kids')),
@@ -115,7 +115,12 @@ export async function saveDetails(form: FormData) {
     pets: valid(PETS, form.get('pets')),
     religion: valid(RELIGION, form.get('religion')),
     politics: valid(POLITICS, form.get('politics')),
+  };
+  let { error } = await supabase.from('profiles').update({
+    ...details, religion_match: form.get('religion_match') === 'on', politics_match: form.get('politics_match') === 'on',
   }).eq('id', user.id);
+  // Before migration 0076 runs, the "This matters to me" columns don't exist yet: save everything else.
+  if (error && /religion_match|politics_match/.test(error.message)) ({ error } = await supabase.from('profiles').update(details).eq('id', user.id));
   if (error) back('error=' + encodeURIComponent(/column|schema/.test(error.message) ? 'Profile details are almost ready. Please try again later.' : error.message));
   revalidatePath('/app/profile');
   back('saved=details#details');

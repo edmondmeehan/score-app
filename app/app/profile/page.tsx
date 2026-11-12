@@ -128,6 +128,12 @@ export default async function EditProfile({ searchParams }: { searchParams: Prom
           <label className="field grow">Religion<select className="input" name="religion" defaultValue={me.religion || ''}><option value="">Prefer not to say</option>{RELIGION.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
           <label className="field grow">Politics<select className="input" name="politics" defaultValue={me.politics || ''}><option value="">Prefer not to say</option>{POLITICS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
         </div>
+        <div className="stack" style={{ gap: 8 }}>
+          <span className="label">This matters to me</span>
+          <label className="row small" style={{ gap: 10 }}><input type="checkbox" name="religion_match" defaultChecked={Boolean(me.religion_match)} style={{ width: 20, height: 20, accentColor: 'var(--gold)' }} />Only show me people who share my religion</label>
+          <label className="row small" style={{ gap: 10 }}><input type="checkbox" name="politics_match" defaultChecked={Boolean(me.politics_match)} style={{ width: 20, height: 20, accentColor: 'var(--gold)' }} />Only show me people who share my politics</label>
+          <span className="small muted">Works both ways: you’ll only see, and be seen by, people with the same answer. It only applies once you’ve picked one above (not “Other”), and it means fewer matches.</span>
+        </div>
         <span className="small muted">Religion and politics only show if you pick one. Leave them on “Prefer not to say” to keep them private.</span>
         {sp.saved === 'details' && <div className="notice">Saved.</div>}
         <button className="btn ghost sm" style={{ alignSelf: 'flex-start' }}>Save details</button>
