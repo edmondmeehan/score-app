@@ -41,7 +41,7 @@ export default async function Credit({ searchParams }: { searchParams: Promise<{
         {updating ? <a href="/app/settings#band" className="pill-link" style={{ alignSelf: 'flex-start' }}>← Settings</a> : <Steps at={3} />}
         {updating && <input type="hidden" name="update" value="1" />}
         <h1 className="serif" style={{ fontSize: 38 }}>{updating ? 'Update your credit band' : 'Share your credit band'}</h1>
-        <p className="muted" style={{ margin: 0, lineHeight: 1.55 }}>Check your score on a free service below, or in your bank or card app. Checking it there doesn&apos;t affect your credit. Then pick the band it falls in. Members see your band, never the number.</p>
+        <p className="muted" style={{ margin: 0, lineHeight: 1.55 }}>Check your score on a free service below, or in your bank or card app. Checking it there doesn&apos;t affect your credit. Then pick the band it falls in. Members see your band, never the number. It’s one signal among many, and every band is welcome.</p>
         <CreditPartners placement="onboarding" />
         <div role="radiogroup" aria-label="Your band" className="stack">
           {(Object.keys(BANDS) as Band[]).map((k) => (

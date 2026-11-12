@@ -135,7 +135,7 @@ export const templates = {
               { p: `${hi(d.first_name)} thanks for signing up. ScoreDate sends invites in drops every two weeks, and we'll email you the moment yours is ready.` },
               ...share,
               { facts: [['Area', d.place], ...(d.position ? [['Your spot', `#${d.position.toLocaleString('en-US')}`] as [string, string]] : []), ['Age', '25 and older']] },
-              { note: 'Verification uses a soft credit pull. It never affects your score, and only your band (never the number) is shown to members.' },
+              { note: 'Every member verifies their ID and a live selfie. You’ll also share your credit band: a range, never the number, and every band is welcome.' },
             ]
           : [
               { p: `${hi(d.first_name)} thanks for signing up. ScoreDate is opening in New York City first and expanding area by area. You're on the list for ${d.place}, and we'll email you as soon as invites go out there.` },
@@ -164,7 +164,7 @@ export const templates = {
     heading: "You're in.",
     kind: 'transactional',
     blocks: [
-      { p: d.inviter ? `${hi(d.first_name)} ${d.inviter} thinks you belong on ScoreDate, the invite-only dating app where every member has verified their identity and their credit band.` : `${hi(d.first_name)} your spot in this New York drop is ready. Here is your personal invite code.` },
+      { p: d.inviter ? `${hi(d.first_name)} ${d.inviter} thinks you belong on ScoreDate, invite-only dating for grown-ups who follow through. Every member is ID-verified, and matches are fewer and better.` : `${hi(d.first_name)} your spot in this New York drop is ready. Here is your personal invite code.` },
       { code: d.code, caption: `Good for ${d.days} days · one use` },
       { button: { label: 'Accept your invite', url: `${SITE_URL}/join?code=${encodeURIComponent(d.code)}` } },
       { p: 'Joining takes about ten minutes: the basics, a quick ID and selfie check, your credit band, a short money-values quiz and your photos.' },
@@ -201,10 +201,10 @@ export const templates = {
     subject: 'You’re invited to ScoreDate',
     preheader: 'Your invite is ready. Tap to accept.',
     eyebrow: 'Invitation',
-    heading: 'Someone thinks you have your act together.',
+    heading: 'Someone thinks you follow through.',
     kind: 'transactional',
     blocks: [
-      { p: 'You’ve been invited to ScoreDate, the invite-only dating app where every member has verified their identity and credit band.' },
+      { p: 'You’ve been invited to ScoreDate, invite-only dating for grown-ups who are serious about building a life. Every member is ID-verified, and matches are fewer and better.' },
       { button: { label: 'Accept your invite', url: d.url } },
       { note: 'This link works once. If it expires, reply and we’ll send a new one.' },
     ],
@@ -256,10 +256,10 @@ export const templates = {
     heading: 'Welcome in.',
     kind: 'transactional',
     blocks: [
-      { p: `${hi(d.first_name)} you're verified and your profile is live. Every night at ${dropTimeLabel()} ET you'll get your Daily Drop: ${d.drop_size} people picked for shared money values and compatible bands.` },
+      { p: `${hi(d.first_name)} you're verified and your profile is live. Every night at ${dropTimeLabel()} ET you'll get your Daily Drop: ${d.drop_size} people picked for shared values and what you’re both looking for.` },
       { facts: [['Plan', d.plan], ['Daily Drop', `${d.drop_size} a night at ${dropTimeLabel()} ET`], ['Status', 'Active']] },
       { button: { label: 'Open ScoreDate', url: `${SITE_URL}/app` } },
-      { p: 'Two house rules: be honest, and be kind. You can pause or mark yourself Taken any time from settings, and your profile hides right away.' },
+      { p: 'Three house rules: be honest, be kind, and follow through. You can pause or mark yourself Taken any time from settings, and your profile hides right away.' },
     ],
   }) satisfies Email,
 

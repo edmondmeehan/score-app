@@ -11,8 +11,8 @@ import { activeSeason, seasonsWith, type SeasonKey } from '@/lib/seasons';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.scoredate.app'),
-  openGraph: { type: 'website', siteName: 'ScoreDate', images: [{ url: '/brand/score-share-card-dark.png', width: 1200, height: 630, alt: 'ScoreDate: Reliable is the new attractive.' }] },
-  twitter: { card: 'summary_large_image', images: ['/brand/score-share-card-dark.png'] },
+  openGraph: { type: 'website', siteName: 'ScoreDate', images: [{ url: '/brand/score-share-card-dark.png?v=2', width: 1200, height: 630, alt: 'ScoreDate: Reliable is the new attractive.' }] },
+  twitter: { card: 'summary_large_image', images: ['/brand/score-share-card-dark.png?v=2'] },
   title: 'ScoreDate — Reliable is the new attractive',
   description: 'Invite-only dating in New York for people who follow through. Every member is verified. Fewer, better matches that lead to real dates.',
   applicationName: 'ScoreDate',

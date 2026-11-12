@@ -13,7 +13,7 @@ export default async function Quiz({ searchParams }: { searchParams: Promise<{ e
       <Steps at={4} />
       <span className="eyebrow">Money values</span>
       <h1 className="serif" style={{ fontSize: 38 }}>How you think about money</h1>
-      <p className="muted" style={{ margin: 0 }}>Each answer shows on your profile as a chip. No wrong answers.</p>
+      <p className="muted" style={{ margin: 0 }}>Each answer shows on your profile as a chip. No wrong answers: it’s about finding someone who plans the way you do.</p>
       {MONEY_QUESTIONS.map((q) => (
         <fieldset key={q.id} className="stack" style={{ border: 0, padding: 0, margin: 0, gap: 8 }}>
           <legend style={{ fontWeight: 600, marginBottom: 8 }}>{q.q}</legend>
