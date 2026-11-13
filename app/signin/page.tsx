@@ -54,7 +54,7 @@ export default async function SignIn({ searchParams }: { searchParams: Promise<S
               <label className="field">Email<input className="input" type="email" name="email" required autoComplete="email" defaultValue={sp.email || ''} /></label>
               <label className="field">Password<input className="input" type="password" name="password" required minLength={8} autoComplete="new-password" placeholder="At least 8 characters" /></label>
               <label className="field">Confirm password<input className="input" type="password" name="confirm" required minLength={8} autoComplete="new-password" /></label>
-              <Turnstile />
+              <Turnstile action="signup" />
               {sp.error && <div className="notice error">{sp.error}</div>}
               <button className="btn block">Create account</button>
               <p className="small muted" style={{ textAlign: 'center', margin: 0 }}>Already a member? <Link href={q('signin')}>Sign in</Link></p>
