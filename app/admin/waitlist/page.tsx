@@ -1,12 +1,18 @@
 import Link from 'next/link';
 import { supabaseServer } from '@/lib/supabase/server';
-import { createInvites, emailInvite, inviteBatch, resendInvite, setAreaStatus, setPrefix, setZip, toggleFounder, saveFounderOffer } from '../actions';
+import { createInvites, emailInvite, inviteBatch, resendInvite, setAreaStatus, setPrefix, setZip, toggleFounder, saveFounderOffer, grantInvites, saveInviteDrip } from '../actions';
 import { getFounderOffer } from '@/lib/founderOffer';
 import WaitlistMap from './WaitlistMap';
 
 const BOROUGHS = ['Manhattan', 'Brooklyn', 'Queens', 'Bronx', 'Staten Island'];
 type AreaRow = { name: string; status: 'open' | 'waitlist'; waiting: number; invited: number; joined: number };
 type ZipRow = { area: string; zip: string; sub: string; waiting: number; total: number };
+type InviteStats = {
+  members: number; left_total: number; left_avg: number; members_none_left: number; sent: number; out: number; redeemed: number; expired: number;
+  granted_total: number; per_member: number; per_founder: number;
+  drip: { enabled: boolean; amount: number; every_days: number; cap: number; last_run: string | null } | null;
+  top: { id: string; first_name: string | null; sent: number; redeemed: number; lft: number }[];
+};
 
 export default async function Waitlist({ searchParams }: { searchParams: Promise<{ codes?: string; error?: string; zip_saved?: string; invited?: string; area?: string; zip?: string; map?: string; test?: string }> }) {
   const sp = await searchParams;
@@ -14,11 +20,16 @@ export default async function Waitlist({ searchParams }: { searchParams: Promise
   let q = supabase.from('waitlist').select('*').order('created_at', { ascending: false }).limit(200);
   if (sp.area) q = q.eq('area', sp.area);
   if (sp.zip) q = q.eq('zip', sp.zip);
-  const [{ data: rows }, { data: summary, error: sumErr }, { count: zipCount }] = await Promise.all([
+  const [{ data: rows }, { data: summary, error: sumErr }, { count: zipCount }, { data: inv, error: invErr }, { data: role }] = await Promise.all([
     q,
     supabase.rpc('staff_waitlist_summary'),
     supabase.from('nyc_zip_codes').select('zip', { count: 'exact', head: true }).eq('active', true),
+    supabase.rpc('staff_invite_stats'),
+    supabase.rpc('staff_role'),
   ]);
+  const st = inv as InviteStats | null;
+  const owner = role === 'owner';
+  const drip = st?.drip || { enabled: false, amount: 1, every_days: 30, cap: 3, last_run: null };
   const offer = await getFounderOffer(supabase);
   const areas: AreaRow[] = summary?.areas || [];
   const zips: ZipRow[] = (summary?.zips || []).filter((z: ZipRow) => !sp.area || z.area === sp.area);
@@ -49,6 +60,56 @@ export default async function Waitlist({ searchParams }: { searchParams: Promise
         <label className="choice"><input type="checkbox" name="enabled" defaultChecked={offer.enabled} style={{ accentColor: 'var(--gold)', width: 18, height: 18 }} /><span>Show this offer to Founding Members (plans page and their waitlist page)</span></label>
         <button className="btn ghost sm" style={{ alignSelf: 'flex-start' }}>Save offer</button>
       </form>
+
+      {/* Invite supply */}
+      <section id="supply" className="card stack" style={{ gap: 14, scrollMarginTop: 24 }}>
+        <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+          <h2 style={{ margin: 0, fontSize: 16 }}>Member invites</h2>
+          <span className="small muted">Members get {st?.per_member ?? 3} each ({st?.per_founder ?? 5} for founders). Keep it scarce: give more on purpose.</span>
+        </div>
+        {invErr && <div className="notice error">Run migration 0077 in Supabase to turn on invite supply. ({invErr.message})</div>}
+        {st && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10 }}>
+            {([
+              ['Invites left (all members)', st.left_total.toLocaleString()],
+              ['Average per member', String(st.left_avg)],
+              ['Members with none left', `${st.members_none_left} of ${st.members}`],
+              ['Codes out now', st.out.toLocaleString()],
+              ['Redeemed', `${st.redeemed} of ${st.sent}`],
+              ['Expired unused', st.expired.toLocaleString()],
+            ] as [string, string][]).map(([l, v]) => (
+              <div key={l} className="stack" style={{ gap: 2, padding: 10, borderRadius: 10, background: 'var(--graphite)' }}><span className="small muted">{l}</span><span className="serif" style={{ fontSize: 26 }}>{v}</span></div>
+            ))}
+          </div>
+        )}
+        {st && st.top.length > 0 && (
+          <div className="small"><span className="label">Top inviters</span>{st.top.map((t) => <div key={t.id}><a href={`/admin/members/${t.id}`}>{t.first_name || t.id.slice(0, 8)}</a> · {t.redeemed} joined of {t.sent} sent · {t.lft} left</div>)}</div>
+        )}
+        {owner ? (
+          <>
+            <form action={grantInvites} className="row" style={{ gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+              <label className="field" style={{ width: 90 }}>Give<select className="input" name="amount" defaultValue="1">{[1, 2, 3, 5, 10].map((n) => <option key={n} value={n}>{n}</option>)}</select></label>
+              <label className="field" style={{ width: 200 }}>To<select className="input" name="who" defaultValue="all">
+                <option value="all">Every member</option><option value="founders">Founding Members</option>
+                <option value="black">Reserve members</option><option value="premium">Premium members</option><option value="membership">Membership members</option>
+              </select></label>
+              <label className="field" style={{ width: 150 }}>Up to (cap)<select className="input" name="cap" defaultValue="5"><option value="0">No cap</option>{[1, 2, 3, 5, 10].map((n) => <option key={n} value={n}>{n} left max</option>)}</select></label>
+              <button className="btn sm">Give invites</button>
+            </form>
+            <span className="small muted">The cap keeps anyone from stockpiling: members already at the cap get nothing. To give one person invites, open their profile in Members.</span>
+            <form action={saveInviteDrip} className="stack" style={{ gap: 8, paddingTop: 12, borderTop: '1px solid var(--line-soft)' }}>
+              <label className="choice"><input type="checkbox" name="enabled" defaultChecked={drip.enabled} style={{ accentColor: 'var(--gold)', width: 18, height: 18 }} /><span>Automatic drip: give members more invites over time</span></label>
+              <div className="row" style={{ gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                <label className="field" style={{ width: 90 }}>Give<input className="input" type="number" name="amount" min={1} max={10} defaultValue={drip.amount} /></label>
+                <label className="field" style={{ width: 120 }}>Every (days)<input className="input" type="number" name="every_days" min={7} max={365} defaultValue={drip.every_days} /></label>
+                <label className="field" style={{ width: 120 }}>Cap (left max)<input className="input" type="number" name="cap" min={1} max={20} defaultValue={drip.cap} /></label>
+                <button className="btn ghost sm">Save drip</button>
+              </div>
+              <span className="small muted">{drip.enabled ? `On: +${drip.amount} every ${drip.every_days} days, up to ${drip.cap} left.` : 'Off.'}{drip.last_run ? ` Last ran ${new Date(drip.last_run).toLocaleDateString('en-US', { timeZone: 'America/New_York' })}.` : ''} Runs with the daily job.</span>
+            </form>
+          </>
+        ) : <span className="small muted">Only owners can give invites.</span>}
+      </section>
 
       {/* Areas */}
       <section className="card scroll-x">

@@ -5,7 +5,7 @@ import { BandPill } from '@/components/ui';
 import { photoUrls } from '@/lib/photos';
 import type { Profile } from '@/lib/types';
 import { DRINKING, EDUCATION, EXERCISE, HAS_KIDS, LOOKING_FOR, PETS, POLITICS, RELIGION, SMOKING, WANTS_KIDS, label } from '@/lib/profileDetails';
-import { staffAct } from '../../actions';
+import { staffAct, grantInvites } from '../../actions';
 import { testPush } from './pushActions';
 import { resetTwoStep } from './twoStepActions';
 
@@ -65,7 +65,7 @@ function Section({ title, children, right }: { title: string; children: React.Re
   );
 }
 
-export default async function MemberDetail({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string; push?: string; tfa?: string }> }) {
+export default async function MemberDetail({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string; push?: string; tfa?: string; invited?: string }> }) {
   const { id } = await params;
   const sp = await searchParams;
   const supabase = await supabaseServer();
@@ -237,6 +237,16 @@ export default async function MemberDetail({ params, searchParams }: { params: P
           <Section title="Invites & referrals">
             <Row k="Invited by" v={o?.growth.invited_by ? <Link href={`/admin/members/${o.growth.invited_by.id}`}>{o.growth.invited_by.name || 'Member'}</Link> : '—'} />
             <Row k="Invites sent" v={o ? `${o.growth.invites_sent} (${o.growth.invites_redeemed} used)` : '—'} />
+            <Row k="Extra invites given" v={String((p as { invite_bonus?: number }).invite_bonus || 0)} />
+            {sp.invited && <div className="notice small">{sp.invited}</div>}
+            {owner && (
+              <form action={grantInvites} className="row" style={{ gap: 8, marginTop: 6 }}>
+                <input type="hidden" name="who" value="one" /><input type="hidden" name="user" value={id} />
+                <input type="hidden" name="back" value={`/admin/members/${id}`} />
+                <select className="input" name="amount" defaultValue="1" style={{ width: 80, padding: '6px 8px' }}>{[1, 2, 3, 5, 10].map((n) => <option key={n} value={n}>+{n}</option>)}</select>
+                <button className="btn ghost sm">Give invites</button>
+              </form>
+            )}
             {o && o.growth.referred.length > 0 && <div className="row small" style={{ gap: 8, flexWrap: 'wrap', marginTop: 6 }}><span className="muted">Brought in:</span>{o.growth.referred.map((r) => <Link key={r.id} href={`/admin/members/${r.id}`}>{r.name || 'Member'}</Link>)}</div>}
           </Section>
 

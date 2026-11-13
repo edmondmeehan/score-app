@@ -113,3 +113,26 @@ export async function saveFounderOffer(form: FormData) {
   });
   redirect('/admin/waitlist' + (error ? '?error=' + encodeURIComponent(error.message) : ''));
 }
+
+/** Owners: give invites to one member, every member, founders only, or one plan. */
+export async function grantInvites(form: FormData) {
+  const supabase = await supabaseServer();
+  const who = String(form.get('who') || 'all');
+  const back = String(form.get('back') || '/admin/waitlist#supply');
+  const cap = Number(form.get('cap') || 0);
+  const { data, error } = await supabase.rpc('staff_grant_invites', {
+    p_who: who, p_amount: Number(form.get('amount') || 1), p_user: who === 'one' ? String(form.get('user') || '') : null, p_cap: cap > 0 ? cap : null,
+  });
+  const sep = back.includes('?') ? '&' : '?';
+  const [path, hash] = back.split('#');
+  redirect(`${path}${sep}${error ? 'error=' + encodeURIComponent(error.message) : 'invited=' + encodeURIComponent(`Invites given to ${data ?? 0} member${data === 1 ? '' : 's'}.`)}${hash ? '#' + hash : ''}`);
+}
+
+/** Owners: automatic invite drip (every N days, +amount, never above cap). */
+export async function saveInviteDrip(form: FormData) {
+  const supabase = await supabaseServer();
+  const { error } = await supabase.rpc('staff_set_invite_drip', {
+    p_enabled: form.get('enabled') === 'on', p_amount: Number(form.get('amount') || 1), p_every_days: Number(form.get('every_days') || 30), p_cap: Number(form.get('cap') || 3),
+  });
+  redirect('/admin/waitlist?' + (error ? 'error=' + encodeURIComponent(error.message) : 'invited=' + encodeURIComponent('Invite drip saved.')) + '#supply');
+}

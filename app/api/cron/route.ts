@@ -46,6 +46,9 @@ export async function GET(request: NextRequest) {
       // Sunday recap (no-op other days; only goes to people with good news).
       const weekly = await sb.rpc('queue_weekly', { p_secret: secret });
       out.weekly = weekly.data ?? weekly.error?.message;
+      // Invite drip (Admin → Waitlist & invites): +N invites to members every X days, when it's due and switched on.
+      const drip = await sb.rpc('run_invite_drip', { p_secret: secret });
+      out.invite_drip = drip.data ?? drip.error?.message;
       // Monthly nudge to keep self-reported bands current (once per 30 days per member; respects reminder settings).
       const band = await sb.rpc('queue_band_refresh', { p_secret: secret });
       out.band_refresh = band.data ?? band.error?.message;

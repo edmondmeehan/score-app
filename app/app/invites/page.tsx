@@ -15,7 +15,7 @@ export default async function Invites({ searchParams }: { searchParams: Promise<
   ]);
   const vouchFor = Object.fromEntries((myVouches || []).map((v) => [v.member_id, v]));
   const allowance = Number(cfg?.find((c) => c.key === (me.is_founder ? 'invites_per_founder' : 'invites_per_member'))?.value ?? 3);
-  const left = Math.max(0, allowance - (invites?.length || 0));
+  const left = Math.max(0, allowance + Number((me as { invite_bonus?: number }).invite_bonus || 0) - (invites?.length || 0));
   const site = process.env.NEXT_PUBLIC_SITE_URL || '';
   const member = ['membership', 'premium', 'black'].includes(me.plan);
   return (
