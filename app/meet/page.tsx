@@ -6,6 +6,9 @@ import SiteFooter from '@/components/SiteFooter';
 import { getCreditMode, CREDIT_COPY } from '@/lib/creditMode';
 
 // Ad landing page: dating first, verification explained further down. The homepage (/) stays as it is.
+// Served from Vercel's cache, refreshed at most once a minute.
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: 'ScoreDate · Invite-only dating in New York',
   description: 'Reliable is the new attractive. Invite-only dating in New York for people who follow through: verified members and fewer, better matches. Request an invite.',

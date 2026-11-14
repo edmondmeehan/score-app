@@ -3,11 +3,11 @@ import './globals.css';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import AdminBar from '@/components/AdminBar';
-import { cookies, headers } from 'next/headers';
-import SeasonLayer from '@/components/SeasonLayer';
+import SeasonClient from '@/components/SeasonClient';
+import ShownMetrics from '@/components/ShownMetrics';
 import AdPixels from '@/components/AdPixels';
 import { getSeasonConfig } from '@/lib/seasonsServer';
-import { activeSeason, seasonsWith, type SeasonKey } from '@/lib/seasons';
+import { activeSeason, seasonsWith } from '@/lib/seasons';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.scoredate.app'),
@@ -36,23 +36,18 @@ export const viewport: Viewport = { themeColor: '#0B0B0C', width: 'device-width'
 const THEME_SCRIPT = `(function(){try{var m=document.cookie.match(/(?:^|; )score_theme=(dark|light|system)/);var t=m?m[1]:'dark';var d=document.documentElement;d.dataset.theme=t;var l=t==='light'||(t==='system'&&matchMedia('(prefers-color-scheme: light)').matches);if(l){var e=document.querySelector('meta[name="theme-color"]');if(e)e.setAttribute('content','#E7E2DB');}}catch(e){}})();`;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  // Seasonal theme: scheduled automatically, or previewed by staff via a short-lived cookie.
+  // Seasonal theme: scheduled automatically. Staff previews are applied in the browser (SeasonClient), so this layout
+  // reads no cookies or headers and public pages can be cached at Vercel's edge.
   const cfg = await getSeasonConfig();
-  const previewKey = (await cookies()).get('score_season_preview')?.value as SeasonKey | undefined;
-  const season = (previewKey && seasonsWith(cfg).find((s) => s.key === previewKey)) || activeSeason(cfg);
+  const season = activeSeason(cfg);
   const seasonVars = season ? ({ '--gold': season.accent, '--gold-light': season.accentLight, '--hero-glow': season.glow } as React.CSSProperties) : undefined;
-  // Shown.io metrics: homepage and /meet only (the public waitlist pages), never in the iPhone app.
-  const h = await headers();
-  const path = h.get('x-sd-path') || '';
-  const shown = (path === '/' || path === '/meet') && !/ScoreDateApp/.test(h.get('user-agent') || '');
   return (
     <html lang="en" className={`${serif.variable} ${sans.variable} ${mono.variable}`} data-theme="dark" data-season={season?.key} style={seasonVars} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: INTRO_SCRIPT }} />
-        {shown && <script defer src="https://shown.io/metrics/V40zqXKR9r" type="text/javascript"></script>}
       </head>
-      <body><Suspense fallback={null}><NavProgress /></Suspense><IntroSplash /><AdminBar />{children}{season && <SeasonLayer seasonKey={season.key} name={season.name} banner={season.banner} effect={season.effect} preview={Boolean(previewKey)} />}<Analytics /><SpeedInsights /><AdPixels /><LiveBeat /></body>
+      <body><Suspense fallback={null}><NavProgress /></Suspense><IntroSplash /><AdminBar />{children}<SeasonClient active={season} seasons={seasonsWith(cfg)} /><ShownMetrics /><Analytics /><SpeedInsights /><AdPixels /><LiveBeat /></body>
     </html>
   );
 }

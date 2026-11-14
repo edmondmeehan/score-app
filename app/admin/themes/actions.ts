@@ -41,6 +41,6 @@ export async function previewSeason(form: FormData) {
   const key = String(form.get('key') || '');
   const store = await cookies();
   if (!key) store.delete('score_season_preview');
-  else store.set('score_season_preview', key, { path: '/', maxAge: 3600, sameSite: 'lax', secure: true, httpOnly: true });
+  else store.set('score_season_preview', key, { path: '/', maxAge: 3600, sameSite: 'lax', secure: true, httpOnly: false });
   redirect(key ? '/?' : '/admin/themes?ok=' + encodeURIComponent('Preview ended.'));
 }

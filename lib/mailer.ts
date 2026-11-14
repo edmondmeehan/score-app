@@ -18,11 +18,13 @@ export async function sendEmail<K extends TemplateName>(
   name: K,
   data: Parameters<typeof build<K>>[1],
   attachments?: { filename: string; content: string; content_type?: string }[],
+  opts?: { fromOutbox?: boolean },
 ): Promise<{ ok: boolean; id?: string; error?: string }> {
   if (!to) return { ok: false, error: 'no recipient' };
   if (isTestAddress(to)) return { ok: true, id: 'skipped-test-address' };
   const { subject, html, text } = build(name, data);
   let result: { ok: boolean; id?: string; error?: string };
+  let retryable = false;
   try {
     const email = await getIntegration('email');
     const key = email.secrets.resend_api_key || process.env.RESEND_API_KEY;
@@ -30,25 +32,44 @@ export async function sendEmail<K extends TemplateName>(
     if (!key || !from) {
       result = { ok: false, error: 'Resend not set up (add the API key and From address in admin → Integrations → Email)' };
     } else {
-      const res = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          from: email.config.from_name ? `${email.config.from_name} <${from}>` : from,
-          to: [to],
-          subject,
-          html,
-          text,
-          reply_to: email.config.reply_to || undefined,
-          tags: [{ name: 'template', value: name }],
-          ...(attachments?.length ? { attachments } : {}),
-        }),
+      const payload = JSON.stringify({
+        from: email.config.from_name ? `${email.config.from_name} <${from}>` : from,
+        to: [to],
+        subject,
+        html,
+        text,
+        reply_to: email.config.reply_to || undefined,
+        tags: [{ name: 'template', value: name }],
+        ...(attachments?.length ? { attachments } : {}),
       });
-      const body = await res.json().catch(() => ({}));
-      result = res.ok ? { ok: true, id: body.id } : { ok: false, error: body?.message || `Resend error ${res.status}` };
+      // During a surge Resend may say "slow down" (429) or hiccup (5xx): wait a moment and try again, up to 3 more times.
+      result = { ok: false, error: 'not sent' };
+      for (let attempt = 0; attempt < 4; attempt++) {
+        if (attempt) await new Promise((r) => setTimeout(r, [0, 700, 1600, 3500][attempt] + Math.random() * 400));
+        try {
+          const res = await fetch('https://api.resend.com/emails', {
+            method: 'POST', headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' }, body: payload, signal: AbortSignal.timeout(10_000),
+          });
+          const body = await res.json().catch(() => ({}));
+          if (res.ok) { result = { ok: true, id: body.id }; break; }
+          result = { ok: false, error: body?.message || `Resend error ${res.status}` };
+          retryable = res.status === 429 || res.status >= 500;
+          if (!retryable) break;
+        } catch (e) {
+          result = { ok: false, error: e instanceof Error ? e.message : 'send failed' };
+          retryable = true;
+        }
+      }
     }
   } catch (e) {
     result = { ok: false, error: e instanceof Error ? e.message : 'send failed' };
+  }
+  // Still busy after the retries: park it in the outbox; the 30-minute job sends it (attachments can't be queued).
+  if (!result.ok && retryable && !opts?.fromOutbox && !attachments?.length) {
+    try {
+      await supabaseAnon().rpc('queue_email', { p_secret: process.env.SCORE_SERVER_SECRET, p_to: to, p_template: name, p_data: data as unknown as Record<string, unknown>, p_error: result.error ?? null });
+      result = { ...result, error: `${result.error} (queued to retry)` };
+    } catch { /* best effort */ }
   }
   try {
     await supabaseAnon().rpc('log_email', {
@@ -116,4 +137,17 @@ export async function sendBatch<K extends TemplateName>(name: K, allItems: { to:
     }).then(() => null, () => null)));
   }
   return { sent, failed: items.length - sent, error: failures[0] };
+}
+
+/** Cron: send emails that were parked in the outbox during a surge. Returns how many went out. */
+export async function drainOutbox(limit = 50): Promise<number> {
+  const sb = supabaseAnon(); const secret = process.env.SCORE_SERVER_SECRET;
+  const { data } = await sb.rpc('claim_email_outbox', { p_secret: secret, p_limit: limit });
+  let sent = 0;
+  for (const row of (data || []) as { id: number; to_email: string; template: TemplateName; data: never }[]) {
+    const r = await sendEmail(row.to_email, row.template, row.data, undefined, { fromOutbox: true });
+    if (r.ok) sent++;
+    await sb.rpc('finish_email_outbox', { p_secret: secret, p_id: row.id, p_ok: r.ok, p_error: r.error ?? null });
+  }
+  return sent;
 }

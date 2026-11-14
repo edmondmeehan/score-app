@@ -8,8 +8,8 @@ import SiteFooter from '@/components/SiteFooter';
 import DemandMap from './DemandMap';
 import { getCreditMode, CREDIT_COPY } from '@/lib/creditMode';
 
-// Rendered per request so the map always reflects the latest waitlist and the admin sample-data switch.
-export const dynamic = 'force-dynamic';
+// Served from Vercel's cache and refreshed at most once a minute, so a traffic spike costs almost nothing.
+export const revalidate = 60;
 
 export default async function Landing() {
   const copy = CREDIT_COPY[await getCreditMode()];

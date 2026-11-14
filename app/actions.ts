@@ -1,6 +1,7 @@
 'use server';
 import { clientIp, verifyHuman } from '@/lib/turnstile';
 import { cookies } from 'next/headers';
+import { after } from 'next/server';
 import { supabaseAnon, supabaseServer } from '@/lib/supabase/server';
 import { SITE_URL } from '@/lib/emails';
 import { sendEmail } from '@/lib/mailer';
@@ -45,27 +46,28 @@ export async function joinWaitlist(_: WaitlistState, form: FormData): Promise<Wa
     });
     if (e2 && !e2.message.includes('duplicate')) return { ok: false, message: 'Something went wrong. Try again.' };
     if (e2) return { ok: true, message: `You're already on the waitlist with ${email}. We'll email you when your invite is ready.` };
-    await Promise.all([sendEmail(email, 'waitlist_joined', { first_name: first || null, place, open }), trackEvent(quick ? 'waitlist_join_app' : 'waitlist_join')]);
+    after(() => Promise.all([sendEmail(email, 'waitlist_joined', { first_name: first || null, place, open }), trackEvent(quick ? 'waitlist_join_app' : 'waitlist_join')]));
     return { ok: true, message: `You're on the waitlist for ${place}. We sent a confirmation to ${email} and will email you when your invite is ready.` };
   }
   if (error) return { ok: false, message: /zip/i.test(error.message) ? error.message : 'Something went wrong. Try again.' };
   const r = data as { status: 'joined' | 'exists'; resend?: boolean; share_code?: string; status_token?: string; first_name?: string | null; position?: number; total?: number; founder?: boolean; founder_reason?: string | null; referred?: boolean };
   if (r.status === 'exists') {
     // Never show someone else's place in line on screen; email the owner of the address their own link.
-    if (r.resend && r.status_token) await sendEmail(email, 'waitlist_joined', { first_name: r.first_name ?? null, place, open, share_url: `${SITE_URL}/w/${r.status_token}`, again: true });
+    if (r.resend && r.status_token) after(() => sendEmail(email, 'waitlist_joined', { first_name: r.first_name ?? null, place, open, share_url: `${SITE_URL}/w/${r.status_token}`, again: true }));
     return { ok: true, message: `You're already on the waitlist. We just emailed ${email} a link to check your spot and share your invite link.` };
   }
   const shareUrl = `${SITE_URL}/w/${r.status_token}`;
   store.delete('score_ref');
   const eventId = newEventId();
-  await Promise.all([
-    recordAttribution(email),
+  // Respond right away; the email, ad-platform ping and stats happen just after (so a surge never slows the form down).
+  await recordAttribution(email);
+  after(() => Promise.all([
     sendMetaLead(email, eventId),
     sendEmail(email, 'waitlist_joined', { first_name: first || null, place, open, share_url: shareUrl, position: r.position ?? null, founder: Boolean(r.founder) }),
     trackEvent(quick ? 'waitlist_join_app' : 'waitlist_join'),
     r.referred ? trackEvent('waitlist_join_referred') : Promise.resolve(),
     r.referred ? notifyReferrer(email) : Promise.resolve(),
-  ]);
+  ]));
   const joined: Joined = { eventId, code: r.share_code!, token: r.status_token!, position: r.position ?? null, total: r.total ?? null, founder: Boolean(r.founder), founderReason: r.founder_reason ?? null, referred: Boolean(r.referred) };
   return {
     ok: true,

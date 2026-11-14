@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { supabaseAnon } from '@/lib/supabase/server';
-import { sendBatch } from '@/lib/mailer';
+import { drainOutbox, sendBatch } from '@/lib/mailer';
 import { unsubUrl } from '@/lib/unsub';
 import { flushNotifications } from '@/lib/notify';
 import { reportBlocks } from '@/lib/adminReport';
@@ -35,7 +35,9 @@ export async function GET(request: NextRequest) {
 
   try {
     if (job === 'drop') {
-      // Right after the Drop flips (00:00 UTC = 7pm ET winter / 8pm summer): build Drops + push, then the email.
+      // Right after the Drop flips (00:00 UTC = 7pm ET winter / 8pm summer): build everyone's Drop in small batches first,
+      // so members opening the app all at once only read a finished list. Then push, then the email.
+      out.drops_built = await buildDrops(sb, secret, 40_000);
       const dropReady = await sb.rpc('queue_drop_ready', { p_secret: secret });
       out.drop_ready = dropReady.data ?? dropReady.error?.message;
       const rows = await claim('daily_drop');
@@ -83,6 +85,9 @@ export async function GET(request: NextRequest) {
           : 0;
       }
     } else {
+      // Catch-up: anyone who became active since midnight gets their Drop built now; and send emails parked during a surge.
+      out.drops_built = await buildDrops(sb, secret, 15_000);
+      out.outbox = await drainOutbox(50).catch((e) => (e as Error).message);
       const housekeeping = await sb.rpc('cron_housekeeping', { p_secret: secret });
       out.housekeeping = housekeeping.data ?? housekeeping.error?.message;
 
@@ -137,4 +142,16 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(out, { status: 500 });
   }
   return NextResponse.json(out);
+}
+
+/** Calls cron_build_drops (≈2 seconds of work per call) until everyone has today's Drop or the time budget runs out. */
+async function buildDrops(sb: ReturnType<typeof supabaseAnon>, secret: string | undefined, budgetMs: number): Promise<number | string> {
+  const t0 = Date.now(); let total = 0;
+  while (Date.now() - t0 < budgetMs) {
+    const { data, error } = await sb.rpc('cron_build_drops', { p_secret: secret, p_max: 200 });
+    if (error) return /cron_build_drops|does not exist|schema cache/i.test(error.message) ? 'run migration 0078' : error.message;
+    total += Number(data) || 0;
+    if (!data) break;
+  }
+  return total;
 }

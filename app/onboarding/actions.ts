@@ -113,14 +113,19 @@ async function checkPhotos(supabase: Awaited<ReturnType<typeof supabaseServer>>,
   let pos = (last?.[0]?.position ?? -1) + 1;
   for (const file of photos.slice(0, room)) {
     if (!file.type.startsWith('image/')) continue;
-    const bytes = new Uint8Array(await file.arrayBuffer());
-    const meta = await sharp(bytes).metadata().catch(() => null);
+    const original = new Uint8Array(await file.arrayBuffer());
+    const meta = await sharp(original).metadata().catch(() => null);
     if (meta?.width && meta?.height && Math.min(meta.width, meta.height) < 600) {
       results.push({ name: file.name, status: 'error', similarity: null, reason: 'Too low-resolution. Use an original photo, not a screenshot.' });
       continue;
     }
-    const path = `${user.id}/${crypto.randomUUID()}.${file.type.split('/')[1] || 'jpg'}`;
-    const up = await supabase.storage.from('photos').upload(path, bytes, { contentType: file.type });
+    // Store a phone-sized copy (longest side 1440px, ~85% JPEG, upright, no location data). Phone photos are often
+    // 4–8 MB; this is usually 200–400 KB, so the Daily Drop loads fast and bandwidth stays low during traffic spikes.
+    const bytes = await sharp(original).rotate().resize({ width: 1440, height: 1440, fit: 'inside', withoutEnlargement: true })
+      .jpeg({ quality: 85, mozjpeg: true }).toBuffer().then((b) => new Uint8Array(b)).catch(() => original);
+    const resized = bytes !== original;
+    const path = `${user.id}/${crypto.randomUUID()}.${resized ? 'jpg' : file.type.split('/')[1] || 'jpg'}`;
+    const up = await supabase.storage.from('photos').upload(path, bytes, { contentType: resized ? 'image/jpeg' : file.type, cacheControl: '31536000' });
     if (up.error) { results.push({ name: file.name, status: 'error', similarity: null, reason: up.error.message }); continue; }
     const { data: row, error: insErr } = await supabase.from('photos').insert({ user_id: user.id, path, position: pos++ }).select('id').single();
     if (insErr || !row) { results.push({ name: file.name, status: 'error', similarity: null, reason: insErr?.message || 'Could not save' }); continue; }
