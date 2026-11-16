@@ -60,6 +60,9 @@ export async function flushNotifications(actorId: string | null = null, limit = 
     if (fcmReady() || apnsReady()) {
       const { data: toks } = await sb.rpc('native_tokens_for', { p_secret: secret, p_users: [...new Set(rows.map((r) => r.user_id))] });
       const byUser = new Map<string, { token: string; platform: string }[]>();
+      // Unread messages per person, shown as the red number on the app icon.
+      const { data: counts } = await sb.rpc('unread_counts_for', { p_secret: secret, p_users: [...new Set(rows.map((r) => r.user_id))] });
+      const badge = new Map<string, number>(((counts as { user_id: string; n: number }[]) || []).map((c) => [c.user_id, Number(c.n) || 0]));
       for (const t of (toks as { user_id: string; token: string; platform: string }[]) || []) byUser.set(t.user_id, [...(byUser.get(t.user_id) || []), t]);
       // iPhone tokens from the Capacitor app are raw APNs tokens; Android tokens go through Firebase.
       const send = async (t: { token: string; platform: string }, msg: Parameters<typeof sendApns>[1]) => {
@@ -71,7 +74,7 @@ export async function flushNotifications(actorId: string | null = null, limit = 
         return fcmReady() ? sendNativePush(t.token, msg) : ('error' as const);
       };
       await Promise.all(rows.flatMap((n) => (byUser.get(n.user_id) || []).map(({ token: tk, platform }) =>
-        send({ token: tk, platform }, { title: n.title, body: n.body, url: n.url, tag: n.kind, high: n.category === 'interaction' }).then((r) => {
+        send({ token: tk, platform }, { title: n.title, body: n.body, url: n.url, tag: n.kind, high: n.category === 'interaction', badge: badge.get(n.user_id) }).then((r) => {
           if (r === 'ok') out.pushed++;
           if (r === 'dead') { out.dead++; return sb.rpc('native_token_dead', { p_secret: secret, p_token: tk }).then(() => undefined, () => undefined); }
         }))));

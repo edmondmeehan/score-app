@@ -79,6 +79,11 @@ h1, h2, h3 { margin: 0; font-weight: 400; }
 .tabbar a:hover { color: var(--ivory); }
 .tabbar a.on { color: var(--gold-light); background: var(--tab-on); }
 .tabbar a svg { transition: transform .2s; }
+.tab-dot { position: absolute; top: -2px; right: -4px; width: 10px; height: 10px; border-radius: 50%; background: #E5484D; box-shadow: 0 0 0 2px var(--onyx, #0B0B0C); animation: tabdot-in .25s ease-out; }
+@keyframes tabdot-in { from { transform: scale(0); } to { transform: scale(1); } }
+.seg-switch { display: inline-flex; gap: 4px; padding: 4px; border-radius: 999px; background: var(--graphite); border: 1px solid var(--line-soft); align-self: flex-start; }
+.seg-switch a { padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; color: var(--muted); text-decoration: none; }
+.seg-switch a.on { background: var(--tab-on); color: var(--gold-light); }
 .tabbar a:active svg { transform: scale(.88); }
 .tabbar .dot { position: absolute; margin: -2px 0 0 18px; width: 7px; height: 7px; border-radius: 9px; background: var(--gold); box-shadow: 0 0 0 2px var(--dot-ring); }
 .composer { position: fixed; z-index: 20; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom)); width: min(420px, calc(100% - 28px)); padding: 6px; border-radius: 28px; background: var(--glass-strong); border: 1px solid var(--glass-line); box-shadow: 0 12px 40px var(--shadow); backdrop-filter: blur(22px) saturate(160%); -webkit-backdrop-filter: blur(22px) saturate(160%); }

@@ -53,9 +53,10 @@ async function sendTo(host: keyof typeof HOSTS, token: string, body: string, pri
 export type ApnsDetail = { result: 'ok' | 'dead' | 'error'; status: number; reason?: string; host?: keyof typeof HOSTS };
 
 /** Like sendApns, but also returns Apple's status and reason (for the admin push check). */
-export async function sendApnsDetail(token: string, n: { title: string; body: string; url: string; tag?: string; high?: boolean }): Promise<ApnsDetail> {
+export async function sendApnsDetail(token: string, n: { title: string; body: string; url: string; tag?: string; high?: boolean; badge?: number }): Promise<ApnsDetail> {
   if (!apnsReady()) return { result: 'error', status: 0, reason: 'APNs keys not set on the server' };
-  const body = JSON.stringify({ aps: { alert: { title: n.title, body: n.body }, sound: 'default', 'thread-id': n.tag }, url: n.url });
+  // badge = unread messages: the red number on the app icon.
+  const body = JSON.stringify({ aps: { alert: { title: n.title, body: n.body }, sound: 'default', 'thread-id': n.tag, ...(typeof n.badge === 'number' ? { badge: n.badge } : {}) }, url: n.url });
   const priority = n.high ? '10' : '5';
   try {
     let host: keyof typeof HOSTS = 'production';
@@ -72,6 +73,6 @@ export async function sendApnsDetail(token: string, n: { title: string; body: st
 }
 
 /** Returns 'ok', 'dead' (token no longer valid) or 'error'. */
-export async function sendApns(token: string, n: { title: string; body: string; url: string; tag?: string; high?: boolean }): Promise<'ok' | 'dead' | 'error'> {
+export async function sendApns(token: string, n: { title: string; body: string; url: string; tag?: string; high?: boolean; badge?: number }): Promise<'ok' | 'dead' | 'error'> {
   return (await sendApnsDetail(token, n)).result;
 }

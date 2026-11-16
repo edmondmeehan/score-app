@@ -34,7 +34,7 @@ async function accessToken(sa: SA): Promise<string> {
 }
 
 /** Returns 'ok', 'dead' (token no longer valid) or 'error'. */
-export async function sendNativePush(token: string, n: { title: string; body: string; url: string; tag?: string; high?: boolean }): Promise<'ok' | 'dead' | 'error'> {
+export async function sendNativePush(token: string, n: { title: string; body: string; url: string; tag?: string; high?: boolean; badge?: number }): Promise<'ok' | 'dead' | 'error'> {
   const sa = account();
   if (!sa) return 'error';
   try {
@@ -44,7 +44,7 @@ export async function sendNativePush(token: string, n: { title: string; body: st
       body: JSON.stringify({ message: {
         token, notification: { title: n.title, body: n.body }, data: { url: n.url },
         android: { priority: n.high ? 'HIGH' : 'NORMAL', notification: { tag: n.tag, channel_id: 'score' } },
-        apns: { headers: { 'apns-priority': n.high ? '10' : '5' }, payload: { aps: { sound: 'default', 'thread-id': n.tag } } },
+        apns: { headers: { 'apns-priority': n.high ? '10' : '5' }, payload: { aps: { sound: 'default', 'thread-id': n.tag, ...(typeof n.badge === 'number' ? { badge: n.badge } : {}) } } },
       } }),
     });
     if (res.ok) return 'ok';

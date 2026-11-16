@@ -31,6 +31,8 @@ const config: CapacitorConfig = {
     SplashScreen: { launchShowDuration: 0, launchAutoHide: true, launchFadeOutDuration: 0, backgroundColor: BG, showSpinner: false, iosSpinnerStyle: 'small' },
     StatusBar: { style: 'DARK', backgroundColor: BG, overlaysWebView: true },
     PushNotifications: { presentationOptions: ['badge', 'sound', 'alert'] },
+    // App-icon badge = unread messages. The app sets it; don't wipe it just because the app was opened.
+    Badge: { persist: true, autoClear: false },
   },
 };
 

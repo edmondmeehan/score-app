@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import EventsSwitch from '@/components/EventsSwitch';
 import { requireMember } from '@/lib/session';
 import { countdown, dayParts, eventImage, timeOnly, type EventRow } from '@/lib/events';
 import { getReserveVisible } from '@/lib/reserve';
@@ -34,6 +35,7 @@ export default async function Events() {
 
   return (
     <div className="phone">
+      <EventsSwitch on="events" />
       <span className="eyebrow">Members only</span>
       <h1 className="serif" style={{ fontSize: 40 }}>Events</h1>
       <span className="muted small">Small, hosted nights in the city.{reserve ? ' Reserve members get first access.' : ''} <Link href="/app/map">See where members are</Link>.</span>

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import EventsSwitch from '@/components/EventsSwitch';
 import { requireMember } from '@/lib/session';
 import { gday, isOpen, type Giveaway } from '@/lib/giveaways';
 import GiveawayCard from '../discover/GiveawayCard';
@@ -14,6 +15,7 @@ export default async function AppGiveaways() {
   const mine = await Promise.all(open.map((g) => supabase.rpc('my_giveaway', { p_g: g.id }).then((r) => r.data as { entered: boolean; entries: number } | null)));
   return (
     <div className="phone">
+      <EventsSwitch on="giveaways" />
       <span className="eyebrow">Free to enter</span>
       <h1 className="serif" style={{ fontSize: 40 }}>Giveaways</h1>
       <span className="small muted">Concert tickets, dinners and more. No purchase necessary. Get bonus entries for a complete profile and for friends who join with your invite.</span>
