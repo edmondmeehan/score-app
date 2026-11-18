@@ -12,6 +12,7 @@ import { BandPill } from '@/components/ui';
 import { SITE_URL } from '@/lib/emails';
 import type { Profile } from '@/lib/types';
 import Chat from './Chat';
+import ChatBack from './ChatBack';
 import { photoUrls } from '@/lib/photos';
 import DatePanel, { type Pick, type Plan } from './DatePanel';
 import { nearestFirst, openers, publicTrend } from '@/lib/engagement';
@@ -31,7 +32,8 @@ export default async function Conversation({ params, searchParams }: { params: P
     supabase.from('profiles').select('*').eq('id', otherId).maybeSingle(),
     supabase.from('messages').select('*').eq('conversation_id', id).order('created_at').limit(200),
     supabase.from('date_plans').select('*').eq('conversation_id', id).in('status', ['proposed', 'accepted']).order('created_at', { ascending: false }).limit(1),
-    supabase.rpc('mark_read', { p_conversation: id }),
+    // Marked read in the browser when the chat actually opens (Chat.tsx), so the Messages list can preload chats safely.
+    Promise.resolve(null),
     supabase.rpc('featured_spots_live'),
     me.zip ? supabase.rpc('zip_lookup', { p_zip: me.zip }) : Promise.resolve({ data: null }),
     supabase.rpc('other_read_at', { p_conversation: id }),
@@ -61,7 +63,7 @@ export default async function Conversation({ params, searchParams }: { params: P
     <div className="phone" style={{ paddingBottom: 'calc(240px + env(safe-area-inset-bottom))' }}>
       <ScreenshotContext context="chat" target={otherId} />
       <div className="row appbar">
-        <Link href="/app/messages" aria-label="Back" className="btn ghost sm" style={{ width: 44, padding: 0 }}>‹</Link>
+        <ChatBack />
         <Link href={`/app/u/${otherId}`} className="avatar" aria-label={`${o?.first_name || 'Member'}'s profile`} style={{ width: 44, height: 44, fontSize: 18, textDecoration: 'none' }}>
           {otherPhotos[otherId]?.[0] ? <img src={otherPhotos[otherId][0]} alt="" /> : (o?.first_name?.[0] || '·')}
         </Link>

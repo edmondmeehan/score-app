@@ -1,6 +1,6 @@
 'use client';
 import OpenerIdeas from './OpenerIdeas';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { haptic } from '@/lib/haptics';
 import { kindClose, otherReadAt, sendMessage, sendPhoto, sendVoice, voiceListened } from '../../actions';
@@ -96,13 +96,41 @@ export default function Chat({ conversationId, meId, otherName, initial, canSend
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` }, (payload) => {
         const m = payload.new as Msg;
         setMsgs((cur) => (cur.some((x) => x.id === m.id) ? cur : [...cur, m]));
-        if (m.sender_id !== meId) haptic('medium');
+        if (m.sender_id !== meId) {
+          haptic('medium');
+          // You're looking at it, so it's read.
+          if (document.visibilityState === 'visible') sb.rpc('mark_read', { p_conversation: conversationId }).then(() => window.dispatchEvent(new Event('sd:unread')), () => null);
+        }
       })
       .subscribe();
     const t = setInterval(() => { otherReadAt(conversationId).then(setReadAt).catch(() => null); }, 15000);
     return () => { sb.removeChannel(ch); clearInterval(t); };
   }, [conversationId, meId]);
-  useEffect(() => { end.current?.scrollIntoView({ behavior: 'smooth' }); }, [msgs.length]);
+  // Open already at the latest message (no scroll animation on arrival); new messages after that glide in.
+  const first = useRef(true);
+  useLayoutEffect(() => {
+    end.current?.scrollIntoView({ behavior: first.current ? 'auto' : 'smooth', block: 'end' });
+    first.current = false;
+  }, [msgs.length]);
+  // When the chat opens: mark it read (clears the red dot and app badge), and pick up anything sent since this screen
+  // was preloaded from the Messages list.
+  useEffect(() => {
+    const sb = supabaseBrowser();
+    const markRead = () => sb.rpc('mark_read', { p_conversation: conversationId }).then(() => window.dispatchEvent(new Event('sd:unread')), () => null);
+    markRead();
+    const lastAt = initial.length ? initial[initial.length - 1].created_at : null;
+    let q = sb.from('messages').select('*').eq('conversation_id', conversationId).order('created_at').limit(100);
+    if (lastAt) q = q.gt('created_at', lastAt);
+    q.then(({ data }) => {
+      if (!data?.length) return;
+      setMsgs((cur) => [...cur, ...(data as Msg[]).filter((m) => !cur.some((x) => x.id === m.id))]);
+      markRead();
+    }, () => null);
+    const onVisible = () => { if (document.visibilityState === 'visible') markRead(); };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationId]);
 
   async function send(e: React.FormEvent) {
     e.preventDefault();

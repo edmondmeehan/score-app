@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { requireMember } from '@/lib/session';
 import { photoUrls } from '@/lib/photos';
+import ChatLink from './ChatLink';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,15 +30,15 @@ export default async function Messages({ searchParams }: { searchParams: Promise
       {me.plan === 'preview' && <div className="notice test">Preview members can reply to Notes, but can&apos;t start chats. <Link href="/plans">Become a member</Link> to say hello.</div>}
       {rows.length === 0 && <p className="muted">No conversations yet. Open someone from your Daily Drop and send a note.</p>}
       <div>
-        {rows.map(({ c, other, m }) => (
-          <Link key={c.id} href={`/app/messages/${c.id}`} className="list-row">
+        {rows.map(({ c, other, m }, i) => (
+          <ChatLink key={c.id} href={`/app/messages/${c.id}`} preload={i < 8}>
             <span className="avatar">{photos[other]?.[0] ? <img src={photos[other][0]} alt="" /> : name[other]?.[0]}</span>
             <span className="stack grow" style={{ gap: 4, minWidth: 0 }}>
               <span className="row" style={{ gap: 8 }}><strong>{name[other] || 'Member'}</strong>{c.note_from && c.note_from !== me.id && <span className="chip" style={{ fontSize: 11, padding: '2px 8px', color: 'var(--gold-light)' }}>Note</span>}{m && m.sender_id !== me.id && <span className="your-turn">Your turn</span>}</span>
               <span className="small muted" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m ? `${m.sender_id === me.id ? 'You: ' : ''}${m.body}` : 'Say hello'}</span>
             </span>
             {m && m.sender_id !== me.id && (!readAt[c.id] || m.created_at > readAt[c.id]) && <span aria-label="Unread" style={{ width: 10, height: 10, borderRadius: 999, background: 'var(--gold)', flex: 'none' }} />}
-          </Link>
+          </ChatLink>
         ))}
       </div>
     </div>

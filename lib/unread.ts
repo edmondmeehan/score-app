@@ -35,7 +35,8 @@ export function useUnreadMessages(path: string) {
     document.addEventListener('visibilitychange', onVis);
     window.addEventListener('focus', onVis);
     window.addEventListener('sd:push', onVis);
-    return () => { alive = false; clearInterval(t); document.removeEventListener('visibilitychange', onVis); window.removeEventListener('focus', onVis); window.removeEventListener('sd:push', onVis); };
+    window.addEventListener('sd:unread', onVis);
+    return () => { alive = false; clearInterval(t); document.removeEventListener('visibilitychange', onVis); window.removeEventListener('focus', onVis); window.removeEventListener('sd:push', onVis); window.removeEventListener('sd:unread', onVis); };
   }, [path]);
   return n;
 }
