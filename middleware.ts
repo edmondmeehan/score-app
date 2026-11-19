@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextFetchEvent, type NextRequest } from 'next/server';
 import { ATTR_COOKIE, attrFromParams } from '@/lib/adsShared';
+import { APP_ENV, LIVE_URL } from '@/lib/appEnv';
 import { SESSION_COOKIE, SESSION_MINUTES, VISITOR_COOKIE, isBot, parseUA, sendEvent, trafficSource } from '@/lib/analytics';
 
 export async function middleware(request: NextRequest, event: NextFetchEvent) {
@@ -27,6 +28,19 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
   const hasSession = request.cookies.getAll().some((c) => c.name.startsWith('sb-') && c.name.includes('auth-token'));
   const { data: { user } } = hasSession ? await supabase.auth.getUser() : { data: { user: null } };
   const path = request.nextUrl.pathname;
+
+  // Dev and staging are staff-only. Everyone else (and search engines) goes to the live site.
+  if (APP_ENV !== 'live' && !TEST_OPEN.some((p) => path === p || path.startsWith(p + '/'))) {
+    const staff = user ? (await supabase.rpc('am_staff')).data === true : false;
+    if (!staff) {
+      if (!user && (path.startsWith('/admin') || path === '/')) {
+        const url = request.nextUrl.clone();
+        url.pathname = '/signin'; url.search = ''; url.searchParams.set('next', path === '/' ? '/admin' : path);
+        return NextResponse.redirect(url);
+      }
+      return NextResponse.redirect(LIVE_URL + (path === '/' ? '' : path), { headers: { 'X-Robots-Tag': 'noindex' } });
+    }
+  }
 
   // Brand creative (public/_creative) is staff-only: anyone else gets a plain 404.
   if (path.startsWith('/_creative/')) {
@@ -86,12 +100,14 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
     response.cookies.set('score_seen', '1', { httpOnly: true, sameSite: 'lax', secure: true, path: '/', maxAge: 60 * 60 });
   }
   // Staging (and any non-production host): keep it out of search results.
-  if (request.headers.get('host')?.startsWith('staging.') || process.env.VERCEL_ENV === 'preview') {
+  if (APP_ENV !== 'live' || process.env.VERCEL_ENV === 'preview') {
     response.headers.set('X-Robots-Tag', 'noindex, nofollow');
   }
   return response;
 }
 
+// On dev/staging these stay open so staff can sign in (and webhooks/cron still reach the server).
+const TEST_OPEN = ['/signin', '/auth', '/two-step', '/api', '/legal', '/maintenance', '/manifest.webmanifest', '/icon.svg', '/apple-icon.png'];
 const MAINT_OPEN = ['/maintenance', '/admin', '/signin', '/auth', '/legal', '/manifest.webmanifest', '/icon.svg', '/apple-icon.png'];
 let maint: { on: boolean; at: number } = { on: false, at: 0 };
 /** Checked at most every 20 seconds per server instance, so it adds no real delay. */

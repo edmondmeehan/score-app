@@ -5,6 +5,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import AdminBar from '@/components/AdminBar';
 import SeasonClient from '@/components/SeasonClient';
 import ShownMetrics from '@/components/ShownMetrics';
+import EnvBanner from '@/components/EnvBanner';
 import AdPixels from '@/components/AdPixels';
 import { getSeasonConfig } from '@/lib/seasonsServer';
 import { activeSeason, seasonsWith } from '@/lib/seasons';
@@ -47,7 +48,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: INTRO_SCRIPT }} />
       </head>
-      <body><Suspense fallback={null}><NavProgress /></Suspense><IntroSplash /><AdminBar />{children}<SeasonClient active={season} seasons={seasonsWith(cfg)} /><ShownMetrics /><Analytics /><SpeedInsights /><AdPixels /><LiveBeat /></body>
+      <body><EnvBanner /><Suspense fallback={null}><NavProgress /></Suspense><IntroSplash /><AdminBar />{children}<SeasonClient active={season} seasons={seasonsWith(cfg)} /><ShownMetrics /><Analytics /><SpeedInsights /><AdPixels /><LiveBeat /></body>
     </html>
   );
 }
