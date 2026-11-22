@@ -247,9 +247,9 @@ export async function writeVouch(form: FormData) {
   back('/app/invites', 'ok', 'Sent. They’ll choose whether it shows on their profile.');
 }
 
-export type HerePerson = { id: string; first_name: string | null; age: number | null; job: string | null; band: string | null; since: string; conversation_id: string | null; waved: boolean; waved_me: boolean; photo?: string | null };
+export type HerePerson = { id: string; first_name: string | null; age: number | null; job: string | null; band: string | null; since: string; conversation_id: string | null; waved: boolean; waved_me: boolean; interested?: boolean; mutual?: boolean; photo?: string | null };
 export type HereData = {
-  live: boolean; here?: number; me_here?: boolean; hidden?: boolean; waves_left?: number;
+  live: boolean; mode?: 'before' | 'live' | null; going?: boolean; going_count?: number; here?: number; me_here?: boolean; hidden?: boolean; waves_left?: number;
   matches?: { id: string; first_name: string | null; conversation_id: string; photo?: string | null }[];
   people?: HerePerson[];
 } | null;
@@ -276,6 +276,16 @@ export async function waveAt(eventId: string, toId: string, message: string): Pr
   after(() => flushNotifications(user.id, 20));
   await trackEvent('event_wave', user.id).catch(() => null);
   return { ok: true, conversationId: String(data) };
+}
+
+/** Quietly mark (or unmark) interest in someone at the same event. Only revealed if it's mutual, which opens a chat. */
+export async function setInterest(eventId: string, toId: string, on: boolean): Promise<{ ok: boolean; mutual?: boolean; conversationId?: string | null; error?: string }> {
+  const { supabase, user } = await ctx();
+  const { data, error } = await supabase.rpc('event_interest_set', { p_event: eventId, p_to: toId, p_on: on });
+  if (error) return { ok: false, error: error.message };
+  const r = data as { mutual: boolean; conversation_id?: string | null };
+  if (r.mutual) { after(() => flushNotifications(user.id, 20)); await trackEvent('event_mutual', user.id).catch(() => null); }
+  return { ok: true, mutual: r.mutual, conversationId: r.conversation_id ?? null };
 }
 
 /** Hide or show yourself in Who's here for one event. */
