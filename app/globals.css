@@ -540,3 +540,17 @@ a.chip { text-decoration: none; color: inherit; }
 .spot-pill { position: fixed; bottom: calc(92px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 26; padding: 6px 14px; border-radius: 999px; font: 600 12px var(--sans); letter-spacing: .02em; color: var(--on-gold); background: var(--gold); box-shadow: 0 6px 18px color-mix(in srgb, var(--gold) 35%, transparent); white-space: nowrap; pointer-events: none; }
 html.spotlit .btn:not(.ghost) { box-shadow: 0 0 0 1px color-mix(in srgb, var(--gold) 30%, transparent), 0 6px 20px color-mix(in srgb, var(--gold) 28%, transparent); }
 @media (prefers-reduced-motion: reduce) { .spot-glow.pulse { animation: none; } }
+
+/* Message reactions */
+.react-target { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; touch-action: manipulation; }
+.react-target > * { max-width: 100%; }
+.react-bar { display: flex; gap: 2px; padding: 4px 6px; border-radius: 999px; background: var(--graphite); border: 1px solid var(--line-soft); box-shadow: 0 6px 20px rgba(0,0,0,.35); animation: react-in .14s ease-out; align-self: flex-start; }
+.react-bar.mine { align-self: flex-end; }
+.react-bar button { border: 0; background: transparent; font-size: 24px; line-height: 1; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; transition: transform .12s; }
+.react-bar button:active { transform: scale(1.25); }
+.react-bar button.on { background: var(--line-soft); }
+.react-pill { display: inline-flex; align-items: center; gap: 2px; margin-top: -12px; padding: 2px 7px; border-radius: 999px; font-size: 14px; line-height: 1.4; background: var(--graphite); border: 1px solid var(--line-soft); color: var(--ivory); cursor: pointer; margin-left: 10px; }
+.react-pill.mine { margin-left: 0; margin-right: 10px; }
+.react-count { font-size: 11px; opacity: .75; margin-left: 2px; }
+@keyframes react-in { from { opacity: 0; transform: translateY(4px) scale(.96); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .react-bar { animation: none; } }

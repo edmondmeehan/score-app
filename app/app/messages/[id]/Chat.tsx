@@ -8,6 +8,17 @@ import VoiceRecorder, { type Recording } from '@/components/VoiceRecorder';
 import { KIND_CLOSES, QUIET_HOURS, planItReady } from '@/lib/engagement';
 import type { Pick } from './DatePanel';
 
+const REACTIONS = [
+  { kind: 'love', emoji: '❤️', label: 'Love' },
+  { kind: 'like', emoji: '👍', label: 'Like' },
+  { kind: 'laugh', emoji: '😂', label: 'Laugh' },
+  { kind: 'wow', emoji: '😮', label: 'Wow' },
+  { kind: 'sad', emoji: '😢', label: 'Sad' },
+] as const;
+type Kind = (typeof REACTIONS)[number]['kind'];
+type Reaction = { message_id: string; user_id: string; kind: Kind | null };
+const EMOJI: Record<string, string> = Object.fromEntries(REACTIONS.map((r) => [r.kind, r.emoji]));
+
 type Msg = { id: string; sender_id: string; body: string; created_at: string; flag?: string | null; image_path?: string | null; audio_path?: string | null; audio_seconds?: number | null; audio_listened_at?: string | null; audio_expired?: boolean | null };
 
 const WARN: Record<string, string> = {
@@ -55,7 +66,7 @@ function Voice({ m, mine }: { m: Msg; mine: boolean }) {
   const style = { background: mine ? 'var(--gold)' : 'var(--bubble)', color: mine ? 'var(--on-gold)' : 'var(--ivory)' };
   if (expired) return <div className="voice-msg" style={{ ...style, opacity: 0.7 }}><span className="small">Voice note · expired</span></div>;
   return (
-    <div className="stack" style={{ gap: 4, alignItems: mine ? 'flex-end' : 'flex-start', maxWidth: '78%' }}>
+    <div className="stack" style={{ gap: 4, alignItems: mine ? 'flex-end' : 'flex-start', maxWidth: '100%' }}>
       <div className="voice-msg" style={{ ...style, maxWidth: '100%' }}>
         {url ? <audio controls preload="none" src={url} onEnded={() => { if (!mine && !heard) { setHeard(true); voiceListened(m.id).catch(() => null); } }} /> : <span className="small">Voice note</span>}
         {m.audio_seconds ? <span className="small" style={{ opacity: 0.8 }}>{m.audio_seconds}s</span> : null}
@@ -86,6 +97,67 @@ export default function Chat({ conversationId, meId, otherName, initial, canSend
   }, []);
   const [nudgeOff, setNudgeOff] = useState<number | null>(null);
   useEffect(() => { try { const v = localStorage.getItem(`sd:planit:${conversationId}`); if (v) setNudgeOff(Number(v)); } catch { /* storage blocked */ } }, [conversationId]);
+  // Reactions: messageId → { userId → kind }.
+  const [reacts, setReacts] = useState<Record<string, Record<string, Kind>>>({});
+  const [picking, setPicking] = useState<string | null>(null);
+  const applyReaction = (r: Reaction) => setReacts((cur) => {
+    const forMsg = { ...(cur[r.message_id] || {}) };
+    if (r.kind) forMsg[r.user_id] = r.kind; else delete forMsg[r.user_id];
+    return { ...cur, [r.message_id]: forMsg };
+  });
+  useEffect(() => {
+    const sb = supabaseBrowser();
+    sb.from('message_reactions').select('message_id, user_id, kind').eq('conversation_id', conversationId).not('kind', 'is', null)
+      .then(({ data }) => { if (data) (data as Reaction[]).forEach(applyReaction); }, () => null);
+    const ch = sb.channel(`react-${conversationId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'message_reactions', filter: `conversation_id=eq.${conversationId}` }, (payload) => {
+        const r = payload.new as Reaction;
+        if (!r?.message_id) return;
+        applyReaction(r);
+        if (r.user_id !== meId && r.kind) haptic('light');
+      })
+      .subscribe();
+    return () => { sb.removeChannel(ch); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationId, meId]);
+  useEffect(() => {
+    if (!picking) return;
+    const off = (e: PointerEvent) => { if (!(e.target as HTMLElement)?.closest?.('.react-bar')) setPicking(null); };
+    const t = setTimeout(() => document.addEventListener('pointerdown', off), 0);
+    return () => { clearTimeout(t); document.removeEventListener('pointerdown', off); };
+  }, [picking]);
+  async function react(messageId: string, kind: Kind) {
+    const prev = reacts[messageId]?.[meId] ?? null;
+    const next = prev === kind ? null : kind;
+    setPicking(null);
+    haptic(next ? 'light' : 'selection');
+    applyReaction({ message_id: messageId, user_id: meId, kind: next });
+    const { error } = await supabaseBrowser().rpc('react_message', { p_message: messageId, p_kind: next });
+    if (error) { applyReaction({ message_id: messageId, user_id: meId, kind: prev }); setErr(error.message.includes('ended') ? 'This conversation has ended.' : 'Couldn’t add that reaction.'); }
+  }
+  // Long-press opens the reaction bar; double-tap loves it.
+  const press = useRef<{ t: ReturnType<typeof setTimeout> | null; id: string | null; lastTap: number; lastId: string | null; moved: boolean }>({ t: null, id: null, lastTap: 0, lastId: null, moved: false });
+  const canReact = open && canSend;
+  const bubbleHandlers = (id: string) => canReact ? {
+    onPointerDown: () => {
+      const p = press.current; p.moved = false; p.id = id;
+      if (p.t) clearTimeout(p.t);
+      p.t = setTimeout(() => { p.t = null; if (!p.moved) { haptic('medium'); setPicking(id); } }, 420);
+    },
+    onPointerMove: () => { press.current.moved = true; },
+    onPointerUp: () => {
+      const p = press.current;
+      if (p.t) {
+        clearTimeout(p.t); p.t = null;
+        const now = Date.now();
+        if (!p.moved && p.lastId === id && now - p.lastTap < 320) { p.lastTap = 0; react(id, 'love'); }
+        else { p.lastTap = now; p.lastId = id; }
+      }
+    },
+    onPointerCancel: () => { if (press.current.t) clearTimeout(press.current.t); press.current.t = null; },
+    onContextMenu: (e: React.MouseEvent) => { e.preventDefault(); setPicking(id); },
+  } : {};
+
   const end = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -207,13 +279,31 @@ export default function Chat({ conversationId, meId, otherName, initial, canSend
       <div className="stack" style={{ gap: 10 }}>
         {msgs.map((m) => {
           const mine = m.sender_id === meId;
+          const r = reacts[m.id] || {};
+          const kinds = Object.values(r);
+          const myKind = r[meId];
           return (
-            <div key={m.id} className="stack" style={{ gap: 6, alignItems: mine ? 'flex-end' : 'flex-start' }}>
+            <div key={m.id} className="stack" style={{ gap: 6, alignItems: mine ? 'flex-end' : 'flex-start', position: 'relative' }}>
+              {picking === m.id && (
+                <div className={`react-bar${mine ? ' mine' : ''}`} role="toolbar" aria-label="React to this message">
+                  {REACTIONS.map((x) => (
+                    <button key={x.kind} type="button" className={myKind === x.kind ? 'on' : undefined} onClick={() => react(m.id, x.kind)} aria-label={myKind === x.kind ? `Remove ${x.label}` : x.label} aria-pressed={myKind === x.kind}>{x.emoji}</button>
+                  ))}
+                </div>
+              )}
+              <div className="react-target" {...bubbleHandlers(m.id)} style={{ maxWidth: '78%', display: 'flex', justifyContent: mine ? 'flex-end' : 'flex-start' }}>
               {m.audio_path
                 ? <Voice m={m} mine={mine} />
                 : m.image_path
                 ? <Photo path={m.image_path} mine={mine} />
-                : <div style={{ maxWidth: '78%', padding: '11px 14px', fontSize: 15, lineHeight: 1.4, borderRadius: mine ? '18px 18px 4px 18px' : '18px 18px 18px 4px', background: mine ? 'var(--gold)' : 'var(--bubble)', color: mine ? 'var(--on-gold)' : 'var(--ivory)', whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{m.body}</div>}
+                : <div style={{ padding: '11px 14px', fontSize: 15, lineHeight: 1.4, borderRadius: mine ? '18px 18px 4px 18px' : '18px 18px 18px 4px', background: mine ? 'var(--gold)' : 'var(--bubble)', color: mine ? 'var(--on-gold)' : 'var(--ivory)', whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{m.body}</div>}
+              </div>
+              {kinds.length > 0 && (
+                <button type="button" className={`react-pill${mine ? ' mine' : ''}`} onClick={() => canReact && setPicking(m.id)}
+                  aria-label={`Reactions: ${Object.entries(r).map(([u, k]) => `${u === meId ? 'You' : otherName} ${REACTIONS.find((x) => x.kind === k)?.label.toLowerCase()}`).join(', ')}`}>
+                  {Array.from(new Set(kinds)).map((k) => <span key={k}>{EMOJI[k]}</span>)}{kinds.length > 1 && <span className="react-count">{kinds.length}</span>}
+                </button>
+              )}
               {!mine && m.flag && WARN[m.flag] && <div className="msg-warning" role="note">{WARN[m.flag]}</div>}
               {mine && lastMine?.id === m.id && <span className="small muted" style={{ fontSize: 11 }}>{seen ? 'Read' : 'Delivered'}</span>}
             </div>
