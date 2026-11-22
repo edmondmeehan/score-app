@@ -247,16 +247,42 @@ export async function writeVouch(form: FormData) {
   back('/app/invites', 'ok', 'Sent. They’ll choose whether it shows on their profile.');
 }
 
-export async function eventHere(eventId: string) {
+export type HerePerson = { id: string; first_name: string | null; age: number | null; job: string | null; band: string | null; since: string; conversation_id: string | null; waved: boolean; waved_me: boolean; photo?: string | null };
+export type HereData = {
+  live: boolean; here?: number; me_here?: boolean; hidden?: boolean; waves_left?: number;
+  matches?: { id: string; first_name: string | null; conversation_id: string; photo?: string | null }[];
+  people?: HerePerson[];
+} | null;
+
+export async function eventHere(eventId: string): Promise<HereData> {
   const { supabase } = await ctx();
   const { data } = await supabase.rpc('event_here', { p_event: eventId });
-  const d = data as { live: boolean; here?: number; me_here?: boolean; matches?: { id: string; first_name: string | null; conversation_id: string; photo?: string | null }[] } | null;
-  if (d?.matches?.length) {
+  const d = data as HereData;
+  const ids = [...(d?.matches || []).map((m) => m.id), ...(d?.people || []).map((p) => p.id)];
+  if (d && ids.length) {
     const { photoUrls } = await import('@/lib/photos');
-    const photos = await photoUrls(supabase, d.matches.map((m) => m.id));
-    d.matches = d.matches.map((m) => ({ ...m, photo: photos[m.id]?.[0] || null }));
+    const photos = await photoUrls(supabase, [...new Set(ids)]);
+    d.matches = (d.matches || []).map((m) => ({ ...m, photo: photos[m.id]?.[0] || null }));
+    d.people = (d.people || []).map((p) => ({ ...p, photo: photos[p.id]?.[0] || null }));
   }
   return d;
+}
+
+/** Say hi to someone who's checked in at the same event. Starts a chat and sends them a push. */
+export async function waveAt(eventId: string, toId: string, message: string): Promise<{ ok: boolean; conversationId?: string; error?: string }> {
+  const { supabase, user } = await ctx();
+  const { data, error } = await supabase.rpc('event_wave', { p_event: eventId, p_to: toId, p_message: message });
+  if (error) return { ok: false, error: error.message };
+  after(() => flushNotifications(user.id, 20));
+  await trackEvent('event_wave', user.id).catch(() => null);
+  return { ok: true, conversationId: String(data) };
+}
+
+/** Hide or show yourself in Who's here for one event. */
+export async function hideHere(eventId: string, hide: boolean) {
+  const { supabase } = await ctx();
+  await supabase.rpc('event_hide_here', { p_event: eventId, p_hide: hide });
+  return eventHere(eventId);
 }
 
 /** When a date is confirmed, email both people a calendar invite (.ics) for it. Test accounts are skipped by the mailer. */
