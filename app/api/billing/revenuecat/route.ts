@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { getIntegration } from '@/lib/integrations';
 import { activeEntitlements, isPreviewProduct, planFromEntitlements } from '@/lib/revenuecat';
 import { supabaseAnon } from '@/lib/supabase/server';
-import { LIFETIME_PRODUCTS, planForProduct, skuForProduct } from '@/lib/iap';
+import { FOUNDER_PRODUCT, LIFETIME_PRODUCTS, planForProduct, skuForProduct } from '@/lib/iap';
 
 // RevenueCat → ScoreDate. In RevenueCat: Project settings → Integrations → Webhooks.
 //   URL: https://<domain>/api/billing/revenuecat
@@ -49,6 +49,11 @@ export async function POST(req: Request) {
     if (plan === 'none' || plan === 'preview' || plan === 'membership' || plan === 'paused' || plan === 'unchanged') plan = 'premium';
   }
   if ((e.type === 'NON_RENEWING_PURCHASE' || e.type === 'INITIAL_PURCHASE') && (await isPreviewProduct(e.product_id)) && plan === 'none') plan = 'preview';
+  // Founding Member $9.99: started/renewed keeps the price; once it actually expires, the price is gone for good.
+  if (e.product_id === FOUNDER_PRODUCT || e.new_product_id === FOUNDER_PRODUCT) {
+    const active = e.type !== 'EXPIRATION' && (e.product_id === FOUNDER_PRODUCT ? true : e.new_product_id === FOUNDER_PRODUCT);
+    if (e.type !== 'CANCELLATION') await supabaseAnon().rpc('founder_rate_event', { p_secret: process.env.SCORE_SERVER_SECRET, p_user: userId, p_active: active }).then(() => null, () => null);
+  }
 
   const { data, error } = await supabaseAnon().rpc('record_billing_event', {
     p_server_secret: process.env.SCORE_SERVER_SECRET,

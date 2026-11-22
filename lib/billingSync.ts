@@ -2,7 +2,7 @@ import 'server-only';
 import { getIntegration } from '@/lib/integrations';
 import { planFromEntitlements } from '@/lib/revenuecat';
 import { supabaseAnon } from '@/lib/supabase/server';
-import { LIFETIME_PRODUCT, LIFETIME_PRODUCTS, PREVIEW_PRODUCT, PREVIEW_PRODUCTS, planForProduct, skuForProduct } from '@/lib/iap';
+import { FOUNDER_PRODUCT, LIFETIME_PRODUCT, LIFETIME_PRODUCTS, PREVIEW_PRODUCT, PREVIEW_PRODUCTS, planForProduct, skuForProduct } from '@/lib/iap';
 
 type Sub = { expires_date?: string | null; is_sandbox?: boolean; store?: string; purchase_date?: string };
 type NonSub = { id?: string; store_transaction_id?: string; purchase_date?: string; is_sandbox?: boolean; store?: string };
@@ -37,6 +37,12 @@ export async function syncFromStore(userId: string): Promise<{ plan: string; add
   }
   const nonSubs = (s.non_subscriptions || {}) as Record<string, NonSub[]>;
   const sb = supabaseAnon(); const secret = process.env.SCORE_SERVER_SECRET;
+  // Founding Member $9.99: active while that subscription is unexpired; gone for good once it has expired.
+  const founderSub = subs[FOUNDER_PRODUCT];
+  if (founderSub?.expires_date) {
+    const activeNow = new Date(founderSub.expires_date).getTime() > now;
+    await sb.rpc('founder_rate_event', { p_secret: secret, p_user: userId, p_active: activeNow }).then(() => null, () => null);
+  }
 
   // Founding Lifetime: owned forever, so Premium at least.
   const lifetime = LIFETIME_PRODUCTS.map((id) => (nonSubs[id] || [])[0]).find(Boolean);

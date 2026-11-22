@@ -4,7 +4,7 @@ import PageBack from '@/components/PageBack';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { purchases, cancelled } from '@/lib/purchasesClient';
-import { SUBSCRIPTIONS, PREVIEW_PRODUCTS, LIFETIME_PRODUCT, LIFETIME_PRODUCT_2, LIFETIME_PRODUCTS, MANAGE_SUBSCRIPTIONS_URL } from '@/lib/iap';
+import { FOUNDER_PRODUCT, SUBSCRIPTIONS, PREVIEW_PRODUCTS, LIFETIME_PRODUCT, LIFETIME_PRODUCT_2, LIFETIME_PRODUCTS, MANAGE_SUBSCRIPTIONS_URL } from '@/lib/iap';
 import { syncPurchases } from '@/app/app/billing';
 import { haptic } from '@/lib/haptics';
 
@@ -13,7 +13,9 @@ type Price = Record<string, { price: string; product: any }>;
 type Lifetime = { enabled: boolean; cap: number; sold: number; left: number; price: string; mine: string | null; early_cap?: number; early_left?: number; price2?: string; tier?: number } | null;
 
 /** In the iPhone app: real App Store prices, buy with Apple, and Restore purchases (Apple requires it). */
-export default function NativePaywall({ userId, iosKey, androidKey, plans, currentPlan, staff = false, lifetime = null }: { userId: string; iosKey?: string; androidKey?: string; plans: Plan[]; currentPlan: string; staff?: boolean; lifetime?: Lifetime }) {
+type FounderDeal = { comp_until: string | null; rate: 'eligible' | 'active' | 'forfeited' | null; price: string; can_lock: boolean } | null;
+
+export default function NativePaywall({ userId, iosKey, androidKey, plans, currentPlan, staff = false, lifetime = null, founder = null }: { userId: string; iosKey?: string; androidKey?: string; plans: Plan[]; currentPlan: string; staff?: boolean; lifetime?: Lifetime; founder?: FounderDeal }) {
   const router = useRouter();
   const [prices, setPrices] = useState<Price>({});
   const [annual, setAnnual] = useState(false);
@@ -33,7 +35,7 @@ export default function NativePaywall({ userId, iosKey, androidKey, plans, curre
         if (!mod) { setDiag(`RevenueCat didn’t start (key: ${iosKey ? iosKey.slice(0, 5) + '…' : 'none'})`); setReady(false); return; }
         const { Purchases, PRODUCT_CATEGORY } = mod as any;
         const [subs, once] = await Promise.all([
-          Purchases.getProducts({ productIdentifiers: SUBSCRIPTIONS.map((s) => s.id), type: PRODUCT_CATEGORY.SUBSCRIPTION }),
+          Purchases.getProducts({ productIdentifiers: [...SUBSCRIPTIONS.map((s) => s.id), FOUNDER_PRODUCT], type: PRODUCT_CATEGORY.SUBSCRIPTION }),
           Purchases.getProducts({ productIdentifiers: [...PREVIEW_PRODUCTS, ...LIFETIME_PRODUCTS], type: PRODUCT_CATEGORY.NON_SUBSCRIPTION }),
         ]);
         const p: Price = {};
@@ -60,6 +62,11 @@ export default function NativePaywall({ userId, iosKey, androidKey, plans, curre
       haptic('success');
       const RANK = ['none', 'preview', 'paused', 'membership', 'premium', 'black'];
       const isPreview = productId === '__preview';
+      if (productId === FOUNDER_PRODUCT) {
+        setDone({ title: 'Your Founding price is locked in', detail: 'Membership is yours at your Founding price for as long as you stay subscribed. If the subscription ever ends, the Founding price can’t come back, so keep it running.' });
+        router.refresh();
+        return;
+      }
       if (LIFETIME_PRODUCTS.includes(productId)) {
         setDone({ title: 'Welcome, Founding Lifetime member', detail: 'Premium is yours for as long as ScoreDate runs. No renewals, nothing more to pay. If you had a subscription, cancel it in your App Store settings so you’re not billed again.' });
         router.refresh();
@@ -127,6 +134,28 @@ export default function NativePaywall({ userId, iosKey, androidKey, plans, curre
           <span className="small muted">Thanks for being one of the first {lifetime.cap}.</span>
         </div>
       )}
+      {founder && founder.rate !== 'forfeited' && (() => {
+        const until = founder.comp_until ? new Date(founder.comp_until) : null;
+        const free = until && until.getTime() > Date.now();
+        const dateLabel = until ? until.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+        const fp = prices[FOUNDER_PRODUCT];
+        return (
+          <div className="card gold stack" style={{ gap: 8 }}>
+            <span className="eyebrow">Founding Member</span>
+            {founder.rate === 'active' ? (
+              <><strong>Your Founding price is locked in</strong><span className="small muted">Membership at {founder.price}/month for as long as you stay subscribed. Don’t let it lapse: if it ends, the Founding price can’t come back.</span></>
+            ) : free ? (
+              <><strong>Membership is free until {dateLabel}</strong><span className="small muted">Then keep it for {founder.price}/month, for as long as you stay subscribed (regular price $24.99).{founder.can_lock ? '' : ' You can lock it in starting two weeks before your free months end.'}</span></>
+            ) : (
+              <><strong>Keep Membership for {founder.price}/month</strong><span className="small muted">Your free months have ended. Your Founding price is still here for a few more weeks.</span></>
+            )}
+            {founder.can_lock && founder.rate !== 'active' && fp && (
+              <button className="btn block" disabled={Boolean(busy)} onClick={() => buy(FOUNDER_PRODUCT)}>{busy === FOUNDER_PRODUCT ? 'Opening the App Store…' : `Lock in ${fp.price}/month`}</button>
+            )}
+            {founder.can_lock && founder.rate !== 'active' && !fp && <span className="small muted">Founding price is coming to the App Store shortly.</span>}
+          </div>
+        );
+      })()}
       {(() => {
         if (!lifetime || lifetime.mine || !lifetime.enabled || lifetime.left <= 0) return null;
         const early = (lifetime.tier ?? 1) === 1;

@@ -48,6 +48,9 @@ export async function GET(request: NextRequest) {
       // Sunday recap (no-op other days; only goes to people with good news).
       const weekly = await sb.rpc('queue_weekly', { p_secret: secret });
       out.weekly = weekly.data ?? weekly.error?.message;
+      // Founding Members: reminders before the free months end, end them, and retire unused founder prices.
+      const fc = await sb.rpc('cron_founder_comp', { p_secret: secret });
+      out.founder_comp = fc.data ?? fc.error?.message;
       // Invite drip (Admin → Waitlist & invites): +N invites to members every X days, when it's due and switched on.
       const drip = await sb.rpc('run_invite_drip', { p_secret: secret });
       out.invite_drip = drip.data ?? drip.error?.message;

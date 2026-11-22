@@ -35,4 +35,8 @@ export const skuForProduct = (productId: string | null | undefined) =>
 export const MANAGE_SUBSCRIPTIONS_URL = 'https://apps.apple.com/account/subscriptions';
 
 /** ScoreDate plan for a subscription product ID (used when RevenueCat entitlements aren't attached). */
-export const planForProduct = (productId: string | null | undefined) => SUBSCRIPTIONS.find((x) => x.id === productId)?.plan ?? null;
+export const planForProduct = (productId: string | null | undefined) =>
+  productId === FOUNDER_PRODUCT ? 'membership' : SUBSCRIPTIONS.find((x) => x.id === productId)?.plan ?? null;
+
+/** Founding Member price: Membership at $9.99/month for as long as the subscription never lapses (shown to eligible founders only). */
+export const FOUNDER_PRODUCT = `${BUNDLE}.membership.founder`;
