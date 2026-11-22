@@ -554,3 +554,12 @@ html.spotlit .btn:not(.ghost) { box-shadow: 0 0 0 1px color-mix(in srgb, var(--g
 .react-count { font-size: 11px; opacity: .75; margin-left: 2px; }
 @keyframes react-in { from { opacity: 0; transform: translateY(4px) scale(.96); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .react-bar { animation: none; } }
+
+/* Admin: Dev / Staging / Live switch */
+.env-switch { display: flex; gap: 2px; padding: 3px; margin: 0 6px 14px; border: 1px solid var(--line-soft); border-radius: 10px; background: var(--graphite); }
+.env-switch > * { flex: 1; text-align: center; font-size: 12px; font-weight: 600; padding: 6px 4px !important; border-radius: 7px; color: var(--muted); text-decoration: none; }
+.env-switch a:hover { color: var(--ivory); background: var(--gold-wash); }
+.env-switch .on { color: #fff; }
+.env-switch .on.env-dev { background: #2f6fd6; }
+.env-switch .on.env-staging { background: #c47a12; }
+.env-switch .on.env-live { background: #2e8b57; }

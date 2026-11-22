@@ -1,5 +1,6 @@
 import { requireStaff } from '@/lib/session';
 import AdminNav from './AdminNav';
+import { APP_ENV } from '@/lib/appEnv';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +16,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   ]);
   return (
     <div className="admin">
-      <AdminNav counts={{ rep: rep || 0, ver: ver || 0, del: del || 0, sup: sup || 0, vid: vid || 0 }} email={staffEmail} role={(role as string) || null} />
+      <AdminNav counts={{ rep: rep || 0, ver: ver || 0, del: del || 0, sup: sup || 0, vid: vid || 0 }} email={staffEmail} role={(role as string) || null} env={APP_ENV} />
       <main>{children}</main>
     </div>
   );

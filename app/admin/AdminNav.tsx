@@ -1,4 +1,6 @@
 'use client';
+import EnvSwitch from './EnvSwitch';
+import type { AppEnv } from '@/lib/appEnv';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -7,7 +9,7 @@ import ThemeSwitch from '@/components/ThemeSwitch';
 import { BUILD_LABEL } from '@/lib/build';
 import { canOpen } from '@/lib/staffAccess';
 
-export default function AdminNav({ counts, email, role }: { counts: { rep: number; ver: number; del: number; sup: number; vid?: number }; email: string; role?: string | null }) {
+export default function AdminNav({ counts, email, role, env = 'live' }: { counts: { rep: number; ver: number; del: number; sup: number; vid?: number }; email: string; role?: string | null; env?: AppEnv }) {
   const path = usePathname();
   const [open, setOpen] = useState(false);
   useEffect(() => { setOpen(false); }, [path]);
@@ -49,6 +51,7 @@ export default function AdminNav({ counts, email, role }: { counts: { rep: numbe
       {open && <div className="admin-scrim" onClick={() => setOpen(false)} aria-hidden />}
       <nav id="admin-nav" aria-label="Admin" className={open ? 'open' : ''}>
         <div className="admin-nav-logo" style={{ padding: '0 10px 18px' }}><Logo size={14} /></div>
+        <EnvSwitch current={env} />
         {groups.map((g) => {
           const active = g.items.some(([href]) => isOn(href));
           const isOpen = openGroup === g.title;
