@@ -564,3 +564,18 @@ html.spotlit .btn:not(.ghost) { box-shadow: 0 0 0 1px color-mix(in srgb, var(--g
 .env-switch .on.env-dev { background: #2f6fd6; }
 .env-switch .on.env-staging { background: #c47a12; }
 .env-switch .on.env-live { background: #2e8b57; }
+
+/* Admin → Releases */
+.release-list { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
+.release-list li { display: flex; flex-direction: column; gap: 2px; }
+.release-sql { max-height: 320px; overflow: auto; margin: 6px 0 0; padding: 10px; border-radius: 8px; background: var(--onyx); border: 1px solid var(--line-soft); font: 12px/1.45 var(--font-mono, monospace); white-space: pre; }
+.release-bar { position: relative; height: 6px; border-radius: 999px; background: var(--line-soft); overflow: hidden; }
+.release-bar > span { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; background: var(--gold); transition: width .5s linear; }
+.release-bar.waiting > span { width: 35%; animation: release-slide 1.2s ease-in-out infinite; }
+@keyframes release-slide { from { left: -35%; } to { left: 100%; } }
+@media (prefers-reduced-motion: reduce) { .release-bar.waiting > span { animation: none; width: 100%; opacity: .5; } }
+.release-history { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.release-history li { display: flex; gap: 10px; align-items: flex-start; }
+.release-tag { flex: none; font: 600 11px var(--sans); letter-spacing: .04em; padding: 3px 8px; border-radius: 999px; color: #fff; }
+.release-tag.staging { background: #c47a12; }
+.release-tag.live { background: #2e8b57; }

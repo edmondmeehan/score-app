@@ -28,13 +28,34 @@ export async function branchInfo(branch: string): Promise<BranchInfo> {
 }
 
 /** Commits that are on `head` but not yet on `base` (newest first). */
-export async function pending(base: string, head: string): Promise<{ count: number; behind: number; commits: { sha: string; message: string; date: string }[] } | null> {
-  const r = await gh<{ ahead_by: number; behind_by: number; commits: { sha: string; commit: { message: string; author: { date: string } } }[] }>(`/compare/${base}...${head}`);
+export type Pending = {
+  count: number; behind: number;
+  commits: { sha: string; message: string; date: string }[];
+  /** Database change files (supabase/migrations/*.sql) added or edited in this move. */
+  migrations: string[];
+  files: number;
+};
+export async function pending(base: string, head: string): Promise<Pending | null> {
+  const r = await gh<{ ahead_by: number; behind_by: number; commits: { sha: string; commit: { message: string; author: { date: string } } }[]; files?: { filename: string; status: string }[] }>(`/compare/${base}...${head}`);
   if (!r.ok || !r.data) return null;
+  const files = r.data.files || [];
   return {
     count: r.data.ahead_by, behind: r.data.behind_by,
-    commits: r.data.commits.slice(-15).reverse().map((c) => ({ sha: c.sha, message: c.commit.message.split('\n')[0], date: c.commit.author.date })),
+    commits: r.data.commits.slice(-30).reverse().map((c) => ({ sha: c.sha, message: c.commit.message.split('\n')[0], date: c.commit.author.date })),
+    migrations: files.filter((f) => /^supabase\/migrations\/.+\.sql$/.test(f.filename) && f.status !== 'removed').map((f) => f.filename).sort(),
+    files: files.length,
   };
+}
+
+/** The text of a file at a branch (used to show database changes before going live). */
+export async function fileAt(path: string, ref: string): Promise<string | null> {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}?ref=${encodeURIComponent(ref)}`, {
+      headers: { Authorization: `Bearer ${token()}`, Accept: 'application/vnd.github.raw', 'X-GitHub-Api-Version': '2022-11-28' },
+      cache: 'no-store', signal: AbortSignal.timeout(10_000),
+    });
+    return res.ok ? await res.text() : null;
+  } catch { return null; }
 }
 
 /**
