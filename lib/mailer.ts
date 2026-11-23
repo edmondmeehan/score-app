@@ -1,4 +1,5 @@
 import 'server-only';
+import { APP_ENV } from '@/lib/appEnv';
 import { getIntegration } from '@/lib/integrations';
 import { supabaseAnon } from '@/lib/supabase/server';
 import { build, type TemplateName } from '@/lib/emails';
@@ -22,7 +23,10 @@ export async function sendEmail<K extends TemplateName>(
 ): Promise<{ ok: boolean; id?: string; error?: string }> {
   if (!to) return { ok: false, error: 'no recipient' };
   if (isTestAddress(to)) return { ok: true, id: 'skipped-test-address' };
-  const { subject, html, text } = build(name, data);
+  const built = build(name, data);
+  // Emails from dev/staging say so, so a test email is never mistaken for a real one.
+  const subject = APP_ENV === 'live' ? built.subject : `[${APP_ENV === 'staging' ? 'Staging' : 'Dev'}] ${built.subject}`;
+  const { html, text } = built;
   let result: { ok: boolean; id?: string; error?: string };
   let retryable = false;
   try {

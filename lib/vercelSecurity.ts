@@ -7,7 +7,7 @@ const PROJECT = process.env.SCORE_VERCEL_PROJECT_ID || process.env.VERCEL_PROJEC
 export const BYPASS_RULE_NAME = 'ScoreDate: let webhooks and cron through';
 
 // Server-to-server endpoints that must never get a browser challenge (RevenueCat, ID verification, cron, email unsubscribe).
-const SERVER_PATHS = ['/api/billing/', '/api/verify/webhook', '/api/cron', '/api/unsubscribe'];
+const SERVER_PATHS = ['/api/billing/', '/api/verify/webhook', '/api/cron', '/api/unsubscribe', '/api/auth/email-hook'];
 
 export type SecurityStatus = {
   configured: boolean;
