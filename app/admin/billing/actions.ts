@@ -11,3 +11,14 @@ export async function saveLifetimeOffer(form: FormData) {
   });
   redirect(`/admin/billing?${error ? `error=${encodeURIComponent(error.message)}` : 'saved=1'}#lifetime`);
 }
+
+/** Owners: test mode on/off. Turning it ON makes website purchases free, so it needs the word TEST typed in. */
+export async function setTestMode(form: FormData) {
+  const { supabase } = await requireStaff();
+  const on = form.get('on') === 'true';
+  if (on && String(form.get('confirm') || '').trim().toUpperCase() !== 'TEST') {
+    redirect(`/admin/billing?error=${encodeURIComponent('Type TEST to turn test mode on.')}#test-mode`);
+  }
+  const { error } = await supabase.rpc('staff_set_test_mode', { p_on: on });
+  redirect(`/admin/billing?${error ? `error=${encodeURIComponent(error.message)}` : `saved=${on ? 'test_on' : 'test_off'}`}#test-mode`);
+}
