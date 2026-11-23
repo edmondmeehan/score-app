@@ -101,7 +101,7 @@ table.data { width: 100%; border-collapse: collapse; font-size: 14px; }
 table.data th { text-align: left; color: var(--faint); font-size: 12px; font-weight: 500; padding: 10px 8px; }
 table.data td { padding: 12px 8px; border-top: 1px solid var(--line-soft); }
 .admin { display: flex; flex-wrap: wrap; min-height: 100vh; }
-.admin nav { flex: 1 1 220px; max-width: 264px; background: var(--admin-nav); border-right: 1px solid var(--line-soft); padding: 24px 14px; display: flex; flex-direction: column; gap: 4px; }
+.admin nav { flex: 1 1 220px; max-width: 264px; background: var(--admin-nav); border-right: 1px solid var(--line-soft); padding: 24px 14px; padding-top: max(24px, env(safe-area-inset-top)); padding-left: max(14px, env(safe-area-inset-left)); display: flex; flex-direction: column; gap: 4px; }
 .admin nav a { padding: 10px 12px; border-radius: 10px; color: var(--muted); text-decoration: none; font-size: 14px; }
 .admin nav a.on { background: var(--gold-wash); color: var(--gold-light); font-weight: 600; }
 .admin-nav-group { display: flex; flex-direction: column; gap: 2px; border-radius: 12px; }
@@ -116,7 +116,7 @@ table.data td { padding: 12px 8px; border-top: 1px solid var(--line-soft); }
 .admin-nav-meta { display: inline-flex; align-items: center; gap: 8px; }
 .admin-nav-chev { font-size: 16px; font-weight: 400; color: var(--faint); width: 12px; text-align: center; }
 .admin-nav-count { font-size: 11px; font-weight: 600; color: var(--on-gold); background: var(--gold); border-radius: 999px; padding: 1px 7px; }
-.admin main { flex: 999 1 560px; min-width: 0; padding: 32px; display: flex; flex-direction: column; gap: 22px; }
+.admin main { flex: 999 1 560px; min-width: 0; padding: 32px; padding-top: max(32px, env(safe-area-inset-top)); padding-right: max(32px, env(safe-area-inset-right)); display: flex; flex-direction: column; gap: 22px; }
 .scroll-x { overflow-x: auto; }
 .admin-bar, .admin-scrim { display: none; }
 @media (max-width: 860px) {
@@ -181,7 +181,7 @@ table.data td { padding: 12px 8px; border-top: 1px solid var(--line-soft); }
 }
 
 /* ---------- Public info / legal pages ---------- */
-.site-header { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--onyx) 88%, transparent); backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px); border-bottom: 1px solid var(--line-soft); }
+.site-header { position: sticky; top: 0; z-index: 20; padding-top: env(safe-area-inset-top); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); background: color-mix(in srgb, var(--onyx) 88%, transparent); backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px); border-bottom: 1px solid var(--line-soft); }
 @media (max-width: 640px) { .hide-sm { display: none !important; } }
 .doc-hero { padding: 48px 20px 28px; }
 .doc-hero h1 { font-size: clamp(40px, 9vw, 72px); line-height: 1; margin: 10px 0 14px; }
@@ -403,6 +403,7 @@ table.data td { padding: 12px 8px; border-top: 1px solid var(--line-soft); }
 html.native .staff-bar { display: none !important; }
 html:not(.native) body:has(.staff-bar) .phone { padding-top: 24px; min-height: calc(100dvh - 44px - env(safe-area-inset-top)); }
 html:not(.native) body:has(.staff-bar) .appbar { margin-top: -24px; padding-top: 10px; top: calc(40px + env(safe-area-inset-top)); }
+html:not(.native) body:has(.staff-bar) .site-header { padding-top: 0; top: calc(40px + env(safe-area-inset-top)); }
 html:not(.native) body:has(.staff-bar) .event-hero { margin-top: -24px; }
 html:not(.native) body:has(.staff-bar) .event-hero-back { top: 18px; }
 /* In the app, tighten the gap under the status bar. */
