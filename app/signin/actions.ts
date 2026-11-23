@@ -7,6 +7,7 @@ import { supabaseServer } from '@/lib/supabase/server';
 import { trackEvent } from '@/lib/track';
 import { clientIp, verifyHuman } from '@/lib/turnstile';
 import { flushNotifications } from '@/lib/notify';
+import { logReviewerSignIn } from '@/lib/reviewerLog';
 
 const safeNext = (n: string) => (n.startsWith('/') && !n.startsWith('//') ? n : '');
 const back = (mode: string, next: string, msg: string, email = '') =>
@@ -39,7 +40,11 @@ export async function signInPassword(form: FormData) {
   const password = String(form.get('password') || '');
   const next = String(form.get('next') || '');
   const supabase = await supabaseServer();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data: signed, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (!error && signed.user) {
+    const uid = signed.user.id;
+    after(() => logReviewerSignIn(uid));   // App Review account: log location + alert owners (no-op for everyone else)
+  }
   if (error) {
     const msg = /confirm/i.test(error.message)
       ? 'Confirm your email first, then sign in.'

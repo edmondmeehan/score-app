@@ -22,8 +22,8 @@ export default function JoinedCard({ eventId, message, code, token, position, fo
         <span className="small muted">
           Every friend who joins with your link moves you up 5 spots.{' '}
           {founder
-            ? founderReason === 'early' ? 'You got one of the first founding spots in your neighborhood: a badge on your profile, first in line for invites, and extra invites to bring friends.' : 'You’re a Founding Member.'
-            : 'Bring 3 friends and you become a Founding Member: a badge on your profile, first in line for invites, and extra invites.'}
+            ? founderReason === 'early' ? 'You got one of the first founding spots in your neighborhood: up to 6 months of Membership free, then a locked-in Founding rate, plus a badge and first in line for invites.' : 'You’re a Founding Member: up to 6 months of Membership free, then a locked-in Founding rate.'
+            : 'Bring 3 friends and you become a Founding Member: up to 6 months of Membership free, then a locked-in Founding rate, plus a badge and first in line for invites.'}
         </span>
       </div>
       <ShareInvite url={url} />

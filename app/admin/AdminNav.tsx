@@ -24,7 +24,7 @@ export default function AdminNav({ counts, email, role, env = 'live' }: { counts
     { title: 'Members', items: [['/admin/members', 'Members', 0], ['/admin/wellbeing', 'Wellbeing', 0], ['/admin/reserve', 'Reserve', 0], ['/admin/verification', 'Verification', counts.ver], ['/admin/support', 'Support', counts.sup], ['/admin/deletions', 'Deletions', counts.del]] },
     { title: 'Trust & safety', items: [['/admin/moderation', 'Moderation', counts.rep], ['/admin/videos', 'Video clips', counts.vid ?? 0], ['/admin/flags', 'Flagged messages', 0], ['/admin/screenshots', 'Screenshots', 0], ['/admin/security', 'Security', 0], ['/admin/audit', 'Audit log', 0]] },
     { title: 'Content', items: [['/admin/content', 'Content', 0], ['/admin/events', 'Events', 0], ['/admin/giveaways', 'Giveaways', 0], ['/admin/scan', 'Scan members', 0], ['/admin/date-challenge', '$50 Date Challenge', 0], ['/admin/emails', 'Emails', 0], ['/admin/footer', 'Footer', 0], ['/admin/policies', 'Policies', 0], ['/admin/themes', 'Seasonal themes', 0]] },
-    { title: 'Business', items: [['/admin/billing', 'Billing', 0], ['/admin/integrations', 'Integrations', 0], ['/admin/team', 'Admins', 0], ['/admin/releases', 'Releases', 0]] },
+    { title: 'Business', items: [['/admin/billing', 'Billing', 0], ['/admin/integrations', 'Integrations', 0], ['/admin/team', 'Admins', 0], ['/admin/releases', 'Releases', 0], ['/admin/review', 'App Review', 0]] },
   ];
   const groups: Group[] = allGroups.map((g) => ({ ...g, items: g.items.filter(([href]) => canOpen(role, href)) })).filter((g) => g.items.length > 0);
   const items = groups.flatMap((g) => g.items);

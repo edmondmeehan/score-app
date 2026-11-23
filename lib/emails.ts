@@ -117,7 +117,7 @@ export const templates = {
   waitlist_joined: (d: { first_name?: string | null; place: string; open: boolean; share_url?: string; position?: number | null; founder?: boolean; again?: boolean }) => {
     const share: Block[] = d.share_url
       ? [
-          { p: d.founder ? 'You’re a Founding Member: a badge on your profile, first in line when invites go out, and extra invites to bring friends.' : 'Want in sooner? Every friend who joins with your link moves you up 5 spots, and 3 friends makes you a Founding Member.' },
+          { p: d.founder ? 'You’re a Founding Member: up to 6 months of Membership free, then a Founding rate of $9.99/month locked in for as long as you stay subscribed. You also get a badge on your profile and you’re first in line when invites go out.' : 'Want in sooner? Every friend who joins with your link moves you up 5 spots, and 3 friends makes you a Founding Member: up to 6 months of Membership free, then a locked-in Founding rate.' },
           { button: { label: d.again ? 'See my spot' : 'Share my invite link', url: d.share_url } },
           { note: `Your link: ${d.share_url}` },
         ]
