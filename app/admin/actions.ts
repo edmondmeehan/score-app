@@ -129,6 +129,12 @@ export async function grantInvites(form: FormData) {
 }
 
 /** Owners: automatic invite drip (every N days, +amount, never above cap). */
+export async function saveWaitlistPosition(form: FormData) {
+  const supabase = await supabaseServer();
+  const { error } = await supabase.rpc('staff_set_waitlist_position', { p_min: Math.max(0, Math.round(Number(form.get('min') || 0))) });
+  redirect('/admin/waitlist?' + (error ? 'error=' + encodeURIComponent(error.message) : 'invited=' + encodeURIComponent('Waitlist number setting saved.')) + '#supply');
+}
+
 export async function saveInviteDrip(form: FormData) {
   const supabase = await supabaseServer();
   const { error } = await supabase.rpc('staff_set_invite_drip', {

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { showWaitlistPosition } from '@/lib/waitlistPosition';
 import { notFound } from 'next/navigation';
 import { supabaseAnon } from '@/lib/supabase/server';
 import { Logo } from '@/components/ui';
@@ -19,7 +20,7 @@ export default async function Spot({ params }: { params: Promise<{ code: string 
   const { code } = await params;
   if (!/^[a-f0-9]{20}$/.test(code)) notFound();
   const sb = supabaseAnon();
-  const [{ data }, offer] = await Promise.all([sb.rpc('waitlist_status', { p_token: code }), getFounderOffer(sb)]);
+  const [{ data }, offer, showNumbers] = await Promise.all([sb.rpc('waitlist_status', { p_token: code }), getFounderOffer(sb), showWaitlistPosition(sb)]);
   const s = data as Status | null;
   if (!s) notFound();
   const url = `${SITE_URL}/?ref=${s.share_code}`;
@@ -37,11 +38,20 @@ export default async function Spot({ params }: { params: Promise<{ code: string 
       ) : (
         <div className="card stack" style={{ gap: 6 }}>
           <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
-            <span className="small muted">Your place in line</span>
+            <span className="small muted">{showNumbers ? 'Your place in line' : 'Your spot'}</span>
             {s.founder && <FounderBadge size="md" />}
           </div>
-          <p className="serif" style={{ fontSize: 56, margin: 0, lineHeight: 1 }}>#{(s.position ?? 0).toLocaleString('en-US')}</p>
-          <span className="small muted">of {(s.total ?? 0).toLocaleString('en-US')} waiting · {s.referrals} friend{s.referrals === 1 ? '' : 's'} joined with your link</span>
+          {showNumbers ? (
+            <>
+              <p className="serif" style={{ fontSize: 56, margin: 0, lineHeight: 1 }}>#{(s.position ?? 0).toLocaleString('en-US')}</p>
+              <span className="small muted">of {(s.total ?? 0).toLocaleString('en-US')} waiting · {s.referrals} friend{s.referrals === 1 ? '' : 's'} joined with your link</span>
+            </>
+          ) : (
+            <>
+              <p className="serif" style={{ fontSize: 34, margin: 0, lineHeight: 1.1 }}>You’re on the list.</p>
+              <span className="small muted">Invites go out in drops, neighborhood by neighborhood. Every friend who joins with your link moves you up. {s.referrals} friend{s.referrals === 1 ? '' : 's'} joined so far.</span>
+            </>
+          )}
         </div>
       )}
 

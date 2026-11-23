@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { supabaseServer } from '@/lib/supabase/server';
-import { createInvites, emailInvite, inviteBatch, resendInvite, setAreaStatus, setPrefix, setZip, toggleFounder, saveFounderOffer, grantInvites, saveInviteDrip } from '../actions';
+import { createInvites, emailInvite, inviteBatch, resendInvite, setAreaStatus, setPrefix, setZip, toggleFounder, saveFounderOffer, grantInvites, saveInviteDrip, saveWaitlistPosition } from '../actions';
 import { getFounderOffer } from '@/lib/founderOffer';
 import WaitlistMap from './WaitlistMap';
 
@@ -30,7 +30,12 @@ export default async function Waitlist({ searchParams }: { searchParams: Promise
   const st = inv as InviteStats | null;
   const owner = role === 'owner';
   const drip = st?.drip || { enabled: false, amount: 1, every_days: 30, cap: 3, last_run: null };
-  const offer = await getFounderOffer(supabase);
+  const [offer, { data: posCfg }, { data: showNow }] = await Promise.all([
+    getFounderOffer(supabase),
+    supabase.from('app_config').select('value').eq('key', 'waitlist_position').maybeSingle(),
+    supabase.rpc('waitlist_show_position'),
+  ]);
+  const posMin = Number((posCfg?.value as { min?: number } | null)?.min ?? 2000);
   const areas: AreaRow[] = summary?.areas || [];
   const zips: ZipRow[] = (summary?.zips || []).filter((z: ZipRow) => !sp.area || z.area === sp.area);
   const codes = sp.codes ? sp.codes.split(',') : [];
@@ -109,6 +114,19 @@ export default async function Waitlist({ searchParams }: { searchParams: Promise
             </form>
           </>
         ) : <span className="small muted">Only owners can give invites.</span>}
+        {owner && (
+          <form action={saveWaitlistPosition} className="stack" style={{ gap: 8, paddingTop: 12, borderTop: '1px solid var(--line-soft)' }}>
+            <strong>Waitlist numbers</strong>
+            <div className="row" style={{ gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+              <label className="field" style={{ width: 230 }}>Show “#214 in line” once the list reaches<input className="input" type="number" name="min" min={0} step={100} defaultValue={posMin} /></label>
+              <button className="btn ghost sm">Save</button>
+            </div>
+            <span className="small muted">
+              {showNow ? 'Numbers are showing now.' : `Numbers are hidden: ${waitingTotal.toLocaleString()} waiting, shown from ${posMin.toLocaleString()}.`}{' '}
+              While hidden, people see their neighborhood, the Founding Member perks and “you moved up” instead (on screen, in emails and on their spot page). 0 = always show.
+            </span>
+          </form>
+        )}
       </section>
 
       {/* Areas */}

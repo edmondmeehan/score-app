@@ -1,5 +1,6 @@
 'use server';
 import { clientIp, verifyHuman } from '@/lib/turnstile';
+import { showWaitlistPosition } from '@/lib/waitlistPosition';
 import { cookies } from 'next/headers';
 import { after } from 'next/server';
 import { supabaseAnon, supabaseServer } from '@/lib/supabase/server';
@@ -57,6 +58,8 @@ export async function joinWaitlist(_: WaitlistState, form: FormData): Promise<Wa
     return { ok: true, message: `You're already on the waitlist. We just emailed ${email} a link to check your spot and share your invite link.` };
   }
   const shareUrl = `${SITE_URL}/w/${r.status_token}`;
+  // Numbers ("#214 in line") stay hidden until the list is big enough (Admin → Waitlist & invites).
+  if (!(await showWaitlistPosition(supabase))) { r.position = undefined; r.total = undefined; }
   store.delete('score_ref');
   const eventId = newEventId();
   // Respond right away; the email, ad-platform ping and stats happen just after (so a surge never slows the form down).
@@ -99,8 +102,9 @@ async function notifyReferrer(newEmail: string) {
     const { data } = await supabaseAnon().rpc('waitlist_referral_notice', { p_secret: process.env.SCORE_SERVER_SECRET, p_email: newEmail });
     const n = data as { email: string; first_name: string | null; status_token: string; friend: string | null; position: number | null; referrals: number; referrals_needed: number; founder: boolean; unlocked_founder: boolean; spots_per_referral: number } | null;
     if (!n?.email) return;
+    const show = await showWaitlistPosition(supabaseAnon());
     await sendEmail(n.email, 'waitlist_referral', {
-      first_name: n.first_name, friend: n.friend, position: n.position, referrals: n.referrals, referrals_needed: n.referrals_needed,
+      first_name: n.first_name, friend: n.friend, position: show ? n.position : null, referrals: n.referrals, referrals_needed: n.referrals_needed,
       founder: n.founder, unlocked_founder: n.unlocked_founder, spots: n.spots_per_referral, share_url: `${SITE_URL}/w/${n.status_token}`,
     });
   } catch { /* never block a signup on this */ }
