@@ -1,6 +1,6 @@
 import { requireStaff } from '@/lib/session';
 import { APP_ENV } from '@/lib/appEnv';
-import { BRANCHES, branchInfo, githubReady, pending, type BranchInfo } from '@/lib/github';
+import { BRANCHES, branchInfo, githubProblem, githubReady, pending, type BranchInfo } from '@/lib/github';
 import { toLive, toStaging } from './actions';
 
 export const dynamic = 'force-dynamic';
@@ -42,6 +42,17 @@ export default async function Releases({ searchParams }: { searchParams: Promise
       <>
         <h1 className="serif" style={{ fontSize: 44 }}>Releases</h1>
         <div className="notice error">Add a GitHub token (GITHUB_TOKEN) in Vercel with “Contents: Read and write” on the score-app repo.</div>
+      </>
+    );
+  }
+
+  const problem = await githubProblem();
+  if (problem) {
+    return (
+      <>
+        <h1 className="serif" style={{ fontSize: 44 }}>Releases</h1>
+        <div className="notice error">{problem}</div>
+        <p className="small muted" style={{ margin: 0 }}>GitHub → Settings → Developer settings → Fine-grained tokens → Generate new token. Repository access: only edmondmeehan/score-app. Permissions: Contents “Read and write” (Metadata “Read” is added automatically). Then paste it as GITHUB_TOKEN in Vercel (Production) and redeploy.</p>
       </>
     );
   }

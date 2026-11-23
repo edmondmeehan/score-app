@@ -55,3 +55,17 @@ export async function promote(from: string, to: string): Promise<{ ok: boolean; 
   if (r.status === 403 || r.status === 401) return { ok: false, message: 'The GitHub token in Vercel can’t change branches. It needs “Contents: Read and write” on the score-app repo.' };
   return { ok: false, message: r.message || `GitHub error ${r.status}` };
 }
+
+/** Why GitHub can't be read, in plain words (null = fine). */
+export async function githubProblem(): Promise<string | null> {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${REPO}`, {
+      headers: { Authorization: `Bearer ${token()}`, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' },
+      cache: 'no-store', signal: AbortSignal.timeout(10_000),
+    });
+    if (res.ok) return null;
+    if (res.status === 401) return 'The GitHub token in Vercel is expired or wrong (GitHub said 401). Make a new one and replace GITHUB_TOKEN.';
+    if (res.status === 403 || res.status === 404) return `The GitHub token in Vercel can’t see the ${REPO} repo (GitHub said ${res.status}). Make a token that includes this repo with “Contents: Read and write”.`;
+    return `GitHub error ${res.status}. Try again in a minute.`;
+  } catch { return 'Couldn’t reach GitHub. Try again in a minute.'; }
+}
