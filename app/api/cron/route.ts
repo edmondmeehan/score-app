@@ -38,6 +38,9 @@ export async function GET(request: NextRequest) {
       // Right after the Drop flips (00:00 UTC = 7pm ET winter / 8pm summer): build everyone's Drop in small batches first,
       // so members opening the app all at once only read a finished list. Then push, then the email.
       out.drops_built = await buildDrops(sb, secret, 40_000);
+      // App Review account: fresh demo Drop, likes topped up, a new message from Nadia (lib: migration 0085).
+      const rv = await sb.rpc('reviewer_refresh', { p_secret: secret });
+      out.reviewer = rv.data ?? rv.error?.message;
       const dropReady = await sb.rpc('queue_drop_ready', { p_secret: secret });
       out.drop_ready = dropReady.data ?? dropReady.error?.message;
       const rows = await claim('daily_drop');
