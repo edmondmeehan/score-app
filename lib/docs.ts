@@ -186,6 +186,7 @@ export const DOCS: Record<string, Doc> = {
           'Biometric data held by our partners: deleted within 30 days of verification, or sooner when you delete your account.',
           'Notifications: removed after 90 days.',
           'Server error reports: deleted after 30 days.',
+          'Backups: encrypted copies of our database and photos, kept off-site so we can recover from an outage, are deleted after 28 days. Data you delete leaves our backups within that time.',
           'Verification security signals (IP address, approximate location, device): deleted after 180 days.',
           'Profile views and screenshot events: kept while your account is open, and erased with it.',
           'Chat photos: kept with the conversation, and erased when your account is deleted.',

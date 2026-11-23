@@ -1,0 +1,116 @@
+# Off-site backups of the LIVE ScoreDate database (and member photos) to Backblaze B2.
+# Runs twice a day. At launch, change the schedule to hourly (see docs/BACKUPS.md).
+# Every backup is encrypted before it leaves GitHub, so Backblaze only ever holds unreadable files.
+#
+# GitHub → score-app → Settings → Secrets and variables → Actions → New repository secret:
+#   LIVE_DB_URL         Supabase → Connect → "Session pooler" connection string (with the DB password filled in)
+#   BACKUP_PASSPHRASE   A long random passphrase. Keep a copy in your password manager: without it backups can't be opened.
+#   B2_KEY_ID           Backblaze application key ID (key limited to the backup bucket)
+#   B2_APP_KEY          Backblaze application key
+#   B2_BUCKET           Bucket name, e.g. scoredate-backups
+#   B2_ENDPOINT         The bucket's S3 endpoint, e.g. https://s3.us-east-005.backblazeb2.com
+# Optional, for photos:
+#   SUPABASE_S3_ENDPOINT, SUPABASE_S3_KEY_ID, SUPABASE_S3_SECRET  (Supabase → Storage → S3 connection)
+
+name: Backup to Backblaze
+
+on:
+  schedule:
+    - cron: '17 4,16 * * *'   # 4:17 and 16:17 UTC (11:17 PM and 11:17 AM New York). Hourly at launch: '17 * * * *'
+  workflow_dispatch: {}       # "Run workflow" button for an on-demand backup
+
+concurrency:
+  group: backup
+  cancel-in-progress: false
+
+jobs:
+  database:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      LIVE_DB_URL: ${{ secrets.LIVE_DB_URL }}
+      BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.B2_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.B2_APP_KEY }}
+      AWS_DEFAULT_REGION: us-east-1
+      B2_BUCKET: ${{ secrets.B2_BUCKET }}
+      B2_ENDPOINT: ${{ secrets.B2_ENDPOINT }}
+    steps:
+      - name: Check settings
+        run: |
+          for v in LIVE_DB_URL BACKUP_PASSPHRASE AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY B2_BUCKET B2_ENDPOINT; do
+            if [ -z "${!v}" ]; then echo "::error::Missing secret for $v (see the top of .github/workflows/backup.yml)"; exit 1; fi
+          done
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Dump the database (roles, schema, data)
+        run: |
+          set -euo pipefail
+          STAMP=$(date -u +%Y-%m-%dT%H%MZ)
+          echo "STAMP=$STAMP" >> "$GITHUB_ENV"
+          mkdir -p out/$STAMP
+          supabase db dump --db-url "$LIVE_DB_URL" --role-only -f out/$STAMP/roles.sql
+          supabase db dump --db-url "$LIVE_DB_URL" -f out/$STAMP/schema.sql
+          supabase db dump --db-url "$LIVE_DB_URL" --data-only --use-copy -f out/$STAMP/data.sql
+          # Sanity check: the data file must actually contain member profiles.
+          grep -q 'COPY "public"."profiles"' out/$STAMP/data.sql || { echo "::error::Backup looks empty (no profiles)"; exit 1; }
+          tar -C out -czf scoredate-$STAMP.tar.gz $STAMP
+          ls -lh scoredate-$STAMP.tar.gz
+
+      - name: Encrypt
+        run: |
+          set -euo pipefail
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$BACKUP_PASSPHRASE" \
+            --symmetric --cipher-algo AES256 -o scoredate-$STAMP.tar.gz.gpg scoredate-$STAMP.tar.gz
+          sha256sum scoredate-$STAMP.tar.gz.gpg | tee scoredate-$STAMP.sha256
+          rm -rf out scoredate-$STAMP.tar.gz
+
+      - name: Upload to Backblaze
+        run: |
+          set -euo pipefail
+          DAY=$(date -u +%Y/%m/%d)
+          aws s3 cp scoredate-$STAMP.tar.gz.gpg "s3://$B2_BUCKET/database/$DAY/" --endpoint-url "$B2_ENDPOINT" --only-show-errors
+          aws s3 cp scoredate-$STAMP.sha256 "s3://$B2_BUCKET/database/$DAY/" --endpoint-url "$B2_ENDPOINT" --only-show-errors
+          echo "Saved database/$DAY/scoredate-$STAMP.tar.gz.gpg" >> "$GITHUB_STEP_SUMMARY"
+
+  photos:
+    # Member photos and videos from Supabase Storage. Copies only new/changed files, twice a day (skipped on hourly runs).
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '17 4,16 * * *' }}
+    env:
+      SRC_ENDPOINT: ${{ secrets.SUPABASE_S3_ENDPOINT }}
+      SRC_KEY: ${{ secrets.SUPABASE_S3_KEY_ID }}
+      SRC_SECRET: ${{ secrets.SUPABASE_S3_SECRET }}
+      DST_KEY: ${{ secrets.B2_KEY_ID }}
+      DST_SECRET: ${{ secrets.B2_APP_KEY }}
+      DST_ENDPOINT: ${{ secrets.B2_ENDPOINT }}
+      B2_BUCKET: ${{ secrets.B2_BUCKET }}
+      BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+    steps:
+      - name: Skip if photo backup isn't set up
+        id: check
+        run: |
+          if [ -z "$SRC_ENDPOINT" ] || [ -z "$SRC_KEY" ] || [ -z "$SRC_SECRET" ]; then
+            echo "Photo backup not set up yet (add the SUPABASE_S3_* secrets)." >> "$GITHUB_STEP_SUMMARY"; echo "run=no" >> "$GITHUB_OUTPUT"
+          else echo "run=yes" >> "$GITHUB_OUTPUT"; fi
+      - name: Install rclone
+        if: steps.check.outputs.run == 'yes'
+        run: curl -fsSL https://rclone.org/install.sh | sudo bash
+      - name: Sync photos (encrypted)
+        if: steps.check.outputs.run == 'yes'
+        run: |
+          set -euo pipefail
+          export RCLONE_CONFIG_SB_TYPE=s3 RCLONE_CONFIG_SB_PROVIDER=Other RCLONE_CONFIG_SB_ENDPOINT="$SRC_ENDPOINT" \
+                 RCLONE_CONFIG_SB_ACCESS_KEY_ID="$SRC_KEY" RCLONE_CONFIG_SB_SECRET_ACCESS_KEY="$SRC_SECRET" RCLONE_CONFIG_SB_REGION=us-east-1
+          export RCLONE_CONFIG_B2_TYPE=s3 RCLONE_CONFIG_B2_PROVIDER=Other RCLONE_CONFIG_B2_ENDPOINT="$DST_ENDPOINT" \
+                 RCLONE_CONFIG_B2_ACCESS_KEY_ID="$DST_KEY" RCLONE_CONFIG_B2_SECRET_ACCESS_KEY="$DST_SECRET"
+          export RCLONE_CONFIG_ENC_TYPE=crypt RCLONE_CONFIG_ENC_REMOTE="b2:$B2_BUCKET/storage"
+          export RCLONE_CONFIG_ENC_PASSWORD="$(rclone obscure "$BACKUP_PASSPHRASE")"
+          # sync: photos deleted in the app are removed here too (Backblaze keeps the old version a few days via the lifecycle rule),
+          # so deleted accounts are fully gone within our 30-day promise.
+          rclone sync sb: enc: --fast-list --transfers 16 --stats-one-line --stats 30s
+          echo "Photos copied." >> "$GITHUB_STEP_SUMMARY"
