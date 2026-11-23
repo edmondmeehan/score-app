@@ -5,7 +5,7 @@ export type Doc = { title: string; eyebrow: string; summary: string; updated: st
 
 const COMPANY = 'ScoreDate, LLC';
 const ADDRESS = '1133 Broadway, Suite 1301, New York, NY 10010';
-const UPDATED = 'November 8, 2026';
+const UPDATED = 'November 22, 2026';
 const DRAFT = true; // flip to false once counsel has reviewed
 
 export const DOCS: Record<string, Doc> = {
@@ -111,6 +111,7 @@ export const DOCS: Record<string, Doc> = {
           'Your **ID images and ID selfie stay with our verification partner**, not on ScoreDate’s servers.',
           'We **don’t sell** your personal information. On our public website we use Meta and Google ad tags to measure whether our ads bring people to the waitlist, and you can opt out any time. They never run inside the ScoreDate app.',
           'Other members only ever see what’s on your profile. The member map shows **neighborhoods, never people**, and only for groups of 25 or more.',
+          '**Sensitive details** (religion, political views, who you want to date, and the selfie face check) are used only to run ScoreDate and match you, never for advertising. Religion and politics are optional.',
           'You can delete your account any time in Settings.',
         ] },
       ] },
@@ -119,7 +120,8 @@ export const DOCS: Record<string, Doc> = {
         { ul: [
           'Waitlist details: name, email, zip code, what you do, and an invite or referral code if you have one.',
           'Account and profile: name, birth year, gender, who you’d like to meet, photos, job, neighborhood, prompts, money values, optional song and Instagram handle.',
-          'Messages, photos you send in chat, Notes, likes, date plans and event RSVPs you send through ScoreDate.',
+          'Messages, photos you send in chat, reactions to messages, Notes, likes, date plans and event RSVPs you send through ScoreDate.',
+          'At events: when your member pass is scanned at the door (check-in), the people you tap a heart on (kept private unless they tap you too, which opens a chat), hellos you send to members who are there, and whether you chose “Hide me” for that event. Only checked-in or going members who match your preferences can see you, and never across a block.',
           'Answers you give in Hot or Financially Compatible rounds, and any $50 Date Challenge story you choose to submit.',
           'Event and date locations you enter, which are completed using Google Places.',
           'Optional profile details you choose to add, such as what you’re looking for, pets, religion and political views, your prompts and your “My NYC” places. Religion and politics are shown on your profile only if you pick them, and you can remove them any time. If you turn on “This matters to me”, we use your answer to show you only members who share it, and to show you only to them.',
@@ -148,6 +150,16 @@ export const DOCS: Record<string, Doc> = {
           'Purchase records from Apple, Google and RevenueCat: product, price, store and renewal status. We never see your card number.',
         ] },
       ] },
+      { id: 'sensitive', h: 'Sensitive information', body: [
+        'Some of what you share is sensitive under privacy laws and Apple’s rules. We use it only for the purpose listed, never for advertising, and we never sell or share it with advertisers.',
+        { ul: [
+          '**Religion and political views** (optional): shown on your profile if you add them, and used for the “This matters to me” filter if you turn it on. Remove them any time.',
+          '**Who you want to date** (which can reveal your sexual orientation): used to show you, and show you to, the people you want to meet.',
+          '**Face data** from the selfie check: used only to verify your identity and that your photos are you. See the [Biometric Data Policy](/legal/biometric).',
+          '**Credit band**: shown on your profile and used for matching. We never receive or store your exact score or credit report.',
+        ] },
+        'By adding these details you consent to this use. You can withdraw consent by removing the detail, or for face data and your band, by deleting your account.',
+      ] },
       { id: 'use', h: 'How we use it', body: [
         { ul: [
           'To run ScoreDate: create your account, verify you, build your Daily Drop, deliver messages, and process memberships.',
@@ -167,8 +179,10 @@ export const DOCS: Record<string, Doc> = {
           'identity verification (ID and selfie checks);',
           'credit data (soft-inquiry band and trend);',
           'Amazon Web Services (photo matching);',
-          'Supabase and Vercel (hosting and databases, in the United States);',
-          'Resend (email delivery), Google Firebase Cloud Messaging and Apple Push Notification service (app notifications), and web push services operated by your browser or phone maker;',
+          'Supabase and Vercel (hosting and databases, in the United States, and anonymous page-speed measurements);',
+          'Backblaze, with GitHub running the backup job (encrypted off-site backups of our database and photos; they’re encrypted before they leave our systems, so neither can read them);',
+          'Cloudflare Turnstile (a bot check on our waitlist and sign-up forms; it sees your browser, device and IP address to tell people from bots);',
+          'Resend (all ScoreDate emails, including sign-in, confirmation and password-reset emails), Google Firebase Cloud Messaging and Apple Push Notification service (app notifications), and web push services operated by your browser or phone maker;',
           'Google Maps Platform (address search, maps, and place photos, hours and links for date spots, loaded from Google when you view them);',
           'Apple, Google and RevenueCat (subscriptions and purchases);',
           'CARTO and OpenStreetMap (map tiles; they see that a map was loaded, not who you are);',
@@ -189,7 +203,8 @@ export const DOCS: Record<string, Doc> = {
           'Backups: encrypted copies of our database and photos, kept off-site so we can recover from an outage, are deleted after 28 days. Data you delete leaves our backups within that time.',
           'Verification security signals (IP address, approximate location, device): deleted after 180 days.',
           'Profile views and screenshot events: kept while your account is open, and erased with it.',
-          'Chat photos: kept with the conversation, and erased when your account is deleted.',
+          'Chat photos and message reactions: kept with the conversation, and erased when your account is deleted.',
+          'Event check-ins, hearts and hellos: kept with the event’s history, and erased when your account is deleted.',
           'Waitlist entries: until you join, ask us to remove you, or we close the waitlist.',
         ] },
       ] },
@@ -227,6 +242,9 @@ export const DOCS: Record<string, Doc> = {
           '**Email:** choose which emails you get in Settings, or use the unsubscribe link in any email.',
           '**Notifications:** turn push on or off per device, choose categories, and keep quiet hours on.',
           '**Member map:** Settings → Privacy → leave me off the member map.',
+          '**Religion and politics:** add, change or remove them on your profile, and turn the “This matters to me” filter on or off.',
+          '**At events:** tap “Hide me” on an event to leave Who’s going and Who’s here for that event.',
+          '**Download your data:** Settings → Your data → Download my data.',
           '**Block and report:** from any profile or chat.',
         ] },
       ] },
